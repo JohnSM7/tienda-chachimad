@@ -1,11 +1,39 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="CHACHI MAD STUDIO | Home">
+    <main class="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
+        
+        <div class="absolute inset-0 z-0">
+            <img 
+                src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop" 
+                alt="Background Art" 
+                class="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all duration-[3s] scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60"></div>
+        </div>
+
+        <div class="z-10 text-center space-y-6 px-4">
+            <p class="text-gray-400 text-xs tracking-[0.5em] uppercase animate-pulse">Nuevo Drop Disponible</p>
+            
+            <h1 class="text-6xl md:text-9xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl">
+                One Piece<br/>
+            </h1>
+			<h2 class="text-6xl md:text-6xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl">
+                EggHead Arc Collection
+            </h2>
+            
+            <div class="pt-8">
+                <a href="/shop" class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black">
+                    <span class="absolute inset-0 border-0 group-hover:border-[25px] ease-linear duration-100 transition-all border-white rounded-full"></span>
+                    <span class="relative w-full text-left uppercase tracking-[0.2em] text-sm font-bold">Entra a la tienda</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="absolute bottom-8 w-full text-center text-gray-600 text-[10px] tracking-[0.3em] uppercase z-10">
+            Limited Edition • 2026
+        </div>
+    </main>
 </Layout>

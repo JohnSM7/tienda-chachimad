@@ -1,0 +1,65 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { products } from '../../data/products';
+
+// ESTO ES NUEVO: Le decimos a Astro qué páginas generar basadas en nuestro archivo local
+export function getStaticPaths() {
+  return products.map((product) => ({
+    params: { id: product.id },
+    props: { product },
+  }));
+}
+
+// Ya no buscamos en Firebase, recibimos el producto directamente de getStaticPaths
+const { product } = Astro.props;
+---
+
+<Layout title={`${product.name} | Detail`}>
+    <main class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        
+        <div class="h-[50vh] lg:h-screen bg-zinc-900/20 flex items-center justify-center p-6 lg:p-0 relative overflow-hidden group">
+             <a href="/shop" class="absolute top-24 left-6 text-white text-[10px] uppercase tracking-widest lg:hidden z-20 border border-white/20 px-3 py-1 bg-black/50 backdrop-blur">Back</a>
+
+            <img 
+                src={product.image} 
+                alt={product.name}
+                class="max-h-[80%] max-w-[90%] object-contain shadow-[0_0_100px_rgba(0,0,0,0.5)] group-hover:scale-[1.02] transition duration-700"
+                transition:name={`image-${product.id}`}
+            />
+        </div>
+
+        <div class="h-auto lg:h-screen bg-black flex flex-col justify-center p-8 lg:p-24 border-l border-zinc-900 relative">
+            
+            <a href="/shop" class="hidden lg:inline-block absolute top-28 left-12 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition">← Back to Collection</a>
+            
+            <div class="mb-auto mt-12 lg:mt-0"></div>
+
+            <h1 class="text-4xl lg:text-7xl font-bold uppercase mb-4 leading-[0.9] tracking-tighter">{product.name}</h1>
+            <p class="text-2xl text-gray-400 font-light mb-12 tracking-wider font-mono">{product.price}€</p>
+
+            <div class="space-y-6 text-gray-400 text-sm tracking-wide leading-relaxed mb-16 border-t border-white/10 pt-8 max-w-md">
+                <p>{product.description || "Pieza única de la colección demo."}</p>
+                <ul class="space-y-2 text-xs uppercase tracking-widest text-gray-500 list-disc list-inside">
+                    <li>Estado: {product.status === 'sold' ? 'Vendido' : 'Disponible'}</li>
+                    <li>Soporte: Lienzo Demo</li>
+                    <li>Envío: Simulación</li>
+                </ul>
+            </div>
+
+            <div class="mb-auto">
+                {product.status === 'available' ? (
+                    <button 
+                        class="block w-full bg-white text-black text-center py-5 text-sm font-bold uppercase tracking-[0.3em] hover:bg-gray-300 transition duration-300"
+                        onclick="alert('Esto es una demo. Aquí iría a Stripe.')"
+                    >
+                        Acquire Piece
+                    </button>
+                ) : (
+                    <button disabled class="w-full border border-red-900/30 bg-red-900/10 text-red-500 py-5 text-sm font-bold uppercase tracking-[0.3em] cursor-not-allowed">
+                        Sold Out
+                    </button>
+                )}
+            </div>
+        </div>
+    </main>
+</Layout>

@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+// Si estás usando modo demo, mantén esta línea:
+import { products } from '../data/products'; 
+// Si volvieras a Firebase, descomentarías las líneas de abajo y comentarías la de arriba
+// import { db } from '../firebase/client';
+// import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+// const q = query(collection(db, "products"), orderBy('createdAt', 'desc'));
+// const querySnapshot = await getDocs(q);
+// const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+---
+
+<Layout title="SHOP | Collection">
+    <main class="pt-48 pb-20 px-4 max-w-[1920px] mx-auto min-h-screen">
+        
+        <header class="flex justify-between items-end mb-10 border-b border-white/10 pb-4">
+            <h2 class="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Mis Trabajos</h2>
+            <span class="font-mono text-gray-500 text-xs">{products.length} WORKS</span>
+        </header>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
+            {products.map((product) => (
+                <a href={`/product/${product.id}`} class="group block relative">
+                    
+                    <div class="aspect-[3/4] overflow-hidden bg-gray-900 relative">
+                        <img 
+                            src={product.image} 
+                            alt={product.name}
+                            class={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${product.status === 'sold' ? 'grayscale opacity-50' : ''}`}
+                            transition:name={`image-${product.id}`}
+                        />
+                        
+                        {product.status === 'sold' && (
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+                                <span class="border border-white text-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest">Sold</span>
+                            </div>
+                        )}
+                        
+                        <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                    </div>
+
+                    <div class="mt-3 flex justify-between items-start uppercase tracking-wider">
+                        <div class="pr-2">
+                            <h3 class="text-xs md:text-sm font-bold text-white group-hover:text-gray-400 transition truncate w-full">{product.name}</h3>
+                            <p class="text-[9px] md:text-[10px] text-gray-600 mt-0.5">Óleo / 2026</p>
+                        </div>
+                        <span class="text-xs md:text-sm text-white font-light">{product.price}€</span>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </main>
+</Layout>

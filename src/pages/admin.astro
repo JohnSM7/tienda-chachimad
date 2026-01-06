@@ -1,0 +1,80 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Admin Panel">
+    <div class="pt-32 px-4 max-w-xl mx-auto min-h-screen">
+        <h1 class="text-3xl text-white mb-8 border-b border-gray-800 pb-4 tracking-widest uppercase">Add Product</h1>
+        
+        <form id="add-form" class="space-y-6 bg-zinc-900/30 p-8 border border-zinc-800 backdrop-blur-sm">
+            
+            <div class="space-y-2">
+                <label class="text-xs uppercase tracking-widest text-gray-500">Nombre</label>
+                <input type="text" name="name" class="w-full bg-black border border-gray-700 p-3 text-white focus:border-white outline-none transition" placeholder="EJ: ETERNAL VOID" required>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-xs uppercase tracking-widest text-gray-500">Precio (€)</label>
+                    <input type="number" name="price" class="w-full bg-black border border-gray-700 p-3 text-white focus:border-white outline-none" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs uppercase tracking-widest text-gray-500">Estado</label>
+                    <select name="status" class="w-full bg-black border border-gray-700 p-3 text-white focus:border-white outline-none">
+                        <option value="available">Disponible</option>
+                        <option value="sold">Vendido</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs uppercase tracking-widest text-gray-500">URL Imagen</label>
+                <input type="url" name="image" class="w-full bg-black border border-gray-700 p-3 text-white focus:border-white outline-none" placeholder="https://..." required>
+                <p class="text-[10px] text-gray-600">Tip: Usa enlaces de Unsplash o sube fotos a Imgur y pega el link.</p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs uppercase tracking-widest text-gray-500">Stripe Link</label>
+                <input type="url" name="stripeLink" class="w-full bg-black border border-gray-700 p-3 text-white focus:border-white outline-none" placeholder="Link de pago de Stripe" required>
+            </div>
+
+            <button type="submit" class="w-full bg-white text-black font-bold uppercase tracking-[0.2em] py-4 hover:bg-gray-300 transition mt-4">
+                Publicar
+            </button>
+        </form>
+    </div>
+</Layout>
+
+<script>
+    import { db } from '../firebase/client';
+    import { collection, addDoc } from 'firebase/firestore';
+
+    const form = document.getElementById('add-form') as HTMLFormElement;
+    
+    if(form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const btn = form.querySelector('button');
+            if (btn) btn.textContent = "Subiendo...";
+            
+            try {
+                await addDoc(collection(db, "products"), {
+                    name: formData.get('name'),
+                    price: Number(formData.get('price')),
+                    status: formData.get('status'),
+                    image: formData.get('image'),
+                    stripeLink: formData.get('stripeLink'),
+                    createdAt: new Date()
+                });
+                alert('¡Producto creado!');
+                form.reset();
+            } catch (error) {
+                console.error(error);
+                alert('Error al subir');
+            } finally {
+                if (btn) btn.textContent = "PUBLICAR";
+            }
+        });
+    }
+</script>
