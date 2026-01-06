@@ -44,7 +44,7 @@ import Layout from '../layouts/Layout.astro';
         </form>
     </div>
 </Layout>
-
+<!-- 
 <script>
     import { db } from '../firebase/client';
     import { collection, addDoc } from 'firebase/firestore';
@@ -75,6 +75,17 @@ import Layout from '../layouts/Layout.astro';
             } finally {
                 if (btn) btn.textContent = "PUBLICAR";
             }
+        });
+    }
+</script>-->
+
+<script>
+    // Script falso para modo demo
+    const form = document.getElementById('add-form');
+    if(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("⚠️ MODO DEMO: No hay base de datos conectada. El producto no se guardará.");
         });
     }
 </script>
