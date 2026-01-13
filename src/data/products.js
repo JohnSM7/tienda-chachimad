@@ -5,7 +5,7 @@ export const products = [
         name: "Luffy Gangsta",
         price: 35,
         status: "available",
-        image: "../public/images/LuffyGang.jpeg",
+        image: "/images/LuffyGang.jpeg",
         stripeLink: "#",
         description: "Obra con brillos en los dientes de Luffy Gear 5"
     },
