@@ -70,7 +70,7 @@ Si el archivo es foto.jpg y pides Foto.jpg -> Fallará.
 
 Asegúrate de que la extensión (.jpg, .png, .jpeg) coincida exactamente.
 
-📦 Estructura de Datos (Ejemplo)
+## 📦 Estructura de Datos (Ejemplo)
 Los productos se gestionan en un array de objetos. Asegúrate de seguir este esquema para añadir nuevos items:
 
 JavaScript
@@ -86,7 +86,7 @@ export const products = [
         description: "Obra con brillos en los dientes de Luffy Gear 5"
     }
 ];
-☁️ Despliegue en Vercel
+## ☁️ Despliegue en Vercel
 El proyecto está configurado para despliegue continuo (CI/CD).
 
 Sube tus cambios a GitHub:
@@ -100,7 +100,7 @@ Vercel detectará el commit automáticamente y comenzará el "Build".
 
 En unos minutos, los cambios estarán visibles en la URL de producción.
 
-📄 Licencia
+## 📄 Licencia
 Este proyecto está bajo la licencia MIT. Consulta el archivo LICENSE para más detalles.
 
 Hecho con ❤️ por [Susana Juan Madriz y John Sandoval]
