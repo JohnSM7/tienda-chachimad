@@ -86,6 +86,9 @@ export const products = [
         description: "Obra con brillos en los dientes de Luffy Gear 5"
     }
 ];
+
+---
+
 ## ☁️ Despliegue en Vercel
 El proyecto está configurado para despliegue continuo (CI/CD).
 
@@ -99,6 +102,8 @@ git push origin main
 Vercel detectará el commit automáticamente y comenzará el "Build".
 
 En unos minutos, los cambios estarán visibles en la URL de producción.
+
+---
 
 ## 📄 Licencia
 Este proyecto está bajo la licencia MIT. Consulta el archivo LICENSE para más detalles.
