@@ -1,4 +1,4 @@
-# 🎨 [Nombre de tu Proyecto]
+# 🎨 [MADCRY STUDIO]
 
 ![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel&style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)
