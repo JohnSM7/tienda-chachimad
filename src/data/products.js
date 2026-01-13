@@ -2,12 +2,12 @@
 export const products = [
     {
         id: "demo-1",
-        name: "Neon Genesis",
-        price: 150,
+        name: "Luffy Gangsta",
+        price: 35,
         status: "available",
-        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop",
+        image: "../public/images/LuffyGang.jpeg",
         stripeLink: "#",
-        description: "Obra abstracta con tonos neón sobre fondo oscuro."
+        description: "Obra con brillos en los dientes de Luffy Gear 5"
     },
     {
         id: "demo-2",
