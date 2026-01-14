@@ -30,12 +30,29 @@ const { title } = Astro.props;
                 MADCRY | STUDIO
             </a>
 
-            <div class="flex flex-wrap justify-center gap-6 md:gap-10 text-[10px] md:text-xs tracking-[0.25em] uppercase font-light pointer-events-auto">
-                <a href="/" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Home</a>
-                <a href="/shop" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Tienda</a>
-                <a href="/blog" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Blog</a>
-                <a href="/contact" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Contacto</a>
+            <div class="flex flex-wrap justify-center gap-8 md:gap-12 text-[10px] md:text-xs tracking-[0.25em] uppercase font-light pointer-events-auto items-center">
+    
+    <a href="/" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Home</a>
+
+    <div class="relative group">
+        <a href="/shop" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1 py-4 block">
+            Tienda
+        </a>
+        
+        <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[150px] z-50">
+            <div class="bg-black/90 border border-white/10 backdrop-blur-md flex flex-col p-2 text-center shadow-2xl">
+                <a href="/shop?category=one-piece" class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap">One Piece</a>
+                <a href="/shop?category=dragon-ball" class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap">Dragon Ball</a>
+                <a href="/shop?category=hxh" class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap">Hunter x Hunter</a>
+                <a href="/shop?category=custom" class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap">Custom</a>
+                <div class="border-t border-white/10 my-1"></div>
+                <a href="/shop" class="text-white font-bold hover:bg-white/10 py-2 transition px-4 whitespace-nowrap">Ver Todo</a>
             </div>
+        </div>
+    </div>
+    <a href="/blog" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Blog</a>
+    <a href="/contact" class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1">Contacto</a>
+</div>
         </nav>
 
         <div class="flex-grow">

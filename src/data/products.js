@@ -5,35 +5,40 @@ export const products = [
         name: "Luffy Gangsta",
         price: 35,
         status: "available",
+        category: "one-piece", 
         image: "/images/LuffyGang.jpeg",
         stripeLink: "#",
-        description: "Obra con brillos en los dientes de Luffy Gear 5"
+        description: "..."
     },
     {
         id: "demo-2",
-        name: "Silent Void",
-        price: 300,
-        status: "sold", // Este saldrá como vendido
-        image: "https://images.unsplash.com/photo-1507643179173-61786aa320a0?q=80&w=2600&auto=format&fit=crop",
+        name: "Gon Freecss Rage",
+        price: 50,
+        status: "available",
+        category: "hxh",
+        image: "https://imgs.search.brave.com/J2ZNqyPv8lC91BQufVD6qyj0Zym4eRpDlvBTsil8qKE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJhY2Nlc3Mu/Y29tL2Z1bGwvODcw/MTA1OS5wbmc",
         stripeLink: "#",
-        description: "El silencio interpretado en texturas negras."
+        description: "..."
     },
     {
         id: "demo-3",
-        name: "Chaos Theory",
-        price: 220,
+        name: "Goku Drip",
+        price: 40,
         status: "available",
-        image: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=2600&auto=format&fit=crop",
+        category: "dragon-ball", 
+        image: "https://imgs.search.brave.com/kXOWcoDlE1hV086D5EGML5Na-chBH37BfQY1gxsf6CU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmV3YW1lcmljYW5q/YWNrZXRzLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMS8w/NC9Hb2t1LURyaXAt/SmFja2V0LmpwZw",
         stripeLink: "#",
-        description: "Caos ordenado. Óleo sobre lienzo."
+        description: "..."
     },
     {
         id: "demo-4",
-        name: "Urban Decay",
-        price: 180,
+        name: "Custom",
+        price: 100,
         status: "available",
-        image: "https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=2600&auto=format&fit=crop",
+        category: "custom", 
+        image: "https://imgs.search.brave.com/OKBZCvFRHb-5lq_wcqlKCoHgcHfw38kmZZ-blspDk1c/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91cy4x/MjNyZi5jb20vNDUw/d20vdmVyb244ODQv/dmVyb244ODQxOTA1/L3Zlcm9uODg0MTkw/NTAwODg5LzEyMzkz/MjgzMy1zaWduby1k/ZS1pbnRlcnJvZ2Fj/aSVDMyVCM24tc29i/cmUtZm9uZG8tZ3J1/bmdlLWJhbmRlcmEt/cm9qYS1jb24tc2ln/bm8tZGUtcHJlZ3Vu/dGEtYXp1bC1wJUMz/JUIzc3Rlci5qcGc_/dmVyPTY",
         stripeLink: "#",
-        description: "Inspiración industrial y urbana."
-    }
+        description: "..."
+    },
+    // ... resto de productos
 ];

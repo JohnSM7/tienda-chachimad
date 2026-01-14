@@ -1,53 +1,169 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// Si estás usando modo demo, mantén esta línea:
-import { products } from '../data/products'; 
-// Si volvieras a Firebase, descomentarías las líneas de abajo y comentarías la de arriba
-// import { db } from '../firebase/client';
-// import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-// const q = query(collection(db, "products"), orderBy('createdAt', 'desc'));
-// const querySnapshot = await getDocs(q);
-// const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+import { products } from '../data/products';
+
+// Definimos las categorías disponibles para generar los botones automáticamente
+const categories = [
+  { id: 'all', name: 'Todo' },
+  { id: 'one-piece', name: 'One Piece' },
+  { id: 'dragon-ball', name: 'Dragon Ball' },
+  { id: 'hxh', name: 'Hunter x Hunter' },
+  { id: 'custom', name: 'Custom' },
+];
 ---
 
-<Layout title="SHOP | Collection">
-    <main class="pt-48 pb-20 px-4 max-w-[1920px] mx-auto min-h-screen">
-        
-        <header class="flex justify-between items-end mb-10 border-b border-white/10 pb-4">
-            <h2 class="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Mis Trabajos</h2>
-            <span class="font-mono text-gray-500 text-xs">{products.length} WORKS</span>
-        </header>
+<Layout title="CHACHI MAD STUDIO | Shop">
+    <header class="relative w-full h-[35vh] flex flex-col justify-center items-center overflow-hidden border-b border-white/10">
+        <div class="absolute inset-0 z-0 bg-neutral-900">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 via-black/0 to-black"></div>
+        </div>
+        <div class="z-10 text-center space-y-4 px-4 mt-16">
+            <h1 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter text-white">Colección</h1>
+            <p class="text-gray-400 text-xs tracking-[0.5em] uppercase">Piezas exclusivas • 1/1</p>
+        </div>
+    </header>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
+    <section class="max-w-7xl mx-auto px-4 py-12 min-h-screen">
+
+
+        <!--  MENU FLOTANTE DE CATEGORÍAS (DESACTIVADO)
+
+        <div class="flex flex-wrap justify-center gap-6 mb-16">
+            {categories.map((cat) => (
+                <button 
+                    class="filter-btn text-xs md:text-sm uppercase tracking-[0.2em] text-gray-500 hover:text-white transition-colors duration-300 pb-1 border-b border-transparent hover:border-white focus:outline-none"
+                    data-filter={cat.id}
+                >
+                    {cat.name}
+                </button>
+            ))}
+        </div>
+        -->
+
+        
+
+        <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {products.map((product) => (
-                <a href={`/product/${product.id}`} class="group block relative">
-                    
-                    <div class="aspect-[3/4] overflow-hidden bg-gray-900 relative">
+                <article 
+                    class="product-item group relative flex flex-col gap-4 transition-all duration-500" 
+                    data-category={product.category} 
+                >
+                    <a href={`/product/${product.id}`} class="block relative aspect-[4/5] overflow-hidden bg-zinc-900 border border-white/5">
+                        {product.status === 'sold' && (
+                            <div class="absolute top-4 right-4 z-20 bg-white text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">Sold Out</div>
+                        )}
+                        
                         <img 
                             src={product.image} 
                             alt={product.name}
-                            class={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${product.status === 'sold' ? 'grayscale opacity-50' : ''}`}
                             transition:name={`image-${product.id}`}
+                            class={`w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 ${product.status === 'sold' ? 'grayscale opacity-50' : 'grayscale group-hover:grayscale-0'}`}
                         />
                         
-                        {product.status === 'sold' && (
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-                                <span class="border border-white text-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest">Sold</span>
+                        {product.status === 'available' && (
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="border border-white px-6 py-2 text-white text-xs uppercase tracking-[0.2em] backdrop-blur-sm">Ver Obra</span>
                             </div>
                         )}
-                        
-                        <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition duration-300"></div>
-                    </div>
+                    </a>
 
-                    <div class="mt-3 flex justify-between items-start uppercase tracking-wider">
-                        <div class="pr-2">
-                            <h3 class="text-xs md:text-sm font-bold text-white group-hover:text-gray-400 transition truncate w-full">{product.name}</h3>
-                            <p class="text-[9px] md:text-[10px] text-gray-600 mt-0.5">Óleo / 2026</p>
+                    <div class="flex justify-between items-start pt-2">
+                        <div class="space-y-1">
+                            <h3 class="text-xl text-white font-medium uppercase tracking-wide group-hover:text-gray-300 transition">{product.name}</h3>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider line-clamp-1">{product.description}</p>
                         </div>
-                        <span class="text-xs md:text-sm text-white font-light">{product.price}€</span>
+                        <div class="text-right">
+                            <span class="block text-xl text-white font-bold tracking-widest">{product.price}€</span>
+                        </div>
                     </div>
-                </a>
+                </article>
             ))}
         </div>
-    </main>
+
+        <div id="no-results" class="hidden text-center py-20">
+            <p class="text-gray-500 uppercase tracking-widest">No hay obras en esta categoría aún.</p>
+        </div>
+
+    </section>
 </Layout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const buttons = document.querySelectorAll('.filter-btn');
+        const items = document.querySelectorAll('.product-item');
+        const noResults = document.getElementById('no-results');
+
+        // Función principal de filtrado
+        function filterProducts(category) {
+            // 1. Actualizar visualmente los botones
+            buttons.forEach(btn => {
+                const btnCategory = btn.getAttribute('data-filter');
+                if (btnCategory === category) {
+                    btn.classList.remove('text-gray-500', 'border-transparent');
+                    btn.classList.add('text-white', 'border-white', 'border-b');
+                } else {
+                    btn.classList.remove('text-white', 'border-white', 'border-b');
+                    btn.classList.add('text-gray-500', 'border-transparent');
+                }
+            });
+
+            // 2. Filtrar los items
+            let visibleCount = 0;
+            items.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                
+                if (category === 'all' || category === itemCategory) {
+                    item.classList.remove('hidden');
+                    item.classList.add('flex');
+                    // Resetear animación para que se vea siempre
+                    item.style.animation = 'none';
+                    item.offsetHeight; /* trigger reflow */
+                    item.style.animation = 'fadeIn 0.5s ease-out forwards'; 
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                    item.classList.remove('flex');
+                }
+            });
+
+            // 3. Mensaje de vacío
+            if (visibleCount === 0 && noResults) {
+                noResults.classList.remove('hidden');
+            } else if (noResults) {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // --- LÓGICA DE URL ---
+        // Leer si hay un parámetro en la URL (ej: ?category=one-piece)
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFromUrl = urlParams.get('category');
+
+        if (categoryFromUrl) {
+            // Si hay categoría en la URL, filtramos por esa
+            filterProducts(categoryFromUrl);
+        } else {
+            // Si no, activamos "Todo" por defecto (primer botón)
+            buttons[0].classList.add('text-white', 'border-white', 'border-b');
+        }
+
+        // --- EVENT LISTENER DE CLICS ---
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filterValue = btn.getAttribute('data-filter');
+                filterProducts(filterValue);
+                
+                // Opcional: Actualizar la URL sin recargar la página para que se pueda compartir el link
+                const newUrl = filterValue === 'all' ? '/shop' : `/shop?category=${filterValue}`;
+                window.history.pushState({}, '', newUrl);
+            });
+        });
+    });
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
