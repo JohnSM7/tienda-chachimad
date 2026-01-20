@@ -1,57 +1,68 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { posts } from '../data/posts'; 
+import Layout from "../layouts/Layout.astro";
+import { posts } from "../data/posts";
 ---
 
 <Layout title="MADCRY STUDIO | Journal">
-    
-    <header class="pt-32 pb-16 px-6 text-center border-b border-white/10">
-        <h1 class="text-5xl md:text-8xl font-bold uppercase tracking-tighter text-white mb-4">
+    <header class="pt-52 pb-16 px-6 text-center border-b border-white/10">
+        <h1
+            class="text-5xl md:text-8xl font-bold uppercase tracking-tighter text-white mb-4"
+        >
             The Journal
         </h1>
-        <p class="text-gray-500 text-xs md:text-sm tracking-[0.3em] uppercase max-w-2xl mx-auto">
+        <p
+            class="text-gray-500 text-xs md:text-sm tracking-[0.3em] uppercase max-w-2xl mx-auto"
+        >
             Pensamientos, procesos y caos ordenado.
         </p>
     </header>
 
     <section class="max-w-7xl mx-auto px-6 py-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-            
-            {posts.map((post) => (
-                // AHORA SI: Usamos <a> en lugar de <article> para que sea clicable
-                <a href={`/blog/${post.id}`} class="group block cursor-pointer">
-                    
-                    <div class="overflow-hidden mb-6 border border-white/5 relative aspect-video">
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition z-10"></div>
-                        <img 
-                            src={post.image} 
-                            alt={post.title}
-                            transition:name={`post-img-${post.id}`} 
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
-                        />
-                    </div>
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"
+        >
+            {
+                posts.map((post) => (
+                    // AHORA SI: Usamos <a> en lugar de <article> para que sea clicable
+                    <a
+                        href={`/blog/${post.id}`}
+                        class="group block cursor-pointer"
+                    >
+                        <div class="overflow-hidden mb-6 border border-white/5 relative aspect-video">
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition z-10" />
+                            <img
+                                src={post.image}
+                                alt={post.title}
+                                transition:name={`post-img-${post.id}`}
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
+                            />
+                        </div>
 
-                    <div class="flex items-center gap-4 text-[10px] uppercase tracking-widest text-gray-500 mb-3">
-                        <span class="group-hover:text-white transition">{post.date}</span>
-                        <span class="w-8 h-[1px] bg-gray-700"></span>
-                        <span class="group-hover:text-white transition">{post.category}</span>
-                    </div>
+                        <div class="flex items-center gap-4 text-[10px] uppercase tracking-widest text-gray-500 mb-3">
+                            <span class="group-hover:text-white transition">
+                                {post.date}
+                            </span>
+                            <span class="w-8 h-[1px] bg-gray-700" />
+                            <span class="group-hover:text-white transition">
+                                {post.category}
+                            </span>
+                        </div>
 
-                    <h2 class="text-2xl text-white font-bold uppercase leading-tight mb-3 group-hover:text-gray-300 transition">
-                        {post.title}
-                    </h2>
-                    <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 font-sans group-hover:text-gray-400 transition">
-                        {post.excerpt}
-                    </p>
+                        <h2 class="text-2xl text-white font-bold uppercase leading-tight mb-3 group-hover:text-gray-300 transition">
+                            {post.title}
+                        </h2>
+                        <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 font-sans group-hover:text-gray-400 transition">
+                            {post.excerpt}
+                        </p>
 
-                    <div class="mt-6">
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-white border-b border-white/30 pb-1 group-hover:border-white transition">
-                            Leer Artículo
-                        </span>
-                    </div>
-                </a>
-            ))}
-
+                        <div class="mt-6">
+                            <span class="text-[10px] uppercase tracking-[0.2em] text-white border-b border-white/30 pb-1 group-hover:border-white transition">
+                                Leer Artículo
+                            </span>
+                        </div>
+                    </a>
+                ))
+            }
         </div>
     </section>
 </Layout>
