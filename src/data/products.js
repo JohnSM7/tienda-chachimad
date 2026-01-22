@@ -31,7 +31,27 @@ export const products = [
         description: "..."
     },
     {
+        id: "demo-3",
+        name: "Spiderman Brillante",
+        price: 90,
+        status: "sold",
+        category: "otros",
+        image: "images/spiderman.jpeg",
+        stripeLink: "#",
+        description: "..."
+    },
+    {
         id: "demo-4",
+        name: "One Piece Shadows",
+        price: 70,
+        status: "sold",
+        category: "one-piece",
+        image: "images/onepieceshadows.jpeg",
+        stripeLink: "#",
+        description: "..."
+    },
+    {
+        id: "demo-5",
         name: "Custom",
         price: 100,
         status: "available",
