@@ -3,11 +3,11 @@ export const products = [
     {
         id: "demo-1",
         name: "Luffy Gangsta",
-        price: 35,
+        price: 100,
         status: "available",
-        category: "one-piece", 
+        category: "one-piece",
         image: "/images/LuffyGang.jpeg",
-        stripeLink: "#",
+        stripeLink: "https://buy.stripe.com/test_aFafZhbcK5Sa6Fa2IE5ZC00",
         description: "..."
     },
     {
@@ -25,7 +25,7 @@ export const products = [
         name: "Goku Drip",
         price: 40,
         status: "available",
-        category: "dragon-ball", 
+        category: "dragon-ball",
         image: "https://imgs.search.brave.com/kXOWcoDlE1hV086D5EGML5Na-chBH37BfQY1gxsf6CU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmV3YW1lcmljYW5q/YWNrZXRzLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMS8w/NC9Hb2t1LURyaXAt/SmFja2V0LmpwZw",
         stripeLink: "#",
         description: "..."
@@ -35,7 +35,7 @@ export const products = [
         name: "Custom",
         price: 100,
         status: "available",
-        category: "custom", 
+        category: "custom",
         image: "https://imgs.search.brave.com/OKBZCvFRHb-5lq_wcqlKCoHgcHfw38kmZZ-blspDk1c/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91cy4x/MjNyZi5jb20vNDUw/d20vdmVyb244ODQv/dmVyb244ODQxOTA1/L3Zlcm9uODg0MTkw/NTAwODg5LzEyMzkz/MjgzMy1zaWduby1k/ZS1pbnRlcnJvZ2Fj/aSVDMyVCM24tc29i/cmUtZm9uZG8tZ3J1/bmdlLWJhbmRlcmEt/cm9qYS1jb24tc2ln/bm8tZGUtcHJlZ3Vu/dGEtYXp1bC1wJUMz/JUIzc3Rlci5qcGc_/dmVyPTY",
         stripeLink: "#",
         description: "..."
