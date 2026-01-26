@@ -31,7 +31,7 @@ export const products = [
         description: "..."
     },
     {
-        id: "demo-3",
+        id: "demo-4",
         name: "Spiderman Brillante",
         price: 90,
         status: "sold",
@@ -41,7 +41,7 @@ export const products = [
         description: "..."
     },
     {
-        id: "demo-4",
+        id: "demo-5",
         name: "One Piece Shadows",
         price: 70,
         status: "sold",
@@ -51,7 +51,7 @@ export const products = [
         description: "..."
     },
     {
-        id: "demo-5",
+        id: "demo-6",
         name: "Custom",
         price: 100,
         status: "available",

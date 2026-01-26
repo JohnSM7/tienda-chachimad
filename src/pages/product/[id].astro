@@ -15,7 +15,7 @@ const { product } = Astro.props;
 ---
 
 <Layout title={`${product.name} | Detail`}>
-    <main class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <main class="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-12">
         <div
             class="h-[50vh] lg:h-screen bg-zinc-900/20 flex items-center justify-center p-6 lg:p-0 relative overflow-hidden group"
         >
@@ -28,7 +28,7 @@ const { product } = Astro.props;
             <img
                 src={product.image}
                 alt={product.name}
-                class="max-h-[80%] max-w-[90%] object-contain shadow-[0_0_100px_rgba(0,0,0,0.5)] group-hover:scale-[1.02] transition duration-700"
+                class="max-h-[60%] max-w-[90%] object-contain shadow-[0_0_100px_rgba(0,0,0,0.5)] group-hover:scale-[1.02] transition duration-700"
                 transition:name={`image-${product.id}`}
             />
         </div>

@@ -13,32 +13,21 @@ const { title } = Astro.props;
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-
         <link rel="icon" type="image/png" href="/images/logo.png" />
-
         <title>{title}</title>
-
         <meta
             name="description"
             content="Galería de arte independiente. Piezas únicas y estilo Dark/Anime."
         />
-
         <meta property="og:type" content="website" />
         <meta property="og:url" content={Astro.url} />
         <meta property="og:title" content={title} />
         <meta
             property="og:description"
-            content="Galería de arte independiente. Explorando la oscuridad a través del lienzo."
+            content="Galería de arte independiente."
         />
         <meta property="og:image" content="/images/social-banner.jpg" />
-
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content={title} />
-        <meta
-            property="twitter:description"
-            content="Galería de arte independiente. Explorando la oscuridad a través del lienzo."
-        />
-        <meta property="twitter:image" content="/images/social-banner.jpg" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,7 +42,7 @@ const { title } = Astro.props;
         class="bg-black text-gray-200 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black"
     >
         <nav
-            class="fixed top-0 w-full z-50 px-6 py-6 flex justify-between md:justify-center items-center bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none"
+            class="fixed top-0 w-full z-50 px-6 py-2 flex justify-between md:justify-center items-center bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none"
         >
             <div
                 class="pointer-events-auto z-50 md:w-full flex justify-start md:justify-center"
@@ -65,22 +54,21 @@ const { title } = Astro.props;
                     <img
                         src="/images/logo.png"
                         alt="MADCRY Logo"
-                        class="h-12 md:h-32 w-auto object-contain drop-shadow-lg"
+                        class="h-10 md:h-24 w-auto object-contain drop-shadow-lg"
                     />
-
                     <span
                         class="text-xl md:text-4xl font-bold tracking-[0.2em] uppercase text-white drop-shadow-lg pt-1"
+                        >| STUDIO</span
                     >
-                        | STUDIO
-                    </span>
                 </a>
             </div>
 
             <button
                 id="menu-toggle"
-                class="md:hidden pointer-events-auto text-white focus:outline-none z-50"
+                class="md:hidden pointer-events-auto text-white focus:outline-none z-50 p-2"
             >
                 <svg
+                    id="icon-menu"
                     class="w-8 h-8"
                     fill="none"
                     stroke="currentColor"
@@ -92,10 +80,23 @@ const { title } = Astro.props;
                         stroke-width="1.5"
                         d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
+                <svg
+                    id="icon-close"
+                    class="w-8 h-8 hidden"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="square"
+                        stroke-linejoin="miter"
+                        stroke-width="1.5"
+                        d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
             </button>
 
             <div
-                class="hidden md:flex absolute left-0 w-full justify-center top-32 pointer-events-auto"
+                class="hidden md:flex absolute left-0 w-full justify-center top-24 pointer-events-auto"
             >
                 <div
                     class="flex gap-12 text-xs tracking-[0.25em] uppercase font-light items-center bg-black/50 backdrop-blur-sm px-6 py-2 rounded-full border border-white/5"
@@ -106,44 +107,58 @@ const { title } = Astro.props;
                         >Home</a
                     >
 
-                    <div class="relative group">
-                        <a
-                            href="/shop"
-                            class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1 py-2 block"
+                    <div class="relative" id="desktop-shop-container">
+                        <button
+                            id="shop-toggle-btn"
+                            class="hover:text-white text-gray-400 transition hover:underline underline-offset-4 decoration-1 py-2 flex items-center gap-1 focus:outline-none uppercase tracking-[0.25em]"
                         >
                             Shop
-                        </a>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="w-3 h-3 pt-1"
+                            >
+                                <path
+                                    stroke-linecap="square"
+                                    stroke-linejoin="miter"
+                                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+                            </svg>
+                        </button>
                         <div
-                            class="absolute left-1/2 -translate-x-1/2 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[150px]"
+                            id="shop-dropdown"
+                            class="absolute left-1/2 -translate-x-1/2 top-full pt-4 hidden min-w-[160px]"
                         >
                             <div
                                 class="bg-black/95 border border-white/10 backdrop-blur-md flex flex-col p-2 text-center shadow-2xl"
                             >
                                 <a
                                     href="/shop?category=one-piece"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap"
+                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
                                     >One Piece</a
                                 >
                                 <a
                                     href="/shop?category=dragon-ball"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap"
+                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
                                     >Dragon Ball</a
                                 >
                                 <a
                                     href="/shop?category=hxh"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap"
-                                    >Hunter x Hunter</a
+                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
+                                    >HxH</a
                                 >
                                 <a
                                     href="/shop?category=custom"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition px-4 whitespace-nowrap"
+                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
                                     >Custom</a
                                 >
                                 <div class="border-t border-white/10 my-1">
                                 </div>
                                 <a
                                     href="/shop"
-                                    class="text-white font-bold hover:bg-white/10 py-2 transition px-4 whitespace-nowrap"
+                                    class="text-white font-bold hover:bg-white/10 py-2 block transition"
                                     >Ver Todo</a
                                 >
                             </div>
@@ -166,7 +181,7 @@ const { title } = Astro.props;
 
         <div
             id="mobile-menu"
-            class="fixed inset-0 bg-black z-40 transform translate-x-full transition-transform duration-500 ease-in-out md:hidden flex flex-col justify-start pt-20 px-8 overflow-y-auto"
+            class="fixed inset-0 bg-black z-40 transform translate-x-full transition-transform duration-300 ease-out md:hidden flex flex-col justify-start pt-32 px-8 overflow-y-auto pointer-events-auto"
         >
             <div
                 class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-zinc-800/20 via-black to-black -z-10"
@@ -185,34 +200,32 @@ const { title } = Astro.props;
                         href="/shop"
                         class="text-4xl font-bold uppercase tracking-tighter text-white hover:text-gray-300 transition-colors flex items-center justify-between"
                     >
-                        Tienda
-                        <span
+                        Tienda <span
                             class="text-xs tracking-widest text-gray-500 border border-gray-700 px-2 py-1 rounded-full"
                             >ALL</span
                         >
                     </a>
-
                     <div
                         class="pl-4 border-l border-white/10 flex flex-col space-y-3"
                     >
                         <a
                             href="/shop?category=one-piece"
-                            class="text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
+                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
                             >One Piece</a
                         >
                         <a
                             href="/shop?category=dragon-ball"
-                            class="text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
+                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
                             >Dragon Ball</a
                         >
                         <a
                             href="/shop?category=hxh"
-                            class="text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
+                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
                             >Hunter x Hunter</a
                         >
                         <a
                             href="/shop?category=custom"
-                            class="text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
+                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
                             >Custom</a
                         >
                     </div>
@@ -224,18 +237,13 @@ const { title } = Astro.props;
                     >Journal</a
                 >
                 <a
-                    href="/faq"
-                    class="mobile-link text-4xl font-bold uppercase tracking-tighter text-white/50 hover:text-white transition-colors"
-                    >FAQ</a
-                >
-                <a
                     href="/contact"
                     class="mobile-link text-4xl font-bold uppercase tracking-tighter text-white/50 hover:text-white transition-colors"
                     >Contacto</a
                 >
             </nav>
 
-            <div class="mt-16 pt-8 border-t border-white/10">
+            <div class="mt-16 pt-8 border-t border-white/10 pb-8">
                 <p class="text-[10px] text-gray-600 uppercase tracking-widest">
                     Madcry Studio © 2026
                 </p>
@@ -259,42 +267,9 @@ const { title } = Astro.props;
                     <p
                         class="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto md:mx-0"
                     >
-                        Galería de arte independiente enfocada en piezas únicas
-                        y series limitadas. Explorando la oscuridad y la luz a
-                        través del lienzo.
+                        Galería de arte independiente.
                     </p>
                 </div>
-
-                <div class="space-y-4">
-                    <h5
-                        class="text-xs font-bold uppercase tracking-[0.2em] text-white"
-                    >
-                        Cliente
-                    </h5>
-                    <ul
-                        class="space-y-2 text-xs text-gray-500 uppercase tracking-wider"
-                    >
-                        <li>
-                            <a
-                                href="/shipping"
-                                class="hover:text-white transition"
-                                >Envíos y Entregas</a
-                            >
-                        </li>
-                        <li>
-                            <a href="/faq" class="hover:text-white transition"
-                                >Preguntas Frecuentes</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                href="/contact"
-                                class="hover:text-white transition">Contacto</a
-                            >
-                        </li>
-                    </ul>
-                </div>
-
                 <div class="space-y-4">
                     <h5
                         class="text-xs font-bold uppercase tracking-[0.2em] text-white"
@@ -313,22 +288,16 @@ const { title } = Astro.props;
                             <a
                                 href="/privacidad"
                                 class="hover:text-white transition"
-                                >Política de Privacidad</a
+                                >Privacidad</a
                             >
                         </li>
                         <li>
                             <a href="/terms" class="hover:text-white transition"
-                                >Términos y Condiciones</a
+                                >Términos</a
                             >
                         </li>
                     </ul>
                 </div>
-            </div>
-
-            <div class="mt-16 text-center border-t border-white/5 pt-8">
-                <p class="text-[10px] text-gray-700 uppercase tracking-[0.3em]">
-                    © 2026 Madcry Studio. <br /> Todos los derechos reservados.
-                </p>
             </div>
         </footer>
     </body>
@@ -345,41 +314,77 @@ const { title } = Astro.props;
 </style>
 
 <script>
-    // LÓGICA DEL MENÚ MÓVIL
+    // ESTE SCRIPT SE EJECUTA EN CADA NAVEGACIÓN
     document.addEventListener("astro:page-load", () => {
-        const menuBtn = document.getElementById("menu-toggle");
-        const mobileMenu = document.getElementById("mobile-menu");
-        const links = document.querySelectorAll(".mobile-link"); // Enlaces simples
-        const shopLinks = mobileMenu?.querySelectorAll("a"); // Todos los enlaces del menú móvil
+        // --- 1. CONFIGURACIÓN MENÚ MÓVIL ---
+        const btn = document.getElementById("menu-toggle");
+        const menu = document.getElementById("mobile-menu");
+        const iconMenu = document.getElementById("icon-menu");
+        const iconClose = document.getElementById("icon-close");
+        const mobileLinks = document.querySelectorAll(".mobile-link");
 
-        let isMenuOpen = false;
+        if (btn && menu && iconMenu && iconClose) {
+            btn.onclick = () => {
+                // Toggle Clases
+                const isClosed = menu.classList.contains("translate-x-full");
 
-        if (menuBtn && mobileMenu) {
-            menuBtn.addEventListener("click", () => {
-                isMenuOpen = !isMenuOpen;
-                if (isMenuOpen) {
-                    // Abrir menú
-                    mobileMenu.classList.remove("translate-x-full");
-                    document.body.style.overflow = "hidden"; // Evitar scroll de fondo
-                    // Cambiar icono a X (opcional, simple visual hack)
-                    menuBtn.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                if (isClosed) {
+                    menu.classList.remove("translate-x-full"); // Abrir
+                    document.body.style.overflow = "hidden"; // Bloquear scroll
+                    iconMenu.classList.add("hidden");
+                    iconClose.classList.remove("hidden");
                 } else {
-                    // Cerrar menú
-                    mobileMenu.classList.add("translate-x-full");
-                    document.body.style.overflow = "";
-                    menuBtn.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
+                    menu.classList.add("translate-x-full"); // Cerrar
+                    document.body.style.overflow = ""; // Permitir scroll
+                    iconMenu.classList.remove("hidden");
+                    iconClose.classList.add("hidden");
                 }
-            });
+            };
 
-            // Cerrar menú al hacer click en cualquier enlace
-            shopLinks?.forEach((link) => {
+            // Cerrar al hacer click en un enlace
+            mobileLinks.forEach((link) => {
                 link.addEventListener("click", () => {
-                    isMenuOpen = false;
-                    mobileMenu.classList.add("translate-x-full");
+                    menu.classList.add("translate-x-full");
                     document.body.style.overflow = "";
-                    menuBtn.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
+                    iconMenu.classList.remove("hidden");
+                    iconClose.classList.add("hidden");
                 });
             });
+        }
+
+        // --- 2. CONFIGURACIÓN MENÚ ESCRITORIO ---
+        const shopBtn = document.getElementById("shop-toggle-btn");
+        const shopDropdown = document.getElementById("shop-dropdown");
+        const desktopContainer = document.getElementById(
+            "desktop-shop-container",
+        );
+
+        if (shopBtn && shopDropdown && desktopContainer) {
+            // Toggle Click
+            shopBtn.onclick = (e) => {
+                e.stopPropagation(); // Evita que el click llegue al document
+                shopDropdown.classList.toggle("hidden");
+            };
+
+            // Cerrar al hacer click FUERA
+            const closeMenu = (e) => {
+                if (!desktopContainer.contains(e.target as Node)) {
+                    shopDropdown.classList.add("hidden");
+                }
+            };
+
+            // Añadir evento al documento
+            document.addEventListener("click", closeMenu);
+
+            // IMPORTANTE: Limpiar el evento al cambiar de página para que no se acumulen
+            // Esto arregla el "funciona cuando quiere"
+            document.addEventListener(
+                "astro:before-swap",
+                () => {
+                    document.removeEventListener("click", closeMenu);
+                },
+                { once: true },
+            );
         }
     });
 </script>
