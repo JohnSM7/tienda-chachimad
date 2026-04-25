@@ -3,9 +3,15 @@ import { ViewTransitions } from "astro:transitions";
 
 interface Props {
     title: string;
+    description?: string;
+    image?: string;
 }
 
-const { title } = Astro.props;
+const {
+    title,
+    description = "Galería de arte independiente. Piezas únicas y estilo Dark/Anime.",
+    image = "/images/social-banner.jpg",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -15,19 +21,14 @@ const { title } = Astro.props;
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/png" href="/images/logo.png" />
         <title>{title}</title>
-        <meta
-            name="description"
-            content="Galería de arte independiente. Piezas únicas y estilo Dark/Anime."
-        />
+        <meta name="description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={Astro.url} />
         <meta property="og:title" content={title} />
-        <meta
-            property="og:description"
-            content="Galería de arte independiente."
-        />
-        <meta property="og:image" content="/images/social-banner.jpg" />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={new URL(image, Astro.site || Astro.url)} />
         <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:image" content={new URL(image, Astro.site || Astro.url)} />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -135,6 +136,14 @@ const { title } = Astro.props;
                                 class="bg-black/95 border border-white/10 backdrop-blur-md flex flex-col p-2 text-center shadow-2xl"
                             >
                                 <a
+                                    href="/shop?category=madcry"
+                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition flex items-center justify-center gap-2"
+                                    >MadCry <span
+                                        class="bg-red-600 text-white text-[8px] font-bold px-1 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
+                                        >New</span
+                                    ></a
+                                >
+                                <a
                                     href="/shop?category=one-piece"
                                     class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
                                     >One Piece</a
@@ -145,9 +154,9 @@ const { title } = Astro.props;
                                     >Dragon Ball</a
                                 >
                                 <a
-                                    href="/shop?category=hxh"
+                                    href="/shop?category=jujutsu-kaisen"
                                     class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
-                                    >HxH</a
+                                    >Jujutsu Kaisen</a
                                 >
                                 <a
                                     href="/shop?category=custom"
@@ -209,6 +218,14 @@ const { title } = Astro.props;
                         class="pl-4 border-l border-white/10 flex flex-col space-y-3"
                     >
                         <a
+                            href="/shop?category=madcry"
+                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition flex items-center gap-3"
+                            >MadCry <span
+                                class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
+                                >New</span
+                            ></a
+                        >
+                        <a
                             href="/shop?category=one-piece"
                             class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
                             >One Piece</a
@@ -219,9 +236,9 @@ const { title } = Astro.props;
                             >Dragon Ball</a
                         >
                         <a
-                            href="/shop?category=hxh"
+                            href="/shop?category=jujutsu-kaisen"
                             class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
-                            >Hunter x Hunter</a
+                            >Jujutsu Kaisen</a
                         >
                         <a
                             href="/shop?category=custom"
@@ -254,52 +271,292 @@ const { title } = Astro.props;
             <slot />
         </div>
 
-        <footer class="border-t border-white/10 bg-black pt-16 pb-8 px-6 mt-20">
+        <footer
+            class="relative border-t border-white/10 bg-black pt-24 pb-8 overflow-hidden mt-20"
+        >
+            <!-- Marca de agua gigante de fondo -->
             <div
-                class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left"
+                class="absolute top-0 left-0 w-full overflow-hidden flex justify-center pointer-events-none opacity-[0.03] select-none text-center"
             >
-                <div class="space-y-4">
-                    <h4
-                        class="text-xl font-bold uppercase tracking-widest text-white"
-                    >
-                        Madcry Studio.
-                    </h4>
-                    <p
-                        class="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto md:mx-0"
-                    >
-                        Galería de arte independiente.
+                <span
+                    class="text-[20vw] font-bold uppercase tracking-tighter leading-[0.8] whitespace-nowrap"
+                    >MADCRY</span
+                >
+            </div>
+
+            <div
+                class="relative z-10 max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left mb-16"
+            >
+                <!-- Brand -->
+                <div class="space-y-6 md:col-span-1">
+                    <img src="/images/logo.png" alt="Madcry Logo" class="h-28 object-contain mx-auto md:mx-0 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform hover:scale-105 duration-500" />
+                    <p class="text-[11px] text-gray-400 leading-relaxed max-w-xs mx-auto md:mx-0 tracking-wide">
+                        Estudio de arte independiente.<br/><br/>
+                        Desde visiones oscuras y abstractas de autor, hasta exclusivas reinvenciones del anime y la cultura pop. Arte sin reglas.
                     </p>
                 </div>
+
+                <!-- Explore -->
                 <div class="space-y-4">
                     <h5
-                        class="text-xs font-bold uppercase tracking-[0.2em] text-white"
+                        class="text-[10px] font-bold uppercase tracking-[0.3em] text-white"
                     >
-                        Legal
+                        Explorar
                     </h5>
                     <ul
-                        class="space-y-2 text-xs text-gray-500 uppercase tracking-wider"
+                        class="space-y-3 text-[11px] text-gray-500 uppercase tracking-widest"
                     >
                         <li>
-                            <a href="/legal" class="hover:text-white transition"
-                                >Aviso Legal</a
-                            >
+                            <a
+                                href="/shop"
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Colección</a>
+                        </li>
+                        <li>
+                            <a
+                                href="/blog"
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Journal</a>
+                        </li>
+                        <li>
+                            <a
+                                href="/contact"
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div class="space-y-4">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.3em] text-white"
+                    >
+                        Info
+                    </h5>
+                    <ul
+                        class="space-y-3 text-[11px] text-gray-500 uppercase tracking-widest"
+                    >
+                        <li>
+                            <a
+                                href="/faq"
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Envíos / FAQ</a>
+                        </li>
+                        <li>
+                            <a
+                                href="/legal"
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Aviso Legal</a>
                         </li>
                         <li>
                             <a
                                 href="/privacidad"
-                                class="hover:text-white transition"
-                                >Privacidad</a
-                            >
-                        </li>
-                        <li>
-                            <a href="/terms" class="hover:text-white transition"
-                                >Términos</a
-                            >
+                                class="hover:text-white inline-block transition-transform hover:translate-x-1 duration-300"
+                                >Privacidad</a>
                         </li>
                     </ul>
                 </div>
+
+                <!-- Connect / Newsletter -->
+                <div class="space-y-6">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.3em] text-white"
+                    >
+                        Connect
+                    </h5>
+                    <a
+                        href="https://instagram.com/madcry.studio"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group inline-flex items-center justify-center md:justify-start gap-3 text-[11px] text-gray-500 uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                        <svg
+                            class="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Insta @madcry.studio</span>
+                    </a>
+
+                    <div
+                        class="pt-4 border-t border-white/5 max-w-xs mx-auto md:mx-0"
+                    >
+                        <p
+                            class="text-[9px] text-gray-500 tracking-[0.2em] uppercase mb-3"
+                        >
+                            Únete al culto para accesos secretos.
+                        </p>
+                        <form
+                            id="newsletter-form"
+                            class="flex"
+                        >
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="TU EMAIL"
+                                class="w-full bg-zinc-900 border border-zinc-800 focus:border-white text-white text-[10px] px-4 py-2 outline-none transition uppercase tracking-widest placeholder:text-zinc-700"
+                                required
+                            />
+                            <button
+                                type="submit"
+                                class="bg-white text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-300 transition"
+                                >→</button
+                            >
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative z-10 max-w-6xl mx-auto px-6 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-[9px] text-gray-600 uppercase tracking-[0.2em]">
+                    <span>© {new Date().getFullYear()} Madcry Studio. All rights reserved.</span>
+                    <span class="hidden md:block">|</span>
+                    <a href="https://www.tanesolutions.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors font-bold text-gray-500">
+                        Powered by Tane Solutions
+                    </a>
+                </div>
+                <p class="text-[9px] text-gray-700 uppercase tracking-[0.4em] font-bold mt-2 md:mt-0">
+                    Designed with tears.
+                </p>
             </div>
         </footer>
+
+        <!-- WhatsApp Floating Button -->
+        <a
+            id="whatsapp-btn"
+            href="https://wa.me/34684123159?text=Hola!%20Me%20interesa%20una%20pieza%20de%20Madcry%20Studio%20🎨"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactar por WhatsApp"
+            title="Escríbenos por WhatsApp"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                ></path>
+            </svg>
+            <span class="whatsapp-tooltip">¡Escríbenos!</span>
+        </a>
+
+        <style>
+            #whatsapp-btn {
+                position: fixed;
+                bottom: 28px;
+                right: 28px;
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 58px;
+                height: 58px;
+                background-color: #000;
+                color: #fff;
+                border-radius: 50%;
+                box-shadow:
+                    0 4px 20px rgba(0, 0, 0, 0.5),
+                    0 0 0 1px rgba(255, 255, 255, 0.08);
+                text-decoration: none;
+                transition:
+                    transform 0.25s ease,
+                    box-shadow 0.25s ease,
+                    background-color 0.25s ease;
+            }
+
+            #whatsapp-btn:hover {
+                transform: scale(1.12);
+                background-color: #25d366;
+                box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+            }
+
+            #whatsapp-btn svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .whatsapp-tooltip {
+                position: absolute;
+                right: 68px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #000;
+                color: #fff;
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                white-space: nowrap;
+                padding: 6px 12px;
+                border-radius: 4px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                font-family: "Oswald", sans-serif;
+            }
+
+            #whatsapp-btn:hover .whatsapp-tooltip {
+                opacity: 1;
+            }
+
+            @media (max-width: 640px) {
+                #whatsapp-btn {
+                    bottom: 20px;
+                    right: 20px;
+                    width: 52px;
+                    height: 52px;
+                }
+
+                #whatsapp-btn svg {
+                    width: 24px;
+                    height: 24px;
+                }
+
+                .whatsapp-tooltip {
+                    display: none;
+                }
+            }
+        </style>
+        <!-- Global Lightbox -->
+        <div
+            id="global-lightbox"
+            class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm hidden items-center justify-center opacity-0 transition-opacity duration-300"
+        >
+            <button
+                id="lightbox-close"
+                class="absolute top-6 right-6 text-white hover:text-gray-400 z-[110] focus:outline-none"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-10 h-10"
+                >
+                    <path
+                        stroke-linecap="square"
+                        stroke-linejoin="miter"
+                        d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <img
+                id="lightbox-img"
+                src=""
+                alt="Fullscreen Image"
+                class="max-w-[95vw] max-h-[90vh] object-contain scale-95 transition-transform duration-300 pointer-events-none"
+            />
+        </div>
     </body>
 </html>
 
@@ -316,6 +573,17 @@ const { title } = Astro.props;
 <script>
     // ESTE SCRIPT SE EJECUTA EN CADA NAVEGACIÓN
     document.addEventListener("astro:page-load", () => {
+        // --- 0. NEWSLETTER (placeholder hasta conectar backend) ---
+        const newsletter = document.getElementById("newsletter-form");
+        if (newsletter) {
+            newsletter.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const form = e.currentTarget as HTMLFormElement;
+                alert("Gracias por unirte. Pronto conectaremos la lista.");
+                form.reset();
+            });
+        }
+
         // --- 1. CONFIGURACIÓN MENÚ MÓVIL ---
         const btn = document.getElementById("menu-toggle");
         const menu = document.getElementById("mobile-menu");
@@ -385,6 +653,52 @@ const { title } = Astro.props;
                 },
                 { once: true },
             );
+        }
+
+        // --- 3. CONFIGURACIÓN LIGHTBOX GLOBAL ---
+        const lightbox = document.getElementById("global-lightbox");
+        const lightboxImg = document.getElementById("lightbox-img");
+        const lightboxClose = document.getElementById("lightbox-close");
+        const triggers = document.querySelectorAll(".lightbox-trigger");
+
+        if (lightbox && lightboxImg && lightboxClose) {
+            const closeLightbox = () => {
+                lightbox.classList.remove("opacity-100");
+                lightboxImg.classList.remove("scale-100");
+                setTimeout(() => {
+                    lightbox.classList.remove("flex");
+                    lightbox.classList.add("hidden");
+                }, 300); // Coincide con duration-300
+                document.body.style.overflow = "";
+            };
+
+            lightboxClose.addEventListener("click", closeLightbox);
+            // Cerrar al hacer click fuera de la imagen (en el fondo oscuro)
+            lightbox.addEventListener("click", (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+
+            triggers.forEach((trigger) => {
+                trigger.addEventListener("click", (e) => {
+                    // Evitar que el clic en la imagen lance otros enlaces/eventos
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const imgElement = e.currentTarget as HTMLImageElement;
+                    let src = imgElement.src;
+
+                    if (src) {
+                        lightboxImg.setAttribute("src", src);
+                        lightbox.classList.remove("hidden");
+                        lightbox.classList.add("flex");
+                        // Forzar el repintado antes de cambiar la opacidad
+                        void lightbox.offsetWidth;
+                        lightbox.classList.add("opacity-100");
+                        lightboxImg.classList.add("scale-100");
+                        document.body.style.overflow = "hidden"; // Bloquear scroll
+                    }
+                });
+            });
         }
     });
 </script>
