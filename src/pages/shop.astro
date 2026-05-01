@@ -1,13 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { products } from "../data/products";
+import { supabase, formatPrice, getProductImageUrl, type Product } from "../lib/supabase";
 
-// Definimos las categorías disponibles para generar los botones automáticamente
+// SSG: leer productos en build. Para refrescar stock sin rebuild,
+// ver el script al final que hace polling client-side.
+const { data: products, error } = await supabase
+    .from("products_public")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+if (error) {
+    console.error("Error cargando productos:", error);
+}
+
+const list: Product[] = (products as Product[] | null) ?? [];
+
 const categories = [
     { id: "all", name: "Todo" },
+    { id: "madcry", name: "MadCry" },
     { id: "one-piece", name: "One Piece" },
     { id: "dragon-ball", name: "Dragon Ball" },
-    { id: "hxh", name: "Hunter x Hunter" },
+    { id: "jujutsu-kaisen", name: "Jujutsu Kaisen" },
     { id: "custom", name: "Custom" },
 ];
 ---
@@ -35,47 +48,31 @@ const categories = [
     </header>
 
     <section class="max-w-7xl mx-auto px-4 py-12 min-h-screen">
-        <!--  MENU FLOTANTE DE CATEGORÍAS (DESACTIVADO)
-
-        <div class="flex flex-wrap justify-center gap-6 mb-16">
-            {categories.map((cat) => (
-                <button 
-                    class="filter-btn text-xs md:text-sm uppercase tracking-[0.2em] text-gray-500 hover:text-white transition-colors duration-300 pb-1 border-b border-transparent hover:border-white focus:outline-none"
-                    data-filter={cat.id}
-                >
-                    {cat.name}
-                </button>
-            ))}
-        </div>
-        -->
-
         <div
             id="product-grid"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"
         >
             {
-                products.map((product) => (
+                list.map((product) => (
                     <article
                         class="product-item group relative flex flex-col gap-4 transition-all duration-500"
-                        data-category={product.category}
+                        data-category={product.category_slug}
+                        data-product-id={product.id}
                     >
                         <a
-                            href={`/product/${product.id}`}
-                            class="block relative aspect-[4/5] overflow-hidden bg-zinc-900 border border-white/5"
+                            href={`/product/${product.slug}`}
+                            class="block relative aspect-square overflow-hidden bg-black border border-white/5"
                         >
-         <!-- Cartel Sold Out deshabilitado -->
-         
-                            <!--  {product.status === "sold" && (
-                                <div class="absolute top-4 right-4 z-20 bg-white text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
-                                    Sold Out
-                                </div>
-                            )}-->
-
                             <img
-                                src={product.image}
+                                src={getProductImageUrl(
+                                    Array.isArray(product.images) && product.images.length > 0
+                                        ? String(product.images[0])
+                                        : null
+                                )}
                                 alt={product.name}
+                                loading="lazy"
                                 transition:name={`image-${product.id}`}
-                                class={`w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 `}
+                                class="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110"
                             />
 
                             {product.status === "available" && (
@@ -87,14 +84,19 @@ const categories = [
                             )}
                         </a>
 
-                        <div class="flex justify-between items-start pt-2">
+                        <div class="flex justify-between items-start pt-2 relative z-10">
                             <div class="space-y-1">
-                                <h3 class="text-xl text-white font-medium uppercase tracking-wide group-hover:text-gray-300 transition flex items-center gap-3">
+                                <h3 class="text-xl text-white font-medium uppercase tracking-wide group-hover:text-gray-300 transition flex items-center gap-3 flex-wrap">
                                     {product.name}
-                                    
+
                                     {product.status === "sold" && (
-                                        <span class="border border-red-900/30 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                                        <span data-status-badge class="border border-red-900/30 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
                                             Sold Out
+                                        </span>
+                                    )}
+                                    {product.is_new && (
+                                        <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest whitespace-nowrap animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+                                            New
                                         </span>
                                     )}
                                 </h3>
@@ -104,7 +106,7 @@ const categories = [
                             </div>
                             <div class="text-right">
                                 <span class="block text-xl text-white font-bold tracking-widest">
-                                    {product.price}€
+                                    {formatPrice(product.price_cents, product.currency || "eur")}
                                 </span>
                             </div>
                         </div>
@@ -113,107 +115,52 @@ const categories = [
             }
         </div>
 
-        <div id="no-results" class="hidden text-center py-20">
-            <p class="text-gray-500 uppercase tracking-widest">
-                No hay obras en esta categoría aún.
-            </p>
-        </div>
+        {list.length === 0 && (
+            <div class="text-center py-20">
+                <p class="text-gray-500 uppercase tracking-widest">
+                    Aun no hay obras publicadas.
+                </p>
+            </div>
+        )}
     </section>
 </Layout>
 
 <script>
-    document.addEventListener("astro:page-load", () => {
-        const buttons = document.querySelectorAll(".filter-btn");
-        const items = document.querySelectorAll(".product-item");
-        const noResults = document.getElementById("no-results");
+    import { supabase } from "../lib/supabase";
 
-        // Función principal de filtrado
-        function filterProducts(category: string | null) {
-            // 1. Actualizar visualmente los botones
-            buttons.forEach((btn) => {
-                const btnCategory = btn.getAttribute("data-filter");
-                if (btnCategory === category) {
-                    btn.classList.remove("text-gray-500", "border-transparent");
-                    btn.classList.add("text-white", "border-white", "border-b");
-                } else {
-                    btn.classList.remove(
-                        "text-white",
-                        "border-white",
-                        "border-b",
-                    );
-                    btn.classList.add("text-gray-500", "border-transparent");
-                }
-            });
+    document.addEventListener("astro:page-load", async () => {
+        // --- Refresh stock client-side (sin rebuild necesario) ---
+        // Si Susana marca un cuadro como sold, se ve aqui en segundos.
+        try {
+            const { data } = await supabase
+                .from("products_public")
+                .select("id, status")
+                .in("status", ["available", "sold", "reserved"]);
 
-            // 2. Filtrar los items
-            let visibleCount = 0;
-            items.forEach((item) => {
-                const itemCategory = item.getAttribute("data-category");
+            if (data) {
+                document.querySelectorAll<HTMLElement>(".product-item").forEach((el) => {
+                    const id = el.dataset.productId;
+                    const fresh = data.find((p) => p.id === id);
+                    if (!fresh) return;
+                    const badge = el.querySelector("[data-status-badge]");
 
-                if (category === "all" || category === itemCategory) {
-                    item.classList.remove("hidden");
-                    item.classList.add("flex");
-                    // Resetear animación para que se vea siempre
-                    if (!(item instanceof HTMLElement)) return;
-                    item.style.animation = "none";
-                    item.offsetHeight; /* trigger reflow */
-                    item.style.animation = "fadeIn 0.5s ease-out forwards";
-                    visibleCount++;
-                } else {
-                    item.classList.add("hidden");
-                    item.classList.remove("flex");
-                }
-            });
-
-            // 3. Mensaje de vacío
-            if (visibleCount === 0 && noResults) {
-                noResults.classList.remove("hidden");
-            } else if (noResults) {
-                noResults.classList.add("hidden");
+                    if (fresh.status === "sold" && !badge) {
+                        const h3 = el.querySelector("h3");
+                        if (h3) {
+                            const span = document.createElement("span");
+                            span.dataset.statusBadge = "true";
+                            span.className =
+                                "border border-red-900/30 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap";
+                            span.textContent = "Sold Out";
+                            h3.appendChild(span);
+                        }
+                    } else if (fresh.status === "available" && badge) {
+                        badge.remove();
+                    }
+                });
             }
+        } catch (err) {
+            console.warn("Stock refresh fallo:", err);
         }
-
-        // --- LÓGICA DE URL ---
-        // Leer si hay un parámetro en la URL (ej: ?category=one-piece)
-        const urlParams = new URLSearchParams(window.location.search);
-        const categoryFromUrl = urlParams.get("category");
-
-        if (categoryFromUrl) {
-            // Si hay categoría en la URL, filtramos por esa
-            filterProducts(categoryFromUrl);
-        } else {
-            // Si no, activamos "Todo" por defecto (primer botón)
-            if (buttons.length > 0) {
-                buttons[0].classList.add("text-white", "border-white", "border-b");
-            }
-        }
-
-        // --- EVENT LISTENER DE CLICS ---
-        buttons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const filterValue = btn.getAttribute("data-filter");
-                filterProducts(filterValue);
-
-                // Opcional: Actualizar la URL sin recargar la página para que se pueda compartir el link
-                const newUrl =
-                    filterValue === "all"
-                        ? "/shop"
-                        : `/shop?category=${filterValue}`;
-                window.history.pushState({}, "", newUrl);
-            });
-        });
     });
 </script>
-
-<style>
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>

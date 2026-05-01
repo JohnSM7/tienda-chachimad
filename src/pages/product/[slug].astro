@@ -1,0 +1,162 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { supabase, formatPrice, getProductImageUrl, type Product } from "../../lib/supabase";
+
+export async function getStaticPaths() {
+    const { data } = await supabase
+        .from("products_public")
+        .select("*");
+
+    if (!data) return [];
+
+    return data.map((product) => ({
+        params: { slug: product.slug },
+        props: { product },
+    }));
+}
+
+const { product } = Astro.props as { product: Product };
+const mainImage = Array.isArray(product.images) && product.images.length > 0
+    ? getProductImageUrl(String(product.images[0]))
+    : "/images/logo.png";
+---
+
+<Layout
+    title={`${product.name} | MADCRY`}
+    description={product.description || `Adquiere ${product.name} en MadCry Studio.`}
+    image={mainImage}
+>
+    <main class="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-12">
+        <div
+            class="h-[50vh] lg:h-screen bg-black flex items-center justify-center p-6 lg:p-0 relative overflow-hidden group"
+        >
+            <a
+                href="/shop"
+                class="absolute top-24 left-6 text-white text-[10px] uppercase tracking-widest lg:hidden z-20 border border-white/20 px-3 py-1 bg-black/50 backdrop-blur"
+                >Back</a
+            >
+
+            <img
+                src={mainImage}
+                alt={product.name}
+                class="lightbox-trigger cursor-zoom-in max-h-[60%] max-w-[90%] object-contain shadow-[0_0_100px_rgba(0,0,0,0.5)] group-hover:scale-[1.02] transition duration-700"
+                transition:name={`image-${product.id}`}
+            />
+        </div>
+
+        <div
+            class="h-auto lg:h-screen bg-black flex flex-col justify-center p-8 lg:p-24 border-l border-zinc-900 relative"
+        >
+            <a
+                href="/shop"
+                class="hidden lg:inline-block absolute top-32 right-12 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition z-50"
+                >← Back to Collection</a
+            >
+
+            <div class="mb-auto mt-12 lg:mt-0"></div>
+
+            <h1
+                class="text-4xl lg:text-7xl font-bold uppercase mb-4 leading-[0.9] tracking-tighter"
+            >
+                {product.name}
+            </h1>
+            <p
+                class="text-2xl text-gray-400 font-light mb-12 tracking-wider font-mono"
+            >
+                {formatPrice(product.price_cents, product.currency || "eur")}
+            </p>
+
+            <div
+                class="space-y-6 text-gray-400 text-sm tracking-wide leading-relaxed mb-16 border-t border-white/10 pt-8 max-w-md"
+            >
+                <p>{product.description || "Pieza unica de la coleccion."}</p>
+                <ul
+                    class="space-y-2 text-xs uppercase tracking-widest text-gray-500 list-disc list-inside"
+                >
+                    <li>
+                        Estado: <span data-status-text>{product.status === "sold" ? "Vendido" : "Disponible"}</span>
+                    </li>
+                    {product.dimensions && <li>Dimensiones: {product.dimensions}</li>}
+                    {product.technique && <li>Tecnica: {product.technique}</li>}
+                    {product.year_created && <li>Ano: {product.year_created}</li>}
+                </ul>
+            </div>
+
+            <div class="mb-auto">
+                <button
+                    id="buy-btn"
+                    data-product-id={product.id}
+                    data-status={product.status}
+                    class:list={[
+                        "w-full text-center py-5 text-sm font-bold uppercase tracking-[0.3em] transition duration-300",
+                        product.status === "available"
+                            ? "bg-white text-black hover:bg-gray-300 cursor-pointer"
+                            : "border border-red-900/30 bg-red-900/10 text-red-500 cursor-not-allowed"
+                    ]}
+                    disabled={product.status !== "available"}
+                >
+                    {product.status === "available" ? "Adquirir Obra" : "Sold Out"}
+                </button>
+                <p id="buy-error" class="text-red-500 text-xs mt-3 text-center hidden"></p>
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    import { supabase } from "../../lib/supabase";
+
+    document.addEventListener("astro:page-load", async () => {
+        const btn = document.getElementById("buy-btn") as HTMLButtonElement | null;
+        if (!btn) return;
+        const productId = btn.dataset.productId;
+        if (!productId) return;
+
+        // Refresh stock — por si Susana lo marco como vendido entre build y carga
+        try {
+            const { data } = await supabase
+                .from("products_public")
+                .select("status")
+                .eq("id", productId)
+                .single();
+            if (data && data.status !== btn.dataset.status) {
+                location.reload();
+            }
+        } catch {}
+
+        btn.addEventListener("click", async () => {
+            if (btn.disabled) return;
+            const original = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Preparando pago...";
+            const errEl = document.getElementById("buy-error");
+            if (errEl) errEl.classList.add("hidden");
+
+            try {
+                const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/create-checkout-session`;
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${import.meta.env.PUBLIC_SUPABASE_ANON_KEY}`,
+                    },
+                    body: JSON.stringify({ product_id: productId }),
+                });
+
+                const json = await res.json();
+                if (!res.ok || !json.url) {
+                    throw new Error(json.error || "No se pudo iniciar el pago");
+                }
+                window.location.href = json.url;
+            } catch (e) {
+                btn.disabled = false;
+                btn.textContent = original;
+                const message = e instanceof Error ? e.message : "Error";
+                if (errEl) {
+                    errEl.textContent = message;
+                    errEl.classList.remove("hidden");
+                }
+            }
+        });
+    });
+</script>

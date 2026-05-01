@@ -1,0 +1,68 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AdminLogin from "../components/admin/AdminLogin.vue";
+import AdminPanel from "../components/admin/AdminPanel.vue";
+---
+
+<Layout title="MADCRY | Admin">
+    <main class="bg-black min-h-screen">
+        <div id="admin-mount">
+            <!-- Mostrado por defecto hasta que el JS decida login vs panel -->
+            <div class="min-h-screen flex items-center justify-center pt-32">
+                <div class="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+            </div>
+        </div>
+
+        <div id="login-container" class="hidden">
+            <AdminLogin client:only="vue" />
+        </div>
+
+        <div id="panel-container" class="hidden">
+            <AdminPanel client:only="vue" />
+        </div>
+    </main>
+</Layout>
+
+<script>
+    import { supabase } from "../lib/supabase";
+    import { isAdmin } from "../lib/admin";
+
+    document.addEventListener("astro:page-load", async () => {
+        const mount = document.getElementById("admin-mount");
+        const loginEl = document.getElementById("login-container");
+        const panelEl = document.getElementById("panel-container");
+        if (!mount || !loginEl || !panelEl) return;
+
+        // Escuchar cambios de auth (login via magic link)
+        supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user && isAdmin(session.user.email)) {
+                mount.classList.add("hidden");
+                loginEl.classList.add("hidden");
+                panelEl.classList.remove("hidden");
+            } else {
+                mount.classList.add("hidden");
+                panelEl.classList.add("hidden");
+                loginEl.classList.remove("hidden");
+            }
+        });
+
+        // Estado inicial
+        const { data } = await supabase.auth.getSession();
+        const user = data.session?.user;
+        mount.classList.add("hidden");
+        if (user && isAdmin(user.email)) {
+            panelEl.classList.remove("hidden");
+        } else {
+            loginEl.classList.remove("hidden");
+        }
+    });
+</script>
+
+<style>
+    /* Ocultar nav publica en admin para Susana */
+    nav,
+    footer,
+    #whatsapp-btn {
+        display: none !important;
+    }
+</style>

@@ -81,21 +81,12 @@ import Layout from "../layouts/Layout.astro";
             <div class="lg:w-7/12 pt-4">
                 <form
                     id="contact-form"
-                    action="https://formsubmit.co/ajax/info@madcry.com"
-                    method="POST"
                     class="space-y-12"
                 >
-                    <input
-                        type="hidden"
-                        name="_subject"
-                        value="Nuevo contacto - MADCRY STUDIO"
-                    />
-                    <input type="hidden" name="_captcha" value="true" />
-                    <input type="hidden" name="_template" value="box" />
-                    <input type="hidden" name="_honey" value="" />
+                    <!-- Honeypot anti-bots: humanos no lo ven, bots lo rellenan -->
                     <input
                         type="text"
-                        name="_honeypot"
+                        name="honeypot"
                         tabindex="-1"
                         autocomplete="off"
                         class="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden"
@@ -268,59 +259,74 @@ import Layout from "../layouts/Layout.astro";
     const btn = form?.querySelector("button");
     const btnText = btn?.querySelector("span");
 
-    if (form) {
-        form.addEventListener("submit", (e) => {
+    if (form && btn && btnText) {
+        // Guardamos los nodos originales (texto + flecha) de forma segura
+        // sin innerHTML para no romper CSP estricta.
+        const originalNodes = Array.from(btnText.childNodes).map((n) =>
+            n.cloneNode(true),
+        );
+        const restoreOriginal = () => {
+            btnText.replaceChildren(
+                ...originalNodes.map((n) => n.cloneNode(true)),
+            );
+        };
+
+        form.addEventListener("submit", async (e) => {
             e.preventDefault();
+            btnText.textContent = "ENVIANDO...";
+            btn.disabled = true;
+            btn.classList.add("opacity-70", "cursor-not-allowed");
 
-            if (btn && btnText) {
-                const originalContent = btnText.innerHTML;
-                btnText.innerText = "ENVIANDO...";
-                btn.disabled = true;
-                btn.classList.add("opacity-70", "cursor-not-allowed");
+            const formData = new FormData(form as HTMLFormElement);
+            const payload = {
+                type: formData.get("type") as string,
+                name: formData.get("name") as string,
+                email: formData.get("email") as string,
+                budget: formData.get("budget") as string,
+                message: formData.get("message") as string,
+                honeypot: formData.get("honeypot") as string,
+            };
 
-                // Enviar formulario a FormSubmit por AJAX
-                fetch((form as HTMLFormElement).action, {
-                    method: (form as HTMLFormElement).method,
-                    body: new FormData(form as HTMLFormElement),
+            try {
+                const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/send-contact-email`;
+                const response = await fetch(url, {
+                    method: "POST",
                     headers: {
-                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${import.meta.env.PUBLIC_SUPABASE_ANON_KEY}`,
                     },
-                })
-                    .then((response) => {
-                        if (!response.ok) throw new Error("Error de envío");
+                    body: JSON.stringify(payload),
+                });
 
-                        if (status) {
-                            status.classList.remove("hidden");
-                            status.scrollIntoView({
-                                behavior: "smooth",
-                                block: "center",
-                            });
-                        }
-                        (form as HTMLFormElement).reset();
-                        btnText.innerText = "ENVIADO";
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || "Error de envio");
+                }
 
-                        setTimeout(() => {
-                            btnText.innerHTML = originalContent;
-                            btn.disabled = false;
-                            btn.classList.remove(
-                                "opacity-70",
-                                "cursor-not-allowed",
-                            );
-                            if (status) status.classList.add("hidden");
-                        }, 4000);
-                    })
-                    .catch((error) => {
-                        console.error("FormSubmit Error:", error);
-                        btnText.innerText = "ERROR AL ENVIAR";
-                        setTimeout(() => {
-                            btnText.innerHTML = originalContent;
-                            btn.disabled = false;
-                            btn.classList.remove(
-                                "opacity-70",
-                                "cursor-not-allowed",
-                            );
-                        }, 4000);
+                if (status) {
+                    status.classList.remove("hidden");
+                    status.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
                     });
+                }
+                (form as HTMLFormElement).reset();
+                btnText.textContent = "ENVIADO";
+
+                setTimeout(() => {
+                    restoreOriginal();
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-70", "cursor-not-allowed");
+                    if (status) status.classList.add("hidden");
+                }, 4000);
+            } catch (error) {
+                console.error("Contact error:", error);
+                btnText.textContent = "ERROR AL ENVIAR";
+                setTimeout(() => {
+                    restoreOriginal();
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-70", "cursor-not-allowed");
+                }, 4000);
             }
         });
     }
