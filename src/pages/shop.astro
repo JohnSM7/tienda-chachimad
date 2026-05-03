@@ -4,9 +4,14 @@ import { supabase, formatPrice, getProductImageUrl, type Product } from "../lib/
 
 // SSG: leer productos en build. Para refrescar stock sin rebuild,
 // ver el script al final que hace polling client-side.
+//
+// Orden: las piezas de venta directa primero (por precio desc),
+// luego las Commission (categorias con hide_price=true) al final.
 const { data: products, error } = await supabase
     .from("products_public")
     .select("*")
+    .order("category_hide_price", { ascending: true, nullsFirst: true })
+    .order("price_cents", { ascending: false })
     .order("created_at", { ascending: false });
 
 if (error) {
