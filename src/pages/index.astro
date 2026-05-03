@@ -6,34 +6,40 @@ import Layout from '../layouts/Layout.astro';
     <main class="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
         
         <div class="absolute inset-0 z-0">
+            <!-- Provisional background image until they upload the real one -->
             <img 
-                src="/images/LuffyGang.jpeg" 
-                alt="Background Art" 
+                src="/images/evento-mena.jpg" 
+                alt="MadCry Exhibition Background" 
                 class="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all duration-[3s] scale-105"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black"></div>
         </div>
 
-        <div class="z-10 text-center space-y-6 px-4">
-            <p class="text-gray-400 text-xs tracking-[0.5em] uppercase animate-pulse">Nuevo Drop Disponible</p>
+        <div class="z-10 text-center space-y-4 px-4">
+            <p class="text-red-500 text-xs tracking-[0.5em] font-bold uppercase animate-pulse">1 de Mayo 2026</p>
             
-            <h1 class="text-6xl md:text-9xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl">
-                ANIME<br/>
+            <h1 class="text-6xl md:text-9xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl leading-none">
+                MADCRY<br/>
             </h1>
-			<h2 class="text-6xl md:text-6xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl">
-                Gangsta Sh*t Collection
+			<h2 class="text-3xl md:text-5xl font-light uppercase tracking-widest text-gray-300 drop-shadow-2xl">
+                Primera Exposición
             </h2>
             
-            <div class="pt-8">
-                <a href="/shop" class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black">
+            <p class="text-gray-400 text-xs md:text-sm tracking-[0.2em] uppercase max-w-lg mx-auto pt-4 leading-relaxed">
+                Obras disponibles a la venta en web tras la exposición oficial.
+            </p>
+            
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a href="/shop?category=madcry" class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black">
                     <span class="absolute inset-0 border-0 group-hover:border-[25px] ease-linear duration-100 transition-all border-white rounded-full"></span>
-                    <span class="relative w-full text-left uppercase tracking-[0.2em] text-sm font-bold">Accede a la shop</span>
+                    <span class="relative w-full text-center uppercase tracking-[0.2em] text-xs md:text-sm font-bold whitespace-nowrap">Ver Colección</span>
                 </a>
             </div>
         </div>
 
-        <div class="absolute bottom-8 w-full text-center text-gray-600 text-[10px] tracking-[0.3em] uppercase z-10">
-            Limited Edition • 2026
+        <div class="absolute bottom-8 w-full text-center text-gray-600 text-[10px] tracking-[0.3em] uppercase z-10 flex flex-col gap-1">
+            <span>MADCRY STUDIO</span>
+            <span>MENA - APULIAN FOOD</span>
         </div>
     </main>
 </Layout>
