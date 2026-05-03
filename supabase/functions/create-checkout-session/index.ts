@@ -38,10 +38,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Falta product_id' }, 400);
     }
 
-    // 1. Lee producto fresco — usamos service_role para bypassear RLS
+    // 1. Lee producto fresco con flag hide_price de la categoria
     const { data: product, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, categories(hide_price)')
       .eq('id', product_id)
       .single();
 
@@ -53,9 +53,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Producto no disponible' }, 400);
     }
 
-    // Las piezas custom van por encargo: no se compran online, se solicita
-    // presupuesto via /contact. Bloqueo defensivo aunque el HTML no muestre el boton.
-    if (product.category_slug === 'custom') {
+    // Las categorias con hide_price=true van por encargo (Commission):
+    // se solicita presupuesto via /contact, no checkout online. Defensa
+    // server-side aunque el HTML no muestre el boton.
+    if ((product as any).categories?.hide_price) {
       return jsonResponse(
         { error: 'Esta pieza es por encargo. Solicita presupuesto en /contact.' },
         400

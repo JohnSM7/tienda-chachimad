@@ -17,22 +17,31 @@ export type Database = {
       categories: {
         Row: {
           created_at: string | null
+          default_description: string | null
+          hide_price: boolean
           id: string
           name: string
+          price_label: string | null
           slug: string
           sort_order: number | null
         }
         Insert: {
           created_at?: string | null
+          default_description?: string | null
+          hide_price?: boolean
           id?: string
           name: string
+          price_label?: string | null
           slug: string
           sort_order?: number | null
         }
         Update: {
           created_at?: string | null
+          default_description?: string | null
+          hide_price?: boolean
           id?: string
           name?: string
+          price_label?: string | null
           slug?: string
           sort_order?: number | null
         }
@@ -248,6 +257,9 @@ export type Database = {
     Views: {
       products_public: {
         Row: {
+          category_default_description: string | null
+          category_hide_price: boolean | null
+          category_price_label: string | null
           category_slug: string | null
           created_at: string | null
           currency: string | null
@@ -264,42 +276,6 @@ export type Database = {
           stripe_payment_link: string | null
           technique: string | null
           year_created: number | null
-        }
-        Insert: {
-          category_slug?: string | null
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          dimensions?: string | null
-          id?: string | null
-          images?: Json | null
-          is_new?: boolean | null
-          name?: string | null
-          price_cents?: number | null
-          published_at?: string | null
-          slug?: string | null
-          status?: Database["public"]["Enums"]["product_status"] | null
-          stripe_payment_link?: string | null
-          technique?: string | null
-          year_created?: number | null
-        }
-        Update: {
-          category_slug?: string | null
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          dimensions?: string | null
-          id?: string | null
-          images?: Json | null
-          is_new?: boolean | null
-          name?: string | null
-          price_cents?: number | null
-          published_at?: string | null
-          slug?: string | null
-          status?: Database["public"]["Enums"]["product_status"] | null
-          stripe_payment_link?: string | null
-          technique?: string | null
-          year_created?: number | null
         }
         Relationships: [
           {

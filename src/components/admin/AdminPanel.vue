@@ -9,8 +9,9 @@ import {
 } from "../../lib/supabase";
 import { signOut, triggerRebuild } from "../../lib/admin";
 import ProductForm from "./ProductForm.vue";
+import CategoryEditor from "./CategoryEditor.vue";
 
-const tab = ref<"products" | "orders" | "messages">("products");
+const tab = ref<"products" | "orders" | "messages" | "categories">("products");
 
 const products = ref<Product[]>([]);
 const orders = ref<Order[]>([]);
@@ -247,9 +248,9 @@ onMounted(loadAll);
     </div>
 
     <!-- Tabs -->
-    <nav class="flex gap-6 mb-6 text-xs uppercase tracking-widest border-b border-zinc-800">
+    <nav class="flex gap-6 mb-6 text-xs uppercase tracking-widest border-b border-zinc-800 flex-wrap">
       <button
-        v-for="t in (['products', 'orders', 'messages'] as const)"
+        v-for="t in (['products', 'orders', 'messages', 'categories'] as const)"
         :key="t"
         @click="tab = t"
         :class="[
@@ -262,7 +263,9 @@ onMounted(loadAll);
             ? "Cuadros"
             : t === "orders"
               ? `Pedidos (${stats.pendingOrders + stats.paidOrders})`
-              : `Mensajes (${stats.unreadMessages})`
+              : t === "messages"
+                ? `Mensajes (${stats.unreadMessages})`
+                : "Categorias"
         }}
       </button>
     </nav>
@@ -506,6 +509,11 @@ onMounted(loadAll);
           {{ m.message }}
         </p>
       </article>
+    </section>
+
+    <!-- ========== CATEGORIES ========== -->
+    <section v-if="tab === 'categories'">
+      <CategoryEditor />
     </section>
   </div>
 </template>
