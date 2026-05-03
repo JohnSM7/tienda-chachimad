@@ -1,8 +1,37 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const eventSchema = {
+  "@context": "https://schema.org",
+  "@type": "ExhibitionEvent",
+  name: "MADCRY · Primera Exposición",
+  startDate: "2026-05-01",
+  endDate: "2026-05-31",
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+  location: {
+    "@type": "Place",
+    name: "Restaurante MENA · Apulian Food",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Calle Humilladero, 16",
+      addressLocality: "Madrid",
+      addressRegion: "La Latina",
+      postalCode: "28005",
+      addressCountry: "ES",
+    },
+  },
+  image: "https://madcry.com/images/evento-mena.jpg",
+  performer: { "@type": "Person", name: "Susana Madriz" },
+  organizer: { "@type": "Organization", name: "MADCRY Studio", url: "https://madcry.com" },
+};
 ---
 
-<Layout title="MADCRY STUDIO | Home">
+<Layout
+    title="MADCRY Studio · Galería de arte urbano y anime · Madrid"
+    description="Primera exposición de Susana Madriz en MENA Apulian Food (1-31 mayo). Piezas únicas (1/1) de arte urbano, dark y anime. Disponibles en tienda tras la expo."
+    schema={eventSchema}
+>
     <main class="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
         
         <div class="absolute inset-0 z-0">

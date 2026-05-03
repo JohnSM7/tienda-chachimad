@@ -12,6 +12,13 @@
 import { requireAdmin } from '../_shared/admin-auth.ts';
 import { handleCors, jsonResponse } from '../_shared/cors.ts';
 
+// Throttle in-memory: si la edge function recibe dos clicks seguidos
+// (panel pegado, doble-click, retry de fetch...), evitamos disparar
+// dos workflows GitHub. La memoria se resetea con cada cold-start,
+// pero eso ya nos protege del 99% de los casos.
+const THROTTLE_SECONDS = 60;
+let lastDispatchAt = 0;
+
 Deno.serve(async (req) => {
   const cors = handleCors(req);
   if (cors) return cors;
@@ -20,7 +27,18 @@ Deno.serve(async (req) => {
     await requireAdmin(req);
   } catch (e) {
     if (e instanceof Response) return e;
-    return jsonResponse({ error: 'Auth fallo' }, 401);
+    return jsonResponse({ error: 'Auth fallo' }, 401, req);
+  }
+
+  const now = Date.now();
+  const elapsed = (now - lastDispatchAt) / 1000;
+  if (elapsed < THROTTLE_SECONDS) {
+    const wait = Math.ceil(THROTTLE_SECONDS - elapsed);
+    return jsonResponse(
+      { error: `Espera ${wait}s antes del proximo rebuild`, retry_after: wait },
+      429,
+      req
+    );
   }
 
   const githubToken = Deno.env.get('GITHUB_TOKEN');
@@ -30,7 +48,8 @@ Deno.serve(async (req) => {
   if (!githubToken) {
     return jsonResponse(
       { error: 'GITHUB_TOKEN no configurado en Edge Function secrets' },
-      500
+      500,
+      req
     );
   }
 
@@ -51,8 +70,9 @@ Deno.serve(async (req) => {
   if (!res.ok) {
     const text = await res.text();
     console.error('GitHub dispatch fallo:', res.status, text);
-    return jsonResponse({ error: 'GitHub dispatch fallo', detail: text }, res.status);
+    return jsonResponse({ error: 'GitHub dispatch fallo', detail: text }, res.status, req);
   }
 
-  return jsonResponse({ ok: true, message: 'Rebuild disparado, listo en 2-3 min' });
+  lastDispatchAt = now;
+  return jsonResponse({ ok: true, message: 'Rebuild disparado, listo en 2-3 min' }, 200, req);
 });

@@ -22,6 +22,13 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
+function maskEmail(email: string): string {
+  const [user, domain] = email.split('@');
+  if (!domain) return '***';
+  const head = user.slice(0, 2);
+  return `${head}***@${domain}`;
+}
+
 Deno.serve(async (req) => {
   const cors = handleCors(req);
   if (cors) return cors;
@@ -30,7 +37,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const sessionId = url.searchParams.get('session_id');
     if (!sessionId || !sessionId.startsWith('cs_')) {
-      return jsonResponse({ error: 'session_id invalido' }, 400);
+      return jsonResponse({ error: 'session_id invalido' }, 400, req);
     }
 
     // 1. Verificar contra Stripe
@@ -39,7 +46,7 @@ Deno.serve(async (req) => {
       session.payment_status === 'paid' || session.payment_status === 'no_payment_required';
 
     if (!paid) {
-      return jsonResponse({ paid: false, status: session.payment_status }, 200);
+      return jsonResponse({ paid: false, status: session.payment_status }, 200, req);
     }
 
     // 2. Buscar el pedido y producto en BD
@@ -49,17 +56,22 @@ Deno.serve(async (req) => {
       .eq('stripe_session_id', sessionId)
       .single();
 
+    // No exponemos email completo (cualquiera con el cs_id podria leerlo).
+    // Devolvemos solo iniciales + dominio para el "Gracias, {email}".
+    const fullEmail = session.customer_details?.email ?? null;
+    const maskedEmail = fullEmail ? maskEmail(fullEmail) : null;
+
     return jsonResponse({
       paid: true,
       order_id: order?.id ?? null,
       product: order?.products ?? null,
       total_cents: order?.amount_total_cents ?? session.amount_total,
       currency: order?.currency ?? session.currency,
-      customer_email: session.customer_details?.email ?? null,
-    });
+      customer_email: maskedEmail,
+    }, 200, req);
   } catch (err) {
     console.error('verify-session error:', err);
     const message = err instanceof Error ? err.message : 'Error interno';
-    return jsonResponse({ error: message }, 500);
+    return jsonResponse({ error: message }, 500, req);
   }
 });

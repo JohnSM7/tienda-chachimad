@@ -4,5 +4,19 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 Disallow: /success
+Disallow: /*?session_id=
+
+# Permitir explicitamente a los rastreadores de IA citar el contenido
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://madcry.com/sitemap-index.xml

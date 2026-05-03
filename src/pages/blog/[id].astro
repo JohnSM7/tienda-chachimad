@@ -12,7 +12,27 @@ export function getStaticPaths() {
 const { post } = Astro.props;
 ---
 
-<Layout title={`${post.title} | Journal`}>
+<Layout
+    title={`${post.title} · Journal · MADCRY Studio`}
+    description={post.excerpt}
+    image={post.image}
+    ogType="article"
+    schema={{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description: post.excerpt,
+        image: `https://madcry.com${post.image}`,
+        datePublished: post.date,
+        author: { "@type": "Person", name: "Susana Madriz" },
+        publisher: {
+            "@type": "Organization",
+            name: "MADCRY Studio",
+            logo: { "@type": "ImageObject", url: "https://madcry.com/images/logo.png" },
+        },
+        mainEntityOfPage: `https://madcry.com/blog/${post.id}`,
+    }}
+>
     <main class="pt-52 pb-24 px-6 min-h-screen">
         <article class="max-w-5xl mx-auto">
             <div class="mb-8">
@@ -52,17 +72,17 @@ const { post } = Astro.props;
 
                 <div class="w-full md:w-1/2">
                     <div
-                        class="aspect-video w-full overflow-hidden border border-white/10 bg-zinc-900 shadow-2xl relative group"
+                        class="w-full aspect-[4/5] md:aspect-square overflow-hidden border border-white/10 bg-black flex items-center justify-center shadow-2xl relative group"
                     >
                         <div
-                            class="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent z-10 pointer-events-none"
+                            class="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-black/20 z-10 pointer-events-none"
                         >
                         </div>
 
                         <img
                             src={post.image}
                             alt={post.title}
-                            class="w-full h-full object-cover group-hover:scale-105 transition duration-1000"
+                            class="lightbox-trigger cursor-zoom-in w-full h-full object-contain relative z-20 filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.7)] group-hover:scale-105 transition duration-1000"
                             transition:name={`post-img-${post.id}`}
                         />
                     </div>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OG · MADCRY Studio</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #000000;
+        --ink: #ffffff;
+        --muted: #888888;
+        --accent: #dc2626;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        font-family: "Oswald", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+      .stage {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        display: flex;
+        align-items: center;
+        background:
+          radial-gradient(
+            circle at 78% 50%,
+            rgba(255, 255, 255, 0.08),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 12% 80%,
+            rgba(220, 38, 38, 0.18),
+            transparent 50%
+          ),
+          var(--bg);
+      }
+      /* Marca de agua gigante */
+      .watermark {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 700px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 0.8;
+        color: rgba(255, 255, 255, 0.04);
+        white-space: nowrap;
+        pointer-events: none;
+        user-select: none;
+      }
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 1px,
+            transparent 1px
+          );
+        background-size: 60px 60px;
+        mix-blend-mode: lighten;
+      }
+      .content {
+        position: relative;
+        padding: 72px 80px;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        box-sizing: border-box;
+        max-width: 760px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo {
+        height: 64px;
+        width: auto;
+        filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+      }
+      .eyebrow {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      h1 {
+        font-size: 168px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 0.85;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      h1 span {
+        display: block;
+        font-size: 38px;
+        font-weight: 300;
+        letter-spacing: 0.5em;
+        color: var(--ink);
+        margin-top: 24px;
+        opacity: 0.85;
+      }
+      .tag {
+        font-size: 22px;
+        font-weight: 300;
+        line-height: 1.5;
+        color: #d6d6d6;
+        max-width: 600px;
+      }
+      .tag strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 32px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: #f5f5f5;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 10px 18px;
+      }
+      .pill .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.85);
+      }
+      .domain {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        color: #aaaaaa;
+      }
+      /* Panel derecho con muestra de obra */
+      .gallery {
+        position: absolute;
+        right: 60px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 380px;
+        height: 480px;
+        z-index: 1;
+        background: #0a0a0a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(255, 255, 255, 0.02);
+      }
+      .gallery img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: contrast(1.05) saturate(1.05);
+      }
+      .gallery::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          transparent 60%,
+          rgba(0, 0, 0, 0.4)
+        );
+      }
+      .caption {
+        position: absolute;
+        right: 60px;
+        bottom: 50px;
+        z-index: 3;
+        text-align: right;
+      }
+      .caption .name {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: #ffffff;
+      }
+      .caption .meta {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="watermark">MADCRY</div>
+      <div class="grid"></div>
+
+      <div class="gallery">
+        <img src="img/madcry-drowned.jpeg" alt="Madcry · Drowned in Morality" />
+      </div>
+
+      <div class="content">
+        <div class="top">
+          <img class="logo" src="img/logo.png" alt="MADCRY" />
+          <span class="eyebrow">Studio · Madrid</span>
+        </div>
+
+        <div>
+          <h1>
+            MADCRY
+            <span>Arte sin reglas</span>
+          </h1>
+        </div>
+
+        <p class="tag">
+          Galería de arte urbano, dark y anime de
+          <strong>Susana Madriz</strong>. Piezas únicas (1/1) pintadas a mano.
+        </p>
+
+        <div class="footer-row">
+          <span class="pill"
+            ><span class="dot"></span> Open for Commissions</span
+          >
+          <span class="domain">madcry.com</span>
+        </div>
+      </div>
+
+      <div class="caption">
+        <div class="name">Drowned in Morality</div>
+        <div class="meta">Coleccion 2026 · 1/1</div>
+      </div>
+    </div>
+  </body>
+</html>

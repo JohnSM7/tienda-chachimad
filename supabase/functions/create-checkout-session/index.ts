@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
   try {
     const { product_id } = await req.json();
     if (!product_id) {
-      return jsonResponse({ error: 'Falta product_id' }, 400);
+      return jsonResponse({ error: 'Falta product_id' }, 400, req);
     }
 
     // 1. Lee producto fresco con flag hide_price de la categoria
@@ -46,11 +46,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (error || !product) {
-      return jsonResponse({ error: 'Producto no encontrado' }, 404);
+      return jsonResponse({ error: 'Producto no encontrado' }, 404, req);
     }
 
     if (product.status !== 'available') {
-      return jsonResponse({ error: 'Producto no disponible' }, 400);
+      return jsonResponse({ error: 'Producto no disponible' }, 400, req);
     }
 
     // Las categorias con hide_price=true van por encargo (Commission):
@@ -59,7 +59,8 @@ Deno.serve(async (req) => {
     if ((product as any).categories?.hide_price) {
       return jsonResponse(
         { error: 'Esta pieza es por encargo. Solicita presupuesto en /contact.' },
-        400
+        400,
+        req
       );
     }
 
@@ -145,10 +146,10 @@ Deno.serve(async (req) => {
       status: 'pending',
     });
 
-    return jsonResponse({ url: session.url, session_id: session.id });
+    return jsonResponse({ url: session.url, session_id: session.id }, 200, req);
   } catch (err) {
     console.error('create-checkout-session error:', err);
     const message = err instanceof Error ? err.message : 'Error interno';
-    return jsonResponse({ error: message }, 500);
+    return jsonResponse({ error: message }, 500, req);
   }
 });

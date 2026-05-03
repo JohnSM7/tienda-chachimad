@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     await requireAdmin(req);
   } catch (e) {
     if (e instanceof Response) return e;
-    return jsonResponse({ error: 'Auth fallo' }, 401);
+    return jsonResponse({ error: 'Auth fallo' }, 401, req);
   }
 
   const supabase = adminClient();
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     };
 
     if (action === 'delete') {
-      if (!product.id) return jsonResponse({ error: 'Falta id' }, 400);
+      if (!product.id) return jsonResponse({ error: 'Falta id' }, 400, req);
 
       const { data: existing } = await supabase
         .from('products')
@@ -76,15 +76,18 @@ Deno.serve(async (req) => {
           .catch((err) => console.warn('Stripe archive fallo:', err.message));
       }
 
-      return jsonResponse({ ok: true });
+      return jsonResponse({ ok: true }, 200, req);
     }
 
     if (action === 'create') {
       if (!product.name || !product.slug || product.price_cents === undefined) {
-        return jsonResponse({ error: 'Faltan name, slug o price_cents' }, 400);
+        return jsonResponse({ error: 'Faltan name, slug o price_cents' }, 400, req);
       }
 
-      const imageUrls = absolutizeImages(product.images ?? []);
+      // Sanea las imagenes antes de tocar Stripe / BD
+      const safeImages = sanitizeImages(product.images ?? []);
+      product.images = safeImages;
+      const imageUrls = absolutizeImages(safeImages);
 
       // 1. Crear Stripe Product (sin Price — el precio viaja en cada Checkout Session)
       const stripeProduct = await stripe.products.create({
@@ -120,14 +123,14 @@ Deno.serve(async (req) => {
         await stripe.products
           .update(stripeProduct.id, { active: false })
           .catch(() => {});
-        return jsonResponse({ error: error.message }, 400);
+        return jsonResponse({ error: error.message }, 400, req);
       }
 
-      return jsonResponse({ product: data });
+      return jsonResponse({ product: data }, 200, req);
     }
 
     if (action === 'update') {
-      if (!product.id) return jsonResponse({ error: 'Falta id' }, 400);
+      if (!product.id) return jsonResponse({ error: 'Falta id' }, 400, req);
 
       const { data: existing } = await supabase
         .from('products')
@@ -162,8 +165,9 @@ Deno.serve(async (req) => {
         }
       }
       if (product.images !== undefined) {
-        update.images = product.images;
-        stripeUpdate.images = absolutizeImages(product.images).slice(0, 8);
+        const safeImages = sanitizeImages(product.images);
+        update.images = safeImages;
+        stripeUpdate.images = absolutizeImages(safeImages).slice(0, 8);
       }
 
       const { data, error } = await supabase
@@ -173,7 +177,7 @@ Deno.serve(async (req) => {
         .select()
         .single();
 
-      if (error) return jsonResponse({ error: error.message }, 400);
+      if (error) return jsonResponse({ error: error.message }, 400, req);
 
       // Sync con Stripe (solo si hubo cambios relevantes para Stripe)
       if (existing?.stripe_product_id && Object.keys(stripeUpdate).length > 0) {
@@ -182,16 +186,36 @@ Deno.serve(async (req) => {
           .catch((err) => console.warn('Stripe update fallo:', err.message));
       }
 
-      return jsonResponse({ product: data });
+      return jsonResponse({ product: data }, 200, req);
     }
 
-    return jsonResponse({ error: 'Action invalida' }, 400);
+    return jsonResponse({ error: 'Action invalida' }, 400, req);
   } catch (err) {
     console.error('admin-product-sync error:', err);
     const message = err instanceof Error ? err.message : 'Error interno';
-    return jsonResponse({ error: message }, 500);
+    return jsonResponse({ error: message }, 500, req);
   }
 });
+
+// Filtra javascript:, data: y otros esquemas peligrosos antes de
+// guardar en BD o pasar a Stripe. Solo dejamos rutas absolutas https,
+// rutas relativas / o paths internos del bucket.
+function sanitizeImages(images: unknown[]): string[] {
+  if (!Array.isArray(images)) return [];
+  return images
+    .filter((s): s is string => typeof s === 'string')
+    .map((s) => s.trim())
+    .filter((s) => {
+      if (!s) return false;
+      const lower = s.toLowerCase();
+      if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+        return false;
+      }
+      // http/https absoluto, ruta relativa con /, o slug interno (sin esquema)
+      return /^https?:\/\//i.test(s) || s.startsWith('/') || /^[a-z0-9_\-./]+$/i.test(s);
+    })
+    .slice(0, 8);
+}
 
 function absolutizeImages(images: unknown[]): string[] {
   return images

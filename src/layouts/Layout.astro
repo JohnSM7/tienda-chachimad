@@ -5,13 +5,63 @@ interface Props {
     title: string;
     description?: string;
     image?: string;
+    ogType?: "website" | "article" | "product";
+    noindex?: boolean;
+    schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
     title,
-    description = "Galería de arte independiente. Piezas únicas y estilo Dark/Anime.",
-    image = "/images/social-banner.jpg",
+    description = "Galería de arte urbano y anime de Susana Madriz. Piezas únicas (1/1) pintadas a mano en Madrid.",
+    image = "/images/og-banner.png",
+    ogType = "website",
+    noindex = false,
+    schema,
 } = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const imageUrl = new URL(image, Astro.site ?? Astro.url);
+
+// JSON-LD base: Organization + WebSite. Cada pagina puede aportar schemas
+// adicionales via la prop `schema`.
+const baseSchemas: Record<string, unknown>[] = [
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "MADCRY Studio",
+        url: "https://madcry.com",
+        logo: "https://madcry.com/images/logo.png",
+        founder: { "@type": "Person", name: "Susana Madriz" },
+        sameAs: ["https://instagram.com/madcry.studio"],
+        contactPoint: {
+            "@type": "ContactPoint",
+            email: "info@madcry.com",
+            telephone: "+34684123159",
+            contactType: "customer service",
+            areaServed: ["ES", "PT", "FR", "DE", "IT", "NL", "BE", "AT", "IE"],
+            availableLanguage: ["Spanish", "English"],
+        },
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "MADCRY Studio",
+        url: "https://madcry.com",
+        inLanguage: "es-ES",
+        potentialAction: {
+            "@type": "SearchAction",
+            target: "https://madcry.com/shop?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+        },
+    },
+];
+
+const extraSchemas = schema
+    ? Array.isArray(schema)
+        ? schema
+        : [schema]
+    : [];
+const allSchemas = [...baseSchemas, ...extraSchemas];
 ---
 
 <!doctype html>
@@ -20,22 +70,40 @@ const {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/png" href="/images/logo.png" />
+        <link rel="canonical" href={canonicalUrl} />
+        {noindex && <meta name="robots" content="noindex, nofollow" />}
         <title>{title}</title>
         <meta name="description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={Astro.url} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={new URL(image, Astro.site || Astro.url)} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="og:site_name" content="MADCRY Studio" />
+        <meta property="og:locale" content="es_ES" />
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:image" content={new URL(image, Astro.site || Astro.url)} />
+        <meta property="twitter:image" content={imageUrl} />
+        <meta property="twitter:title" content={title} />
+        <meta property="twitter:description" content={description} />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
+            rel="preload"
+            as="style"
             href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap"
-            rel="stylesheet"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript>
+            <link
+                href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap"
+                rel="stylesheet"
+            />
+        </noscript>
+
+        {allSchemas.map((s) => (
+            <script type="application/ld+json" set:html={JSON.stringify(s)} />
+        ))}
 
         <ViewTransitions />
     </head>
@@ -391,25 +459,15 @@ const {
                         <p
                             class="text-[9px] text-gray-500 tracking-[0.2em] uppercase mb-3"
                         >
-                            Únete al culto para accesos secretos.
+                            Newsletter próximamente. Mientras tanto, escríbenos a Instagram.
                         </p>
-                        <form
-                            id="newsletter-form"
-                            class="flex"
+                        <a
+                            href="https://instagram.com/madcry.studio"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-block bg-white text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-300 transition"
+                            >Seguir en Instagram</a
                         >
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="TU EMAIL"
-                                class="w-full bg-zinc-900 border border-zinc-800 focus:border-white text-white text-[10px] px-4 py-2 outline-none transition uppercase tracking-widest placeholder:text-zinc-700"
-                                required
-                            />
-                            <button
-                                type="submit"
-                                class="bg-white text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-300 transition"
-                                >→</button
-                            >
-                        </form>
                     </div>
                 </div>
             </div>
@@ -573,17 +631,6 @@ const {
 <script>
     // ESTE SCRIPT SE EJECUTA EN CADA NAVEGACIÓN
     document.addEventListener("astro:page-load", () => {
-        // --- 0. NEWSLETTER (placeholder hasta conectar backend) ---
-        const newsletter = document.getElementById("newsletter-form");
-        if (newsletter) {
-            newsletter.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const form = e.currentTarget as HTMLFormElement;
-                alert("Gracias por unirte. Pronto conectaremos la lista.");
-                form.reset();
-            });
-        }
-
         // --- 1. CONFIGURACIÓN MENÚ MÓVIL ---
         const btn = document.getElementById("menu-toggle");
         const menu = document.getElementById("mobile-menu");

@@ -27,12 +27,56 @@ const hidePrice = !!product.category_hide_price;
 const priceLabel = product.category_price_label || "Commission";
 const fallbackDescription = product.category_default_description || "Pieza unica de la coleccion.";
 const contactUrl = `/contact?type=commission&product=${encodeURIComponent(product.slug)}`;
+
+const SITE = "https://madcry.com";
+const productUrl = `${SITE}/product/${product.slug}`;
+const absoluteImage = mainImage.startsWith("http") ? mainImage : `${SITE}${mainImage}`;
+const availability =
+    product.status === "available"
+        ? "https://schema.org/InStock"
+        : product.status === "reserved"
+          ? "https://schema.org/PreOrder"
+          : "https://schema.org/SoldOut";
+
+const productSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || fallbackDescription,
+    image: absoluteImage,
+    sku: product.id,
+    brand: { "@type": "Brand", name: "MADCRY Studio" },
+    category: product.category_slug ?? undefined,
+};
+if (!hidePrice) {
+    productSchema.offers = {
+        "@type": "Offer",
+        url: productUrl,
+        priceCurrency: (product.currency || "eur").toUpperCase(),
+        price: (product.price_cents / 100).toFixed(2),
+        availability,
+        itemCondition: "https://schema.org/NewCondition",
+        seller: { "@type": "Organization", name: "MADCRY Studio" },
+    };
+}
+
+const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Colección", item: `${SITE}/shop` },
+        { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
+    ],
+};
 ---
 
 <Layout
-    title={`${product.name} | MADCRY`}
-    description={product.description || `Adquiere ${product.name} en MadCry Studio.`}
+    title={`${product.name} · MADCRY Studio`}
+    description={product.description || `${product.name}: pieza única (1/1) de Susana Madriz. ${fallbackDescription}`}
     image={mainImage}
+    ogType="product"
+    schema={[productSchema, breadcrumbSchema]}
 >
     <main class="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-12">
         <div

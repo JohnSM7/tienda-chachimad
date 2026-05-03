@@ -40,3 +40,12 @@ public/**/*.db
 *-firebase-adminsdk-*.json
 google-services.json
 GoogleService-Info.plist
+
+# Screenshots de debug que se acumulan en raiz
+/home*.png
+/shop*.png
+/custom-product*.png
+/.playwright-mcp/
+
+# Salidas de scripts locales (brand-book, etc)
+brand-book/dist/

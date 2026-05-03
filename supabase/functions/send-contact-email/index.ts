@@ -36,7 +36,7 @@ interface ContactPayload {
 Deno.serve(async (req) => {
   const cors = handleCors(req);
   if (cors) return cors;
-  if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
+  if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405, req);
 
   try {
     const body = (await req.json()) as ContactPayload;
@@ -44,30 +44,41 @@ Deno.serve(async (req) => {
     // Honeypot — bots rellenan este campo, humanos no
     if (body.honeypot) {
       console.log('Honeypot triggered');
-      return jsonResponse({ ok: true });   // mentimos al bot
+      return jsonResponse({ ok: true }, 200, req);   // mentimos al bot
     }
 
     if (!body.name || !body.email || !body.message) {
-      return jsonResponse({ error: 'Campos obligatorios faltantes' }, 400);
+      return jsonResponse({ error: 'Campos obligatorios faltantes' }, 400, req);
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
-      return jsonResponse({ error: 'Email invalido' }, 400);
+      return jsonResponse({ error: 'Email invalido' }, 400, req);
     }
     if (body.message.length > 5000) {
-      return jsonResponse({ error: 'Mensaje demasiado largo' }, 400);
+      return jsonResponse({ error: 'Mensaje demasiado largo' }, 400, req);
     }
 
-    // Rate limit basico — max 3 mensajes por email/IP en 1h
+    // Rate limit por email Y por IP — antes solo email, un bot rotando
+    // emails podia spamear sin freno.
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
     const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
-    const { count } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('email', body.email)
-      .gte('created_at', oneHourAgo);
 
-    if ((count ?? 0) >= 3) {
-      return jsonResponse({ error: 'Demasiados mensajes recientes' }, 429);
+    const [{ count: byEmail }, { count: byIp }] = await Promise.all([
+      supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('email', body.email)
+        .gte('created_at', oneHourAgo),
+      ip
+        ? supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('ip_address', ip)
+            .gte('created_at', oneHourAgo)
+        : Promise.resolve({ count: 0 } as { count: number | null }),
+    ]);
+
+    if ((byEmail ?? 0) >= 3 || (byIp ?? 0) >= 10) {
+      return jsonResponse({ error: 'Demasiados mensajes recientes' }, 429, req);
     }
 
     // Guardar en BD
@@ -82,7 +93,7 @@ Deno.serve(async (req) => {
     });
     if (dbError) {
       console.error('Insert messages fallo:', dbError);
-      return jsonResponse({ error: 'Error guardando mensaje' }, 500);
+      return jsonResponse({ error: 'Error guardando mensaje' }, 500, req);
     }
 
     // Email al admin con plantilla Madcry
@@ -131,9 +142,9 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return jsonResponse({ ok: true });
+    return jsonResponse({ ok: true }, 200, req);
   } catch (err) {
     console.error('send-contact-email error:', err);
-    return jsonResponse({ error: 'Error interno' }, 500);
+    return jsonResponse({ error: 'Error interno' }, 500, req);
   }
 });
