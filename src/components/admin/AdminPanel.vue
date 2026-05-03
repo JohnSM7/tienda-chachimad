@@ -39,6 +39,7 @@ const stats = computed(() => ({
 }));
 
 const rebuildState = ref<"idle" | "loading" | "ok" | "error">("idle");
+const rebuildError = ref<string | null>(null);
 
 async function loadAll() {
   loading.value = true;
@@ -84,18 +85,65 @@ async function quickStatus(p: Product, status: "available" | "sold") {
   if (!error) loadAll();
 }
 
+async function deleteProduct(p: Product) {
+  const ok = confirm(
+    `Borrar "${p.name}"?\n\nPasara a estado 'draft' (oculto en la tienda)\ny se archivara en Stripe. Pedidos antiguos no se pierden.`,
+  );
+  if (!ok) return;
+  try {
+    const { syncProduct } = await import("../../lib/admin");
+    await syncProduct("delete", { id: p.id });
+    loadAll();
+  } catch (e: any) {
+    alert(`Error borrando: ${e?.message ?? "desconocido"}`);
+  }
+}
+
 async function markOrderShipped(o: Order) {
-  const tracking = prompt("Numero de seguimiento (opcional):");
-  const carrier = tracking ? prompt("Empresa (Correos, SEUR, MRW...):") : null;
-  await supabase
+  const tracking = prompt("Numero de seguimiento:");
+  if (!tracking) return;
+  const carrier = prompt("Empresa de envio (Correos, SEUR, MRW, DHL, GLS, UPS):");
+
+  const { error } = await supabase
     .from("orders")
     .update({
       status: "shipped",
-      tracking_number: tracking || null,
+      tracking_number: tracking,
       carrier: carrier || null,
       shipped_at: new Date().toISOString(),
     })
     .eq("id", o.id);
+
+  if (error) {
+    alert(`Error: ${error.message}`);
+    return;
+  }
+
+  // Avisar al cliente con email Madcry
+  try {
+    const { data: session } = await supabase.auth.getSession();
+    if (session.session) {
+      const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/send-shipping-email`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+        body: JSON.stringify({ order_id: o.id }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.warn("Email envio fallo:", err);
+        alert(
+          `Pedido marcado como enviado pero el email al cliente fallo:\n${err.error ?? "desconocido"}`,
+        );
+      }
+    }
+  } catch (e) {
+    console.error("Email shipping error:", e);
+  }
+
   loadAll();
 }
 
@@ -106,14 +154,19 @@ async function markMessageRead(m: any) {
 
 async function publishSite() {
   rebuildState.value = "loading";
+  rebuildError.value = null;
   try {
     await triggerRebuild();
     rebuildState.value = "ok";
     setTimeout(() => (rebuildState.value = "idle"), 5000);
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
     rebuildState.value = "error";
-    setTimeout(() => (rebuildState.value = "idle"), 5000);
+    rebuildError.value = e?.message ?? "Error desconocido";
+    setTimeout(() => {
+      rebuildState.value = "idle";
+      rebuildError.value = null;
+    }, 8000);
   }
 }
 
@@ -131,32 +184,41 @@ onMounted(loadAll);
       <h1 class="text-2xl uppercase tracking-widest text-white font-bold">
         Panel Admin
       </h1>
-      <div class="flex items-center gap-3">
-        <button
-          @click="publishSite"
-          :disabled="rebuildState === 'loading'"
-          class="px-4 py-2 text-[10px] uppercase tracking-widest border border-white/30 text-white hover:bg-white hover:text-black transition disabled:opacity-50"
-          :class="{
-            'border-green-500 text-green-400': rebuildState === 'ok',
-            'border-red-500 text-red-400': rebuildState === 'error',
-          }"
+      <div class="flex flex-col items-end gap-2">
+        <div class="flex items-center gap-3">
+          <button
+            @click="publishSite"
+            :disabled="rebuildState === 'loading'"
+            class="px-4 py-2 text-[10px] uppercase tracking-widest border border-white/30 text-white hover:bg-white hover:text-black transition disabled:opacity-50"
+            :class="{
+              'border-green-500 text-green-400': rebuildState === 'ok',
+              'border-red-500 text-red-400': rebuildState === 'error',
+            }"
+            :title="rebuildError ?? 'Lanza el rebuild del sitio publico'"
+          >
+            {{
+              rebuildState === "loading"
+                ? "Publicando..."
+                : rebuildState === "ok"
+                  ? "✓ Rebuild iniciado"
+                  : rebuildState === "error"
+                    ? "✕ Error"
+                    : "Publicar cambios"
+            }}
+          </button>
+          <button
+            @click="logout"
+            class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition"
+          >
+            Salir
+          </button>
+        </div>
+        <p
+          v-if="rebuildError"
+          class="text-[10px] text-red-400 max-w-xs text-right leading-relaxed"
         >
-          {{
-            rebuildState === "loading"
-              ? "Publicando..."
-              : rebuildState === "ok"
-                ? "✓ Rebuild iniciado"
-                : rebuildState === "error"
-                  ? "Error"
-                  : "Publicar cambios"
-          }}
-        </button>
-        <button
-          @click="logout"
-          class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition"
-        >
-          Salir
-        </button>
+          {{ rebuildError }}
+        </p>
       </div>
     </header>
 
@@ -303,6 +365,7 @@ onMounted(loadAll);
                   v-if="p.status === 'available'"
                   @click="quickStatus(p, 'sold')"
                   class="flex-1 text-[10px] uppercase tracking-widest border border-red-900/30 text-red-400 py-1 hover:bg-red-900/30 transition"
+                  title="Marcar como vendido"
                 >
                   Sold
                 </button>
@@ -310,8 +373,17 @@ onMounted(loadAll);
                   v-else-if="p.status === 'sold'"
                   @click="quickStatus(p, 'available')"
                   class="flex-1 text-[10px] uppercase tracking-widest border border-green-900/30 text-green-400 py-1 hover:bg-green-900/30 transition"
+                  title="Volver a disponible"
                 >
                   Reactivar
+                </button>
+                <button
+                  @click="deleteProduct(p)"
+                  class="text-[10px] uppercase tracking-widest border border-red-900/40 text-red-500 px-2 py-1 hover:bg-red-900/30 hover:text-red-300 transition"
+                  title="Borrar cuadro"
+                  aria-label="Borrar cuadro"
+                >
+                  ✕
                 </button>
               </div>
             </div>

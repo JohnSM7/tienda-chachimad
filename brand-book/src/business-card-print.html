@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MADCRY · Business Card · Print</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: 91mm 61mm; margin: 0; }   /* 85+3+3 x 55+3+3 con sangrado */
+  html, body {
+    margin: 0; padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'Oswald', sans-serif;
+  }
+  /* La pagina fisica es 91x61mm con 3mm de sangrado a cada lado.
+     El area de seguridad esta a 6mm del borde; el corte esta a 3mm. */
+  .card {
+    width: 91mm;
+    height: 61mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:last-child { page-break-after: auto; }
+
+  /* Marcas de corte (decorativas, en la zona de sangrado) */
+  .crop-mark {
+    position: absolute;
+    background: rgba(255,255,255,0.4);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .card.front .crop-mark { background: rgba(255,255,255,0.5); }
+  .card.back .crop-mark { background: rgba(0,0,0,0.4); }
+
+  .crop-tl-h { top: 3mm; left: 0; width: 2mm; height: 0.15mm; }
+  .crop-tl-v { top: 0; left: 3mm; width: 0.15mm; height: 2mm; }
+  .crop-tr-h { top: 3mm; right: 0; width: 2mm; height: 0.15mm; }
+  .crop-tr-v { top: 0; right: 3mm; width: 0.15mm; height: 2mm; }
+  .crop-bl-h { bottom: 3mm; left: 0; width: 2mm; height: 0.15mm; }
+  .crop-bl-v { bottom: 0; left: 3mm; width: 0.15mm; height: 2mm; }
+  .crop-br-h { bottom: 3mm; right: 0; width: 2mm; height: 0.15mm; }
+  .crop-br-v { bottom: 0; right: 3mm; width: 0.15mm; height: 2mm; }
+
+  /* ============== FRONT ============== */
+  .card.front {
+    background: #0a0a0a;
+    background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.07) 0%, transparent 60%);
+    color: #fff;
+    padding: 9mm;  /* 3mm sangrado + 6mm margen seguridad */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card.front .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .card.front .logo { width: 14mm; }
+  .card.front .ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6pt;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.2em;
+  }
+  .card.front .name {
+    font-size: 16pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 1.5mm;
+  }
+  .card.front .role {
+    font-size: 7pt;
+    letter-spacing: 0.3em;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 4mm;
+  }
+  .card.front .contact {
+    font-size: 7pt;
+    letter-spacing: 0.05em;
+    color: #aaa;
+    line-height: 1.6;
+  }
+
+  /* ============== BACK ============== */
+  .card.back {
+    background: #ffffff;
+    color: #000;
+    padding: 9mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card.back .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .card.back .tagline {
+    font-size: 7pt;
+    letter-spacing: 0.4em;
+    color: rgba(0,0,0,0.4);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .card.back .ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6pt;
+    color: rgba(0,0,0,0.3);
+    letter-spacing: 0.2em;
+  }
+  .card.back .big {
+    font-size: 38pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #000;
+    letter-spacing: -0.03em;
+    line-height: 0.85;
+  }
+</style>
+</head>
+<body>
+
+<!-- ANVERSO -->
+<div class="card front">
+  <div class="crop-mark crop-tl-h"></div><div class="crop-mark crop-tl-v"></div>
+  <div class="crop-mark crop-tr-h"></div><div class="crop-mark crop-tr-v"></div>
+  <div class="crop-mark crop-bl-h"></div><div class="crop-mark crop-bl-v"></div>
+  <div class="crop-mark crop-br-h"></div><div class="crop-mark crop-br-v"></div>
+
+  <div class="top">
+    <img src="img/logo.png" class="logo" alt="MADCRY">
+    <span class="ref">MC · 01</span>
+  </div>
+  <div>
+    <p class="name">Susana Madriz</p>
+    <p class="role">Founder · Artist</p>
+    <p class="contact">
+      info@madcry.com · +34 684 123 159<br>
+      madcry.com · Madrid · España
+    </p>
+  </div>
+</div>
+
+<!-- REVERSO -->
+<div class="card back">
+  <div class="crop-mark crop-tl-h"></div><div class="crop-mark crop-tl-v"></div>
+  <div class="crop-mark crop-tr-h"></div><div class="crop-mark crop-tr-v"></div>
+  <div class="crop-mark crop-bl-h"></div><div class="crop-mark crop-bl-v"></div>
+  <div class="crop-mark crop-br-h"></div><div class="crop-mark crop-br-v"></div>
+
+  <div class="top">
+    <span class="tagline">Designed with tears.</span>
+    <span class="ref">REV · 01</span>
+  </div>
+  <div>
+    <p class="big">MADCRY</p>
+  </div>
+</div>
+
+</body>
+</html>

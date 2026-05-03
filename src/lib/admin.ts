@@ -108,8 +108,18 @@ export async function triggerRebuild() {
     headers: { Authorization: `Bearer ${session.session.access_token}` },
   });
 
-  if (!res.ok) throw new Error('Error al solicitar rebuild');
-  return res.json();
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    // Mensajes utiles para el usuario segun el error de la edge function
+    if (json?.error?.includes('GITHUB_TOKEN')) {
+      throw new Error(
+        'Auto-deploy no configurado. Pide a tu desarrollador que configure GITHUB_TOKEN en Supabase.'
+      );
+    }
+    throw new Error(json?.error || `Error ${res.status}`);
+  }
+  return json;
 }
 
 export type { Product };

@@ -46,7 +46,7 @@ async function handleSubmit() {
               type="email"
               required
               autocomplete="email"
-              placeholder="info@madcry.com"
+              placeholder="tu@email.com"
               class="w-full bg-zinc-900 border border-zinc-800 focus:border-white text-white text-sm px-4 py-3 outline-none transition"
             />
           </div>

@@ -12,6 +12,12 @@
 import Stripe from 'https://esm.sh/stripe@17.7.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { Resend } from 'https://esm.sh/resend@4.0.1';
+import {
+  renderEmail,
+  renderDetailRows,
+  formatPriceCents,
+  escapeHtml,
+} from '../_shared/email-template.ts';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
   apiVersion: '2025-09-30.clover',
@@ -129,51 +135,82 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .single();
 
   if (product) {
-    const eur = (cents: number) => `${(cents / 100).toFixed(2)}€`;
-    const total = eur(session.amount_total ?? 0);
+    const orderShortId = session.id.slice(-8).toUpperCase();
+    const totalStr = formatPriceCents(session.amount_total ?? 0, session.currency ?? 'eur');
 
-    // Email cliente
+    // ===== Email cliente =====
+    const clientBody = `
+      <p style="margin:0 0 16px 0;color:#bcbcbc;">Gracias por adquirir una pieza original de Madcry Studio.</p>
+      <p style="margin:0 0 24px 0;color:#bcbcbc;">Tu obra <strong style="color:#ffffff;">${escapeHtml(product.name)}</strong> ya esta confirmada.</p>
+
+      ${renderDetailRows([
+        { label: 'Pieza', value: escapeHtml(product.name) },
+        { label: 'Pedido', value: `#${orderShortId}` },
+        { label: 'Total', value: `<strong>${totalStr}</strong>` },
+      ])}
+
+      <p style="margin:32px 0 8px 0;font-size:10px;letter-spacing:0.2em;color:#888888;text-transform:uppercase;font-weight:700;">Siguientes pasos</p>
+      <ol style="margin:0;padding-left:20px;color:#bcbcbc;font-size:13px;line-height:1.9;">
+        <li>Preparamos tu obra con embalaje de seguridad (24-48h).</li>
+        <li>Recibiras un email con el numero de seguimiento.</li>
+        <li>Entrega estimada: 3-5 dias laborables.</li>
+      </ol>
+    `;
+
     await resend.emails.send({
       from: 'Madcry Studio <pedidos@madcry.com>',
       to: customerEmail,
       replyTo: ADMIN_EMAIL,
-      subject: `Pedido confirmado: ${product.name}`,
-      html: `
-        <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="text-transform: uppercase; letter-spacing: 0.1em;">Pedido confirmado</h1>
-          <p>Gracias por adquirir una pieza original de Madcry Studio.</p>
-          <h2 style="border-top: 1px solid #ccc; padding-top: 20px;">${product.name}</h2>
-          <p><strong>Total:</strong> ${total}</p>
-          <p>Tu pieza estara lista para envio en 24-48h. Recibiras otro email con el numero de seguimiento.</p>
-          <p style="font-size: 11px; color: #888; margin-top: 40px;">
-            Si tienes cualquier duda escribenos a ${ADMIN_EMAIL}.
-          </p>
-        </div>
-      `,
+      subject: `Pedido confirmado · ${product.name}`,
+      html: renderEmail({
+        preheader: `Tu pieza ${product.name} esta en camino. Total ${totalStr}.`,
+        eyebrow: `Pedido #${orderShortId}`,
+        heading: 'Pedido confirmado',
+        bodyHtml: clientBody,
+        cta: { label: 'Ver mi pedido', url: `${SHOP_URL}/product/${product.slug}` },
+        footerNote: `Si tienes cualquier duda contactanos en cualquier momento. Las obras de Madcry son piezas unicas (1/1) pintadas a mano por Susana Madriz.`,
+      }),
     }).catch(err => console.error('Email cliente fallo:', err));
 
-    // Email admin
+    // ===== Email admin =====
+    const shippingHtml = shipping
+      ? `
+        <p style="margin:24px 0 8px 0;font-size:10px;letter-spacing:0.2em;color:#888888;text-transform:uppercase;font-weight:700;">Envio a</p>
+        <div style="background:#0f0f0f;border:1px solid #1f1f1f;padding:16px;color:#ffffff;font-size:13px;line-height:1.7;">
+          ${escapeHtml(shipping.name ?? '')}<br>
+          ${escapeHtml(shipping.address?.line1 ?? '')}<br>
+          ${shipping.address?.line2 ? escapeHtml(shipping.address.line2) + '<br>' : ''}
+          ${escapeHtml(shipping.address?.postal_code ?? '')} ${escapeHtml(shipping.address?.city ?? '')}<br>
+          ${escapeHtml(shipping.address?.country ?? '')}
+        </div>`
+      : '';
+
+    const adminBody = `
+      <p style="margin:0 0 16px 0;color:#bcbcbc;">Nuevo pedido pagado en la tienda.</p>
+
+      ${renderDetailRows([
+        { label: 'Pieza', value: escapeHtml(product.name) },
+        { label: 'Pedido', value: `#${orderShortId}` },
+        { label: 'Total', value: `<strong>${totalStr}</strong>` },
+        { label: 'Cliente', value: escapeHtml(session.customer_details?.name ?? '—') },
+        { label: 'Email', value: `<a href="mailto:${escapeHtml(customerEmail)}" style="color:#ffffff;">${escapeHtml(customerEmail)}</a>` },
+        { label: 'Telefono', value: escapeHtml(session.customer_details?.phone ?? '—') },
+      ])}
+
+      ${shippingHtml}
+    `;
+
     await resend.emails.send({
       from: 'Madcry Pedidos <pedidos@madcry.com>',
       to: ADMIN_EMAIL,
-      subject: `[VENTA] ${product.name} - ${total}`,
-      html: `
-        <h2>Nuevo pedido pagado</h2>
-        <p><strong>Pieza:</strong> ${product.name}</p>
-        <p><strong>Total:</strong> ${total}</p>
-        <p><strong>Cliente:</strong> ${session.customer_details?.name ?? '-'} &lt;${customerEmail}&gt;</p>
-        <p><strong>Telefono:</strong> ${session.customer_details?.phone ?? '-'}</p>
-        ${shipping ? `
-        <p><strong>Envio a:</strong><br>
-          ${shipping.name}<br>
-          ${shipping.address?.line1 ?? ''}<br>
-          ${shipping.address?.line2 ? shipping.address.line2 + '<br>' : ''}
-          ${shipping.address?.postal_code ?? ''} ${shipping.address?.city ?? ''}<br>
-          ${shipping.address?.country ?? ''}
-        </p>
-        ` : ''}
-        <p><a href="${SHOP_URL}/admin">Ir al panel</a></p>
-      `,
+      subject: `[VENTA] ${product.name} · ${totalStr}`,
+      html: renderEmail({
+        preheader: `Nuevo pedido: ${product.name} por ${totalStr}`,
+        eyebrow: `VENTA #${orderShortId}`,
+        heading: 'Nuevo pedido',
+        bodyHtml: adminBody,
+        cta: { label: 'Ir al panel', url: `${SHOP_URL}/admin` },
+      }),
     }).catch(err => console.error('Email admin fallo:', err));
   }
 }

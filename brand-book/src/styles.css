@@ -1,0 +1,581 @@
+/* =====================================================
+   MADCRY STUDIO — Brand Book stylesheet
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+html, body {
+  background: #000000;
+  color: #e5e5e5;
+  font-family: 'Oswald', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* =====================================================
+   PAGE — A4 vertical, 210x297mm
+   ===================================================== */
+.page {
+  width: 210mm;
+  height: 297mm;
+  padding: 20mm 18mm;
+  background: #000000;
+  page-break-after: always;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+.page-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.page-watermark {
+  position: absolute;
+  bottom: -30mm;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 200mm;
+  font-weight: 700;
+  color: rgba(255,255,255,0.025);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  line-height: 0.8;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8pt;
+  letter-spacing: 0.3em;
+  color: #555;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding-bottom: 6mm;
+  border-bottom: 0.3mm solid #1f1f1f;
+  position: relative;
+  z-index: 1;
+}
+.page-header .num { color: #888; }
+
+.page-footer {
+  margin-top: auto;
+  padding-top: 6mm;
+  border-top: 0.3mm solid #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  font-size: 7pt;
+  letter-spacing: 0.3em;
+  color: #444;
+  text-transform: uppercase;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.page-content {
+  flex: 1;
+  padding: 12mm 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* =====================================================
+   TIPOGRAFIA
+   ===================================================== */
+h1, h2, h3, h4 {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  font-size: 9pt;
+  letter-spacing: 0.4em;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 6mm;
+}
+
+.h-display {
+  font-size: 64pt;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin-bottom: 8mm;
+}
+.h-1 {
+  font-size: 38pt;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin-bottom: 6mm;
+}
+.h-2 {
+  font-size: 22pt;
+  line-height: 1;
+  margin-bottom: 4mm;
+}
+.h-3 {
+  font-size: 14pt;
+  letter-spacing: 0.05em;
+  margin-bottom: 3mm;
+}
+
+p {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  font-size: 10.5pt;
+  line-height: 1.7;
+  color: #bcbcbc;
+  margin-bottom: 4mm;
+  letter-spacing: 0.01em;
+}
+p.lead {
+  font-size: 13pt;
+  line-height: 1.6;
+  color: #d4d4d4;
+  font-weight: 300;
+}
+p.small {
+  font-size: 9pt;
+  color: #888;
+  letter-spacing: 0.02em;
+}
+
+strong { color: #ffffff; font-weight: 600; }
+em { font-style: normal; color: #dc2626; font-weight: 500; }
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  letter-spacing: 0;
+}
+
+/* =====================================================
+   COMPONENTES VARIOS
+   ===================================================== */
+.divider {
+  height: 0.3mm;
+  background: #1f1f1f;
+  margin: 8mm 0;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2mm 4mm;
+  font-size: 8pt;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  border: 0.3mm solid #ffffff;
+  color: #ffffff;
+  font-weight: 600;
+}
+.tag.red {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+
+.panel {
+  background: #0a0a0a;
+  border: 0.3mm solid #1f1f1f;
+  padding: 8mm;
+}
+
+/* =====================================================
+   COVER
+   ===================================================== */
+.cover {
+  background: #000;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40mm 20mm;
+}
+.cover .logo {
+  width: 38mm;
+  margin-bottom: 14mm;
+  filter: drop-shadow(0 0 8mm rgba(255,255,255,0.08));
+}
+.cover h1 {
+  font-size: 88pt;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  margin-bottom: 8mm;
+}
+.cover .sub {
+  font-size: 11pt;
+  letter-spacing: 0.5em;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 300;
+  margin-bottom: 50mm;
+}
+.cover .meta {
+  font-size: 8pt;
+  letter-spacing: 0.4em;
+  color: #444;
+  text-transform: uppercase;
+}
+
+/* =====================================================
+   TOC
+   ===================================================== */
+.toc-row {
+  display: flex;
+  align-items: baseline;
+  padding: 3mm 0;
+  border-bottom: 0.3mm dotted #2a2a2a;
+  font-size: 12pt;
+  letter-spacing: 0.05em;
+  color: #ccc;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.toc-row .num {
+  color: #555;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  width: 14mm;
+}
+.toc-row .name { flex: 1; }
+.toc-row .pg { color: #888; font-family: 'JetBrains Mono', monospace; font-size: 9pt; }
+
+/* =====================================================
+   COLOR PALETTE
+   ===================================================== */
+.color-card {
+  display: flex;
+  flex-direction: column;
+}
+.color-swatch {
+  height: 50mm;
+  position: relative;
+  border: 0.3mm solid #1f1f1f;
+  display: flex;
+  align-items: flex-end;
+  padding: 4mm;
+}
+.color-swatch.light { color: #000; }
+.color-swatch .pct {
+  font-size: 32pt;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.color-meta {
+  padding: 4mm 0;
+  font-size: 9pt;
+  line-height: 1.5;
+}
+.color-meta .name {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 10pt;
+  margin-bottom: 2mm;
+}
+.color-meta .code { color: #888; font-family: 'JetBrains Mono', monospace; font-size: 8pt; }
+
+/* =====================================================
+   TYPE SPECIMEN
+   ===================================================== */
+.type-row {
+  border-top: 0.3mm solid #1f1f1f;
+  padding: 5mm 0;
+  display: grid;
+  grid-template-columns: 30mm 1fr 30mm;
+  align-items: baseline;
+  gap: 6mm;
+}
+.type-row .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  color: #666;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.type-row .specimen {
+  font-family: 'Oswald', sans-serif;
+  color: #fff;
+}
+.type-row .meta {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  color: #555;
+}
+
+/* =====================================================
+   LOGO PANEL
+   ===================================================== */
+.logo-panel {
+  background: #0a0a0a;
+  border: 0.3mm solid #1f1f1f;
+  padding: 18mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70mm;
+  position: relative;
+}
+.logo-panel.inverse { background: #ffffff; border-color: #cccccc; }
+.logo-panel img { max-height: 35mm; max-width: 70%; }
+.logo-panel .label {
+  position: absolute;
+  bottom: 3mm;
+  left: 4mm;
+  font-size: 7pt;
+  letter-spacing: 0.3em;
+  color: #555;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.donts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5mm;
+  margin-top: 5mm;
+}
+.dont-item {
+  border: 0.3mm solid #1f1f1f;
+  padding: 6mm;
+  background: #0a0a0a;
+  text-align: center;
+  position: relative;
+  height: 50mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dont-item .x {
+  position: absolute;
+  top: 2mm;
+  right: 3mm;
+  color: #dc2626;
+  font-size: 14pt;
+  font-weight: 700;
+}
+.dont-item .label {
+  position: absolute;
+  bottom: 3mm;
+  left: 0;
+  right: 0;
+  font-size: 7pt;
+  letter-spacing: 0.2em;
+  color: #888;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* =====================================================
+   APPLICATIONS - mockups
+   ===================================================== */
+.mockup {
+  background: #0a0a0a;
+  border: 0.3mm solid #1f1f1f;
+  padding: 6mm;
+  position: relative;
+}
+.mockup-label {
+  font-size: 7pt;
+  letter-spacing: 0.3em;
+  color: #555;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 3mm;
+}
+
+/* Browser mockup */
+.browser-frame {
+  background: #000;
+  border: 0.3mm solid #2a2a2a;
+}
+.browser-bar {
+  background: #0f0f0f;
+  height: 6mm;
+  display: flex;
+  align-items: center;
+  padding: 0 3mm;
+  gap: 1.5mm;
+  border-bottom: 0.2mm solid #1f1f1f;
+}
+.browser-bar .dot { width: 1.5mm; height: 1.5mm; border-radius: 50%; background: #2a2a2a; }
+.browser-bar .url {
+  margin-left: 3mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 6pt;
+  color: #555;
+}
+.browser-content {
+  padding: 6mm;
+  min-height: 50mm;
+}
+
+/* Email mockup */
+.email-frame {
+  background: #000;
+  border: 0.3mm solid #1f1f1f;
+}
+.email-header {
+  padding: 6mm;
+  border-bottom: 0.2mm solid #1f1f1f;
+  text-align: center;
+}
+.email-header img { height: 8mm; }
+.email-body { padding: 6mm; }
+
+/* Instagram mockup */
+.ig-square {
+  aspect-ratio: 1;
+  background: #000;
+  border: 0.3mm solid #1f1f1f;
+  position: relative;
+  overflow: hidden;
+}
+.ig-square .label-mini {
+  position: absolute;
+  top: 3mm;
+  left: 3mm;
+  font-size: 6pt;
+  letter-spacing: 0.3em;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* =====================================================
+   BUSINESS CARD
+   ===================================================== */
+.bc-wrap {
+  display: flex;
+  gap: 10mm;
+  justify-content: center;
+  align-items: center;
+  padding: 12mm 0;
+}
+.business-card {
+  width: 85mm;
+  height: 55mm;
+  background: #000;
+  border: 0.3mm solid #1f1f1f;
+  padding: 7mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.business-card.front {
+  background: #0a0a0a;
+  background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06) 0%, transparent 60%);
+}
+.business-card.back {
+  background: #ffffff;
+  color: #000;
+}
+.business-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+.business-card .logo-mini { width: 14mm; }
+.business-card .ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 6pt;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.2em;
+}
+.business-card.back .ref { color: rgba(0,0,0,0.3); }
+.business-card .name {
+  font-size: 16pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-bottom: 1mm;
+}
+.business-card.back .name { color: #000; }
+.business-card .role {
+  font-size: 7pt;
+  letter-spacing: 0.3em;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4mm;
+}
+.business-card .contact {
+  font-size: 7pt;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  line-height: 1.6;
+}
+.business-card.back .contact { color: #555; }
+.business-card .tagline {
+  font-size: 7pt;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.business-card.back .tagline { color: rgba(0,0,0,0.4); }
+.business-card.back .name-back {
+  font-size: 38pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+  letter-spacing: -0.03em;
+  line-height: 0.85;
+}
+
+/* =====================================================
+   MOOD BOARD
+   ===================================================== */
+.mood-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3mm;
+  height: 100mm;
+}
+.mood-cell {
+  border: 0.3mm solid #1f1f1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7pt;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #888;
+  font-family: 'JetBrains Mono', monospace;
+  background: #0a0a0a;
+  position: relative;
+  overflow: hidden;
+}
+.mood-cell:nth-child(1) { grid-row: 1 / 3; background: radial-gradient(circle at 30% 70%, #1a1a1a, #000); }
+.mood-cell:nth-child(2) { background: linear-gradient(135deg, #000, #1f1f1f); }
+.mood-cell:nth-child(3) { background: linear-gradient(45deg, #0a0a0a 25%, transparent 25%, transparent 75%, #0a0a0a 75%), linear-gradient(45deg, #0a0a0a 25%, #1a1a1a 25%, #1a1a1a 75%, #0a0a0a 75%); background-size: 4mm 4mm; background-position: 0 0, 2mm 2mm; }
+.mood-cell:nth-child(4) { background: radial-gradient(circle at 50% 50%, rgba(220,38,38,0.4) 0%, transparent 60%), #000; }
+.mood-cell:nth-child(5) { background: linear-gradient(180deg, #000 0%, #1a1a1a 100%); }

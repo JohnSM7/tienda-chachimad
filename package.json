@@ -20,6 +20,8 @@
     "vue": "^3.5.33"
   },
   "devDependencies": {
+    "libsodium-wrappers": "^0.8.4",
+    "puppeteer": "^24.42.0",
     "supabase": "^2.98.0"
   }
 }

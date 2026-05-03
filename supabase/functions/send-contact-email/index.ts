@@ -9,6 +9,11 @@
 import { Resend } from 'https://esm.sh/resend@4.0.1';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse } from '../_shared/cors.ts';
+import {
+  renderEmail,
+  renderDetailRows,
+  escapeHtml,
+} from '../_shared/email-template.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY')!);
 const supabase = createClient(
@@ -80,26 +85,50 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Error guardando mensaje' }, 500);
     }
 
-    // Email al admin
-    const subject = `[Contacto - ${body.type ?? 'general'}] ${body.name}`;
+    // Email al admin con plantilla Madcry
+    const typeLabel =
+      body.type === 'commission'
+        ? 'Comision de arte'
+        : body.type === 'collab'
+          ? 'Colaboracion'
+          : 'General';
+
+    const detailRows: Array<{ label: string; value: string }> = [
+      { label: 'Tipo', value: escapeHtml(typeLabel) },
+      { label: 'Nombre', value: escapeHtml(body.name) },
+      {
+        label: 'Email',
+        value: `<a href="mailto:${escapeHtml(body.email)}" style="color:#ffffff;">${escapeHtml(body.email)}</a>`,
+      },
+    ];
+    if (body.budget) {
+      detailRows.push({ label: 'Presupuesto', value: escapeHtml(body.budget) });
+    }
+
+    const adminBody = `
+      <p style="margin:0 0 16px 0;color:#bcbcbc;">Tienes un nuevo mensaje desde el formulario de contacto.</p>
+
+      ${renderDetailRows(detailRows)}
+
+      <p style="margin:24px 0 8px 0;font-size:10px;letter-spacing:0.2em;color:#888888;text-transform:uppercase;font-weight:700;">Mensaje</p>
+      <div style="background:#0f0f0f;border-left:2px solid #ffffff;padding:16px 20px;color:#e5e5e5;font-size:14px;line-height:1.7;white-space:pre-wrap;">${escapeHtml(body.message)}</div>
+    `;
+
     await resend.emails.send({
       from: 'Madcry Web <web@madcry.com>',
       to: ADMIN_EMAIL,
       replyTo: body.email,
-      subject,
-      html: `
-        <div style="font-family: system-ui, sans-serif; max-width: 600px;">
-          <h2>Nuevo contacto desde la web</h2>
-          <p><strong>Tipo:</strong> ${escapeHtml(body.type ?? 'general')}</p>
-          <p><strong>Nombre:</strong> ${escapeHtml(body.name)}</p>
-          <p><strong>Email:</strong> <a href="mailto:${escapeHtml(body.email)}">${escapeHtml(body.email)}</a></p>
-          ${body.budget ? `<p><strong>Presupuesto:</strong> ${escapeHtml(body.budget)}</p>` : ''}
-          <p><strong>Mensaje:</strong></p>
-          <blockquote style="border-left: 3px solid #000; padding-left: 12px; color: #333;">
-            ${escapeHtml(body.message).replace(/\n/g, '<br>')}
-          </blockquote>
-        </div>
-      `,
+      subject: `[Contacto · ${typeLabel}] ${body.name}`,
+      html: renderEmail({
+        preheader: `${body.name} - ${body.message.slice(0, 80)}`,
+        eyebrow: `Nuevo contacto · ${typeLabel}`,
+        heading: body.name,
+        bodyHtml: adminBody,
+        cta: {
+          label: 'Responder',
+          url: `mailto:${body.email}?subject=Re: tu mensaje en madcry.com`,
+        },
+      }),
     });
 
     return jsonResponse({ ok: true });
@@ -108,12 +137,3 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Error interno' }, 500);
   }
 });
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
