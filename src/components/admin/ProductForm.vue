@@ -36,6 +36,28 @@ const saving = ref(false);
 const uploading = ref(false);
 const error = ref<string | null>(null);
 
+// === Slug: auto-genera desde el nombre, comprueba duplicados ===
+const slugManuallyEdited = ref(isEdit.value); // si editamos, no auto-sobrescribir
+const slugCheck = ref<"idle" | "checking" | "available" | "taken" | "invalid">(
+  "idle",
+);
+let slugCheckTimer: ReturnType<typeof setTimeout> | null = null;
+
+function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // quitar tildes
+    .replace(/ñ/g, "n")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+function onSlugInput() {
+  slugManuallyEdited.value = true;
+}
+
 const categories = [
   { id: "madcry", name: "MadCry" },
   { id: "one-piece", name: "One Piece" },
@@ -46,20 +68,42 @@ const categories = [
   { id: "otros", name: "Otros" },
 ];
 
-// Auto-generar slug desde nombre si esta vacio
+// Auto-genera slug mientras el usuario escribe el nombre (hasta que toque
+// manualmente el campo slug — entonces respeta su edicion).
 watch(
   () => form.value.name,
   (name) => {
-    if (!isEdit.value && name && !form.value.slug) {
-      form.value.slug = name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 60);
+    if (!slugManuallyEdited.value && name) {
+      form.value.slug = slugify(name);
     }
-  }
+  },
+);
+
+// Comprueba en BD si el slug esta libre (debounced).
+watch(
+  () => form.value.slug,
+  (slug) => {
+    if (slugCheckTimer) clearTimeout(slugCheckTimer);
+    if (!slug) {
+      slugCheck.value = "idle";
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      slugCheck.value = "invalid";
+      return;
+    }
+    slugCheck.value = "checking";
+    slugCheckTimer = setTimeout(async () => {
+      let q = supabase.from("products").select("id").eq("slug", slug).limit(1);
+      if (form.value.id) q = q.neq("id", form.value.id);
+      const { data, error: e } = await q;
+      if (e) {
+        slugCheck.value = "idle";
+        return;
+      }
+      slugCheck.value = data && data.length > 0 ? "taken" : "available";
+    }, 350);
+  },
 );
 
 async function onFileUpload(e: Event) {
@@ -101,6 +145,14 @@ function moveImage(index: number, dir: -1 | 1) {
 
 async function handleSubmit() {
   if (saving.value) return;
+  if (slugCheck.value === "taken") {
+    error.value = "El slug ya esta en uso por otro cuadro. Cambialo.";
+    return;
+  }
+  if (slugCheck.value === "invalid") {
+    error.value = "El slug solo puede contener minusculas, numeros y guiones.";
+    return;
+  }
   saving.value = true;
   error.value = null;
 
@@ -244,17 +296,40 @@ async function handleDelete() {
         />
       </div>
       <div class="space-y-1">
-        <label class="text-[10px] uppercase tracking-widest text-gray-500"
-          >Slug (URL) *</label
-        >
+        <div class="flex items-center justify-between gap-2">
+          <label class="text-[10px] uppercase tracking-widest text-gray-500">
+            Slug (URL) *
+          </label>
+          <span
+            class="text-[10px] uppercase tracking-widest font-mono"
+            :class="{
+              'text-gray-500': slugCheck === 'idle' || slugCheck === 'checking',
+              'text-green-400': slugCheck === 'available',
+              'text-red-400': slugCheck === 'taken' || slugCheck === 'invalid',
+            }"
+          >
+            <span v-if="slugCheck === 'checking'">comprobando…</span>
+            <span v-else-if="slugCheck === 'available'">✓ disponible</span>
+            <span v-else-if="slugCheck === 'taken'">✕ ya en uso</span>
+            <span v-else-if="slugCheck === 'invalid'">✕ formato invalido</span>
+          </span>
+        </div>
         <input
           v-model="form.slug"
+          @input="onSlugInput"
           type="text"
           required
           pattern="[a-z0-9\-]+"
-          class="w-full bg-black border border-zinc-700 focus:border-white text-white text-sm px-3 py-2 outline-none font-mono"
+          class="w-full bg-black border focus:border-white text-white text-sm px-3 py-2 outline-none font-mono"
+          :class="{
+            'border-zinc-700': slugCheck !== 'taken' && slugCheck !== 'invalid',
+            'border-red-700': slugCheck === 'taken' || slugCheck === 'invalid',
+          }"
           placeholder="drowned-in-morality"
         />
+        <p class="text-[10px] text-gray-600 font-mono">
+          madcry.com/product/<span class="text-gray-400">{{ form.slug || "tu-slug" }}</span>
+        </p>
       </div>
     </div>
 
@@ -371,8 +446,14 @@ async function handleDelete() {
         </button>
         <button
           type="submit"
-          :disabled="saving || uploading"
-          class="px-6 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition disabled:opacity-50"
+          :disabled="
+            saving ||
+            uploading ||
+            slugCheck === 'checking' ||
+            slugCheck === 'taken' ||
+            slugCheck === 'invalid'
+          "
+          class="px-6 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ saving ? "Guardando..." : isEdit ? "Guardar cambios" : "Crear cuadro" }}
         </button>
