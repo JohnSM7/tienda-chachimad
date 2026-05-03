@@ -36,7 +36,12 @@ const categories = [
             </div>
         </div>
         <div class="z-10 text-center space-y-4 px-4 mt-24 md:mt-36">
+            <p
+                id="category-eyebrow"
+                class="hidden text-red-500 text-[10px] tracking-[0.5em] uppercase font-bold"
+            ></p>
             <h1
+                id="shop-title"
                 class="text-4xl md:text-8xl font-bold uppercase tracking-tighter text-white"
             >
                 Colección
@@ -44,6 +49,13 @@ const categories = [
             <p class="text-gray-400 text-xs tracking-[0.5em] uppercase">
                 Piezas exclusivas • 1/1
             </p>
+            <a
+                id="show-all-link"
+                href="/shop"
+                class="hidden mt-4 text-[10px] uppercase tracking-widest text-gray-400 hover:text-white border-b border-gray-700 hover:border-white pb-1 transition"
+            >
+                Ver todas las obras →
+            </a>
         </div>
     </header>
 
@@ -134,7 +146,61 @@ const categories = [
 <script>
     import { supabase } from "../lib/supabase";
 
+    const CATEGORY_NAMES: Record<string, string> = {
+        madcry: "MadCry",
+        "one-piece": "One Piece",
+        "dragon-ball": "Dragon Ball",
+        "jujutsu-kaisen": "Jujutsu Kaisen",
+        naruto: "Naruto",
+        custom: "Commission",
+        otros: "Otros",
+    };
+
     document.addEventListener("astro:page-load", async () => {
+        // --- Filtro por categoria desde ?category= ---
+        const params = new URLSearchParams(window.location.search);
+        const filterCat = params.get("category");
+        if (filterCat) {
+            const items = document.querySelectorAll<HTMLElement>(".product-item");
+            let visibleCount = 0;
+            items.forEach((item) => {
+                if (item.dataset.category === filterCat) {
+                    item.style.display = "";
+                    visibleCount++;
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            // Actualizar header con el nombre de la coleccion
+            const eyebrow = document.getElementById("category-eyebrow");
+            const title = document.getElementById("shop-title");
+            const showAll = document.getElementById("show-all-link");
+            const catName = CATEGORY_NAMES[filterCat] || filterCat;
+            if (eyebrow) {
+                eyebrow.textContent = `Colección ${catName}`;
+                eyebrow.classList.remove("hidden");
+            }
+            if (title) {
+                title.textContent = catName.toUpperCase();
+            }
+            if (showAll) {
+                showAll.classList.remove("hidden");
+            }
+
+            // Si no hay productos en la categoria, mostrar mensaje
+            if (visibleCount === 0) {
+                const grid = document.getElementById("product-grid");
+                if (grid) {
+                    const empty = document.createElement("p");
+                    empty.className =
+                        "text-gray-500 text-xs uppercase tracking-widest text-center py-20 col-span-full";
+                    empty.textContent = "No hay obras en esta colección aún.";
+                    grid.appendChild(empty);
+                }
+            }
+        }
+
         // --- Refresh stock client-side (sin rebuild necesario) ---
         // Si Susana marca un cuadro como sold, se ve aqui en segundos.
         try {
