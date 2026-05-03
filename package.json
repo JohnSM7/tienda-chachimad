@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node brand-book/generate-og.mjs"
+    "og": "node brand-book/generate-og.mjs",
+    "doc:pdf": "node docs/generate-pdf.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",

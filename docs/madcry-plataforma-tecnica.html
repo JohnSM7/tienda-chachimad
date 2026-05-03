@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>MADCRY Studio · Documentación técnica de plataforma</title>
+  <link rel="stylesheet" href="shared-corporate.css" />
+  <style>
+    /* Layout helpers especificos de este documento */
+    .stack-card {
+      background: var(--bone);
+      border-top: 3px solid var(--accent);
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stack-card .label {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      opacity: 0.55;
+    }
+    .stack-card .name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .stack-card .desc {
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .arch-tier {
+      background: var(--ink);
+      color: var(--white);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 132px;
+    }
+    .arch-tier .tier-num {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .arch-tier .tier-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .arch-tier ul {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .arch-tier li {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+    }
+
+    .arrow {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--accent);
+      padding: 4px 0;
+    }
+
+    /* ASCII / pseudo-diagram block */
+    .flow-block {
+      background: var(--ink);
+      color: var(--white);
+      padding: 22px 24px;
+      font-family: "JetBrains Mono", "Courier New", monospace;
+      font-size: 11px;
+      line-height: 1.85;
+      white-space: pre;
+      overflow: hidden;
+      letter-spacing: 0.01em;
+    }
+    .flow-block .accent { color: var(--accent); }
+    .flow-block .muted  { color: rgba(255,255,255,0.45); }
+
+    /* Security matrix */
+    .sec-row {
+      display: grid;
+      grid-template-columns: 28px 130px 1fr;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: flex-start;
+    }
+    .sec-row:last-child { border-bottom: none; }
+    .sec-num {
+      font-family: var(--font-display);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      padding: 3px 0;
+      background: var(--ink);
+      text-align: center;
+    }
+    .sec-name {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.35;
+    }
+    .sec-desc {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    /* Code-like inline */
+    code {
+      font-family: "JetBrains Mono", "Courier New", monospace;
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 6px;
+      letter-spacing: 0.01em;
+    }
+    .callout-dark code { background: rgba(255, 255, 255, 0.08); color: var(--accent); }
+
+    /* TOC */
+    .toc-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 38px;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: baseline;
+    }
+    .toc-num {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+    .toc-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .toc-name span {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--text);
+      opacity: 0.65;
+      margin-left: 8px;
+    }
+    .toc-page {
+      font-family: var(--font-display);
+      font-size: 10px;
+      color: var(--ink);
+      opacity: 0.5;
+      text-align: right;
+    }
+
+    /* KPI / metric strip */
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .metric {
+      background: var(--bone);
+      padding: 14px 14px 12px;
+    }
+    .metric .v {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .metric .l {
+      font-family: var(--font-display);
+      font-size: 8.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      opacity: 0.55;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover-dark">
+    <div class="cover-top">
+      <div class="cover-logo" style="display:flex;align-items:center;gap:14px;">
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:0.08em;color:var(--white);">MADCRY</div>
+        <div style="font-family:var(--font-display);font-size:9px;letter-spacing:0.3em;color:var(--accent);">STUDIO</div>
+      </div>
+      <div class="cover-doc-type">Documentación técnica</div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-eyebrow">Plataforma · Versión 1.0 · Mayo 2026</div>
+      <div class="cover-title">
+        Documentación<br />
+        <span class="hl-lime">técnica</span> de<br />
+        plataforma.
+      </div>
+      <div class="divider-lime"></div>
+      <div class="cover-subtitle">
+        Arquitectura, stack tecnológico, modelo de datos, flujos de negocio, controles de seguridad y cumplimiento normativo de la tienda online y panel de gestión de Madcry Studio (madcry.com).
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <span>Madcry Studio · Susana Madriz</span>
+      <span>Implementación · www.tanesolutions.com</span>
+    </div>
+    <div class="cover-accent-bar"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 2 — METADATA + TABLA DE CONTENIDOS
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:0.06em;color:var(--ink);margin-bottom:28px;">MADCRY <span style="color:var(--text-muted);font-weight:600;">STUDIO</span></div>
+
+    <div class="section-header">
+      <div class="section-num">00</div>
+      <div>
+        <div class="section-title">Datos del documento</div>
+        <div class="section-desc">Versión, alcance y responsables</div>
+      </div>
+    </div>
+
+    <table class="doc-table" style="margin-bottom:28px;">
+      <tbody>
+        <tr>
+          <th style="width:32%;">Documento</th>
+          <td>Documentación técnica de plataforma — madcry.com</td>
+        </tr>
+        <tr>
+          <th>Versión</th>
+          <td>1.0 · Mayo 2026</td>
+        </tr>
+        <tr>
+          <th>Propietario del producto</th>
+          <td>Susana Madriz · Madcry Studio</td>
+        </tr>
+        <tr>
+          <th>Implementación y mantenimiento</th>
+          <td>Tane Solutions (consultora digital)</td>
+        </tr>
+        <tr>
+          <th>Repositorio</th>
+          <td><code>github.com/JohnSM7/tienda-chachimad</code> (privado)</td>
+        </tr>
+        <tr>
+          <th>Entorno productivo</th>
+          <td>https://madcry.com — Firebase Hosting (CDN global)</td>
+        </tr>
+        <tr>
+          <th>Alcance</th>
+          <td>Sitio público de catálogo, e-commerce, formulario de contacto, blog y panel de administración.</td>
+        </tr>
+        <tr>
+          <th>Audiencia objetivo</th>
+          <td>Auditoría técnica, due diligence, evaluación legal, soporte interno.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-header">
+      <div class="section-num">↗</div>
+      <div>
+        <div class="section-title">Tabla de contenidos</div>
+        <div class="section-desc">Estructura del documento</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="toc-row">
+        <div class="toc-num">01</div>
+        <div class="toc-name">Resumen ejecutivo<span>Qué es la plataforma y cómo está construida</span></div>
+        <div class="toc-page">03</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">02</div>
+        <div class="toc-name">Stack tecnológico<span>Tecnologías y proveedores en uso</span></div>
+        <div class="toc-page">04</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">03</div>
+        <div class="toc-name">Arquitectura<span>Frontend, backend, infraestructura</span></div>
+        <div class="toc-page">05</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">04</div>
+        <div class="toc-name">Modelo de datos<span>Esquema de base de datos y relaciones</span></div>
+        <div class="toc-page">06</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">05</div>
+        <div class="toc-name">Flujos críticos<span>Compra, contacto, publicación de obra</span></div>
+        <div class="toc-page">07</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">06</div>
+        <div class="toc-name">Seguridad — capas y controles<span>Defensa en profundidad</span></div>
+        <div class="toc-page">09</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">07</div>
+        <div class="toc-name">Gestión de secretos<span>Credenciales, rotación, exposición</span></div>
+        <div class="toc-page">11</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">08</div>
+        <div class="toc-name">SEO, rendimiento y accesibilidad<span>Indexación, Core Web Vitals, WCAG</span></div>
+        <div class="toc-page">12</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">09</div>
+        <div class="toc-name">Cumplimiento legal<span>RGPD, LSSI-CE, datos personales</span></div>
+        <div class="toc-page">13</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">10</div>
+        <div class="toc-name">Operación, backups y continuidad<span>Despliegue, recuperación, monitorización</span></div>
+        <div class="toc-page">14</div>
+      </div>
+      <div class="toc-row">
+        <div class="toc-num">11</div>
+        <div class="toc-name">Anexos<span>Glosario y matriz de roles</span></div>
+        <div class="toc-page">15</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Índice · 02</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 3 — RESUMEN EJECUTIVO
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div>
+        <div class="section-title">Resumen ejecutivo</div>
+        <div class="section-desc">Visión general en una página</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:14px;">
+      <strong>Madcry Studio</strong> es la galería online y tienda directa de la artista <strong>Susana Madriz</strong>. La plataforma permite mostrar el catálogo de obra, gestionar la venta de piezas únicas (1/1) con cobro a tarjeta, recoger comisiones a medida a través de un formulario de contacto y administrar todo el contenido desde un panel privado.
+    </p>
+
+    <p style="margin-bottom:14px;">
+      El sitio se construye con <strong>Astro 5</strong> en modo estático (SSG): cada despliegue genera HTML pre-renderizado servido desde una CDN global. La interactividad puntual (panel admin, botón de compra) se hidrata con <strong>Vue 3</strong>. El backend transaccional vive en <strong>Supabase</strong> (PostgreSQL gestionado, autenticación, almacenamiento de imágenes y funciones serverless), mientras que el cobro lo realiza <strong>Stripe</strong> en modo Checkout, sin que datos de tarjeta lleguen nunca al servidor de Madcry.
+    </p>
+
+    <h3 class="sub">Características clave</h3>
+    <div class="metric-strip">
+      <div class="metric">
+        <div class="v">SSG</div>
+        <div class="l">Pre-rendering<br />estático</div>
+      </div>
+      <div class="metric">
+        <div class="v">PCI-DSS</div>
+        <div class="l">Pago<br />delegado Stripe</div>
+      </div>
+      <div class="metric">
+        <div class="v">RLS</div>
+        <div class="l">Row-Level<br />Security activo</div>
+      </div>
+      <div class="metric">
+        <div class="v">CSP</div>
+        <div class="l">Headers<br />de seguridad</div>
+      </div>
+    </div>
+
+    <h3 class="sub" style="margin-top:24px;">Principios rectores</h3>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+      <li style="padding:10px 14px;background:var(--bone);border-left:3px solid var(--accent);font-size:13px;line-height:1.6;"><strong>Privilegio mínimo.</strong> Cada componente accede sólo a lo que necesita. La clave anónima del cliente no puede leer pedidos. Las credenciales potentes viven exclusivamente en funciones serverless.</li>
+      <li style="padding:10px 14px;background:var(--bone);border-left:3px solid var(--accent);font-size:13px;line-height:1.6;"><strong>Defensa en profundidad.</strong> Múltiples capas (CDN, CSP, RLS, JWT, validación servidor, captcha futuro) impiden que el fallo de una sola comprometa el sistema.</li>
+      <li style="padding:10px 14px;background:var(--bone);border-left:3px solid var(--accent);font-size:13px;line-height:1.6;"><strong>Estático por defecto.</strong> Lo que se puede pre-renderizar, se pre-renderiza. Reduce superficie de ataque y coste a la vez.</li>
+      <li style="padding:10px 14px;background:var(--bone);border-left:3px solid var(--accent);font-size:13px;line-height:1.6;"><strong>Auditable.</strong> Todo el código está versionado en Git. Cada despliegue es trazable. Las funciones serverless registran logs estructurados.</li>
+    </ul>
+
+    <div class="callout callout-dark" style="margin-top:24px;">
+      <div class="callout-icon">●</div>
+      <div>
+        <p><strong style="color:var(--accent);">Resultado de la auditoría interna (mayo 2026):</strong> sin vulnerabilidades críticas. Mejoras menores de SEO y endurecimiento de CSP en cola para próxima iteración. Detalle en sección 06.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Resumen ejecutivo · 03</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 4 — STACK TECNOLÓGICO
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div>
+        <div class="section-title">Stack tecnológico</div>
+        <div class="section-desc">Componentes y proveedores en producción</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Frontend y compilación</h3>
+    <div class="three-col" style="gap:10px;">
+      <div class="stack-card">
+        <div class="label">Framework</div>
+        <div class="name">Astro 5</div>
+        <div class="desc">Generador estático con islas de hidratación. Build out: HTML + assets sin runtime servidor.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">UI islas</div>
+        <div class="name">Vue 3</div>
+        <div class="desc">Composition API. Hidrata sólo el panel admin y el botón de compra; resto inerte.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Estilos</div>
+        <div class="name">Tailwind CSS 3</div>
+        <div class="desc">Utility-first. Sin CSS custom salvo animaciones globales del layout.</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Backend, datos y servicios</h3>
+    <div class="three-col" style="gap:10px;">
+      <div class="stack-card">
+        <div class="label">Base de datos</div>
+        <div class="name">Supabase / Postgres 17</div>
+        <div class="desc">PostgreSQL gestionado con RLS, vistas y triggers. Backups automáticos diarios.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Auth</div>
+        <div class="name">Supabase Auth</div>
+        <div class="desc">Magic-link por email para acceso al panel. Sin contraseñas que perder.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Storage</div>
+        <div class="name">Supabase Storage</div>
+        <div class="desc">Bucket público <code>products</code>. Sólo admin escribe, lectura CDN. 10 MB/archivo, MIME whitelist.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Funciones serverless</div>
+        <div class="name">Supabase Edge Functions</div>
+        <div class="desc">Deno. 7 funciones desplegadas: pago, webhook, contacto, sync, rebuild, verify y email envíos.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Pasarela de pago</div>
+        <div class="name">Stripe Checkout</div>
+        <div class="desc">PCI-DSS Level 1 delegado. Webhooks firmados con HMAC-SHA256.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Email transaccional</div>
+        <div class="name">Resend</div>
+        <div class="desc">SPF/DKIM/DMARC alineados sobre dominio madcry.com. Plantillas HTML del estudio.</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Infraestructura y despliegue</h3>
+    <div class="three-col" style="gap:10px;">
+      <div class="stack-card">
+        <div class="label">CDN / hosting</div>
+        <div class="name">Firebase Hosting</div>
+        <div class="desc">Multi-región, HTTPS forzado, HTTP/2, rollback instantáneo a versión previa.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">CI / CD</div>
+        <div class="name">GitHub Actions</div>
+        <div class="desc">Workflow <code>deploy.yml</code> dispara build + deploy en cada push a <code>main</code> o vía panel admin.</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">DNS</div>
+        <div class="name">A definir</div>
+        <div class="desc">Registro <code>madcry.com</code> apuntado a Firebase. Subdominio <code>www</code> redirige a apex.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-bone">
+      <div class="callout-icon">i</div>
+      <div>
+        <p>Todas las dependencias están <strong>fijadas por versión</strong> en <code>package.json</code> y <code>package-lock.json</code>. Ninguna es de terceros desconocidos: todas tienen mantenimiento activo y alta adopción comunitaria. La actualización de dependencias se ejecuta de forma controlada cada trimestre.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Stack tecnológico · 04</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 5 — ARQUITECTURA
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div>
+        <div class="section-title">Arquitectura</div>
+        <div class="section-desc">Visión por capas y separación de responsabilidades</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px;">
+      La plataforma sigue una arquitectura <strong>JAMstack con backend gestionado</strong>: el cliente es estático, los servicios sensibles viven detrás de funciones serverless aisladas, y los proveedores externos (Stripe, Resend) se invocan exclusivamente desde el lado servidor con credenciales nunca expuestas al navegador.
+    </p>
+
+    <h3 class="sub">Diagrama de capas</h3>
+    <div class="arch-grid">
+      <div class="arch-tier">
+        <div class="tier-num">Capa 1 · Cliente</div>
+        <div class="tier-name">Navegador</div>
+        <ul>
+          <li>Astro HTML estático</li>
+          <li>Vue 3 (islas)</li>
+          <li>Sólo claves públicas</li>
+          <li>CSP estricta + HSTS</li>
+        </ul>
+      </div>
+      <div class="arch-tier">
+        <div class="tier-num">Capa 2 · Borde</div>
+        <div class="tier-name">CDN + Funciones</div>
+        <ul>
+          <li>Firebase Hosting</li>
+          <li>Edge Functions (Deno)</li>
+          <li>JWT + CORS allowlist</li>
+          <li>Rate-limit por IP</li>
+        </ul>
+      </div>
+      <div class="arch-tier">
+        <div class="tier-num">Capa 3 · Núcleo</div>
+        <div class="tier-name">Datos y pago</div>
+        <ul>
+          <li>Postgres con RLS</li>
+          <li>Stripe (PCI-DSS L1)</li>
+          <li>Resend (email)</li>
+          <li>Storage + bucket auth</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">▲ ▼ comunicación cifrada TLS 1.3</div>
+
+    <h3 class="sub">Relación entre componentes</h3>
+    <div class="flow-block"><span class="muted">┌─────────────┐    ┌─────────────────┐    ┌──────────────────┐</span>
+<span class="muted">│</span>  <span class="accent">Visitante</span>  <span class="muted">│───▶│</span> Firebase CDN    <span class="muted">│───▶│</span> HTML estático    <span class="muted">│</span>
+<span class="muted">│</span>  navegador  <span class="muted">│    │</span> (HTTPS+HSTS)    <span class="muted">│    │</span> de <span class="accent">/dist/</span>       <span class="muted">│</span>
+<span class="muted">└─────────────┘    └─────────────────┘    └──────────────────┘</span>
+        <span class="muted">│</span>
+        <span class="muted">│</span> click "comprar" / submit form
+        <span class="muted">▼</span>
+<span class="muted">┌──────────────────────────────────────────────────────────────┐</span>
+<span class="muted">│</span>  <span class="accent">Supabase Edge Functions</span> (Deno · TLS · CORS allowlist)     <span class="muted">│</span>
+<span class="muted">│</span>  ─ create-checkout-session  ─ verify-session                <span class="muted">│</span>
+<span class="muted">│</span>  ─ stripe-webhook (HMAC)    ─ send-contact-email            <span class="muted">│</span>
+<span class="muted">│</span>  ─ admin-product-sync (JWT) ─ trigger-rebuild (JWT)         <span class="muted">│</span>
+<span class="muted">└──────────────────────────────────────────────────────────────┘</span>
+        <span class="muted">│</span>                          <span class="muted">│</span>                          <span class="muted">│</span>
+        <span class="muted">▼</span>                          <span class="muted">▼</span>                          <span class="muted">▼</span>
+<span class="muted">┌──────────────┐         ┌──────────────┐         ┌──────────────┐</span>
+<span class="muted">│</span> <span class="accent">Postgres</span>     <span class="muted">│</span>         <span class="muted">│</span> <span class="accent">Stripe</span>       <span class="muted">│</span>         <span class="muted">│</span> <span class="accent">Resend</span>       <span class="muted">│</span>
+<span class="muted">│</span> + RLS        <span class="muted">│</span>         <span class="muted">│</span> Checkout     <span class="muted">│</span>         <span class="muted">│</span> SMTP API     <span class="muted">│</span>
+<span class="muted">│</span> + Storage    <span class="muted">│</span>         <span class="muted">│</span> + webhooks   <span class="muted">│</span>         <span class="muted">│</span> SPF/DKIM     <span class="muted">│</span>
+<span class="muted">└──────────────┘</span>         <span class="muted">└──────────────┘</span>         <span class="muted">└──────────────┘</span>
+</div>
+
+    <div class="callout callout-accent">
+      <div class="callout-icon">▣</div>
+      <div>
+        <p><strong>Lectura clave:</strong> el navegador <em>nunca</em> habla directamente con Stripe ni con Postgres con privilegios elevados. Toda operación sensible pasa por una Edge Function que valida origen, autenticación y permisos antes de tocar el dato.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Arquitectura · 05</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 6 — MODELO DE DATOS
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div>
+        <div class="section-title">Modelo de datos</div>
+        <div class="section-desc">Esquema PostgreSQL · públicas y privadas</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:14px;">
+      Cuatro tablas centrales bajo el esquema <code>public</code>. Todas tienen <strong>RLS activado</strong> (Row-Level Security) — el motor de Postgres aplica las políticas a cada consulta, independientemente del cliente que la haga.
+    </p>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th style="width:22%;">Tabla</th>
+          <th style="width:30%;">Datos sensibles</th>
+          <th>Política RLS aplicada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>products</code><br /><span style="font-size:11px;color:var(--text-muted);">Catálogo de obra</span></td>
+          <td>Slug, nombre, descripción, precio, imágenes, IDs Stripe.</td>
+          <td><strong>Lectura pública</strong> sólo de productos no-borrador.<br /><strong>Escritura admin</strong> (email <code>info@madcry.com</code>).</td>
+        </tr>
+        <tr>
+          <td><code>orders</code><br /><span style="font-size:11px;color:var(--text-muted);">Pedidos</span></td>
+          <td>Email cliente, nombre, teléfono, dirección de envío, importe, IDs Stripe.</td>
+          <td><strong>Sin acceso público.</strong> Sólo admin lee/escribe; webhooks usan rol service_role que ignora RLS.</td>
+        </tr>
+        <tr>
+          <td><code>messages</code><br /><span style="font-size:11px;color:var(--text-muted);">Contacto</span></td>
+          <td>Nombre, email, mensaje, IP, user-agent.</td>
+          <td><strong>Inserción pública</strong> (form contacto). <strong>Lectura sólo admin.</strong></td>
+        </tr>
+        <tr>
+          <td><code>categories</code><br /><span style="font-size:11px;color:var(--text-muted);">Colecciones</span></td>
+          <td>Slug, nombre, label de precio, flag <code>hide_price</code>.</td>
+          <td><strong>Lectura pública.</strong> Escritura admin.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Vistas y derivados</h3>
+    <p style="margin-bottom:10px;">
+      <code>products_public</code> · vista que filtra <code>status &lt;&gt; 'draft'</code> y une categoría. Es la única superficie expuesta al cliente para listados; los productos en borrador nunca son visibles aunque alguien manipule el cliente.
+    </p>
+
+    <h3 class="sub">Almacenamiento de archivos</h3>
+    <p style="margin-bottom:10px;">
+      Bucket <code>products</code> (Supabase Storage), público en lectura, escritura limitada a admin. Tipos MIME permitidos: <code>image/jpeg, image/png, image/webp, image/avif</code>. Tamaño máximo por archivo: <strong>10 MB</strong>. Cabeceras CDN <code>Cache-Control: 31536000</code> para inmutabilidad por path.
+    </p>
+
+    <h3 class="sub">Datos personales tratados</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Origen</th>
+          <th>Base legal</th>
+          <th>Plazo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Datos de pedido (nombre, email, dirección, teléfono)</td>
+          <td>Stripe Checkout</td>
+          <td>Ejecución de contrato</td>
+          <td>5 años (obligación fiscal)</td>
+        </tr>
+        <tr>
+          <td>Mensajes de contacto</td>
+          <td>Formulario público</td>
+          <td>Interés legítimo / consentimiento</td>
+          <td>2 años o hasta retirada</td>
+        </tr>
+        <tr>
+          <td>Email del administrador</td>
+          <td>Supabase Auth</td>
+          <td>Ejecución del servicio</td>
+          <td>Mientras dure la relación</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Modelo de datos · 06</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 7 — FLUJOS CRÍTICOS (1/2)
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div>
+        <div class="section-title">Flujos críticos</div>
+        <div class="section-desc">Compra de obra, formulario de contacto, publicación admin</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Flujo 1 · Compra de una pieza</h3>
+    <div class="flow-block"><span class="accent">[1]</span>  Cliente entra en <span class="muted">/product/&lt;slug&gt;</span> (HTML estático servido por CDN)
+<span class="accent">[2]</span>  Click en "Adquirir Obra"
+<span class="accent">[3]</span>  Navegador llama a <span class="muted">create-checkout-session</span> (Edge Function)
+       <span class="muted">→</span> CORS verificado contra allowlist
+       <span class="muted">→</span> Lee precio FRESCO de la BD (no confía en el cliente)
+       <span class="muted">→</span> Verifica status='available' y categoría no es por encargo
+<span class="accent">[4]</span>  Crea Stripe Checkout Session con price_data inline
+<span class="accent">[5]</span>  Pre-crea fila en <span class="muted">orders</span> con status='pending'
+<span class="accent">[6]</span>  Devuelve URL de Stripe; navegador redirige al cliente
+<span class="accent">[7]</span>  Cliente paga en dominio Stripe (PCI-DSS)
+<span class="accent">[8]</span>  Stripe llama al webhook <span class="muted">stripe-webhook</span>
+       <span class="muted">→</span> Firma HMAC verificada con STRIPE_WEBHOOK_SECRET
+       <span class="muted">→</span> Marca pedido como 'paid', producto como 'sold'
+       <span class="muted">→</span> Envía email cliente (Resend) y email admin
+<span class="accent">[9]</span>  Cliente vuelve a <span class="muted">/success?session_id=cs_...</span>
+<span class="accent">[10]</span> Página llama a <span class="muted">verify-session</span>
+       <span class="muted">→</span> Confirma con Stripe que el cobro está pagado
+       <span class="muted">→</span> Devuelve email enmascarado (no completo)
+</div>
+
+    <div class="callout callout-ok" style="margin-top:14px;">
+      <div class="callout-icon">✓</div>
+      <div>
+        <p><strong>Garantía técnica:</strong> el precio nunca puede ser manipulado desde el navegador. La Edge Function relee el valor de Postgres en cada checkout. Si un atacante intentara inyectar otro <code>price_cents</code>, el servidor lo descartaría.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Flujo 2 · Mensaje de contacto / comisión</h3>
+    <div class="flow-block"><span class="accent">[1]</span>  Visitante envía formulario en <span class="muted">/contact</span>
+<span class="accent">[2]</span>  Edge Function <span class="muted">send-contact-email</span> ejecuta:
+       <span class="muted">→</span> Honeypot anti-bots (campo invisible)
+       <span class="muted">→</span> Validación email + límite de 5000 caracteres
+       <span class="muted">→</span> Rate-limit: 3 mensajes/hora por email · 10/hora por IP
+       <span class="muted">→</span> Inserta en tabla <span class="muted">messages</span>
+       <span class="muted">→</span> Notifica a info@madcry.com vía Resend
+<span class="accent">[3]</span>  Confirmación al usuario (200 OK con CORS allowlist)
+</div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Flujos críticos · 07</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 8 — FLUJOS CRÍTICOS (2/2)
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+
+    <h3 class="sub" style="margin-top:0;">Flujo 3 · Publicación de una obra desde el panel admin</h3>
+    <div class="flow-block"><span class="accent">[1]</span>  Susana abre <span class="muted">/admin</span> y solicita magic-link a su email
+<span class="accent">[2]</span>  Supabase Auth envía email con token de un solo uso
+<span class="accent">[3]</span>  Click en el link → sesión JWT en el navegador
+<span class="accent">[4]</span>  Carga del panel Vue (AdminPanel · island hidratada)
+<span class="accent">[5]</span>  Susana edita / crea producto, sube imagen al bucket
+<span class="accent">[6]</span>  Click en "Guardar" → POST con JWT a <span class="muted">admin-product-sync</span>
+       <span class="muted">→</span> requireAdmin() verifica JWT y email exacto
+       <span class="muted">→</span> sanitizeImages() filtra javascript:, data:, vbscript:
+       <span class="muted">→</span> Crea/actualiza producto en BD
+       <span class="muted">→</span> Sincroniza nombre / imágenes con Stripe Product
+<span class="accent">[7]</span>  Click en "Publicar al sitio" → <span class="muted">trigger-rebuild</span>
+       <span class="muted">→</span> Throttle de 60 s (anti-bucle)
+       <span class="muted">→</span> Dispara workflow GitHub Actions
+       <span class="muted">→</span> Build Astro + deploy Firebase (~2-3 min)
+<span class="accent">[8]</span>  Sitio público actualizado · siguiente visitante ve la nueva obra
+</div>
+
+    <div class="section-header" style="margin-top:30px;">
+      <div class="section-num">★</div>
+      <div>
+        <div class="section-title">Inventario de funciones serverless</div>
+        <div class="section-desc">Las 7 Edge Functions desplegadas y su propósito</div>
+      </div>
+    </div>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Función</th>
+          <th>Auth</th>
+          <th>Origen</th>
+          <th>Propósito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>create-checkout-session</code></td>
+          <td>Pública</td>
+          <td>Cliente web</td>
+          <td>Crea sesión Stripe con precio fresco de BD.</td>
+        </tr>
+        <tr>
+          <td><code>stripe-webhook</code></td>
+          <td>Firma HMAC</td>
+          <td>Stripe</td>
+          <td>Marca pedido pagado, manda emails, archiva refunds.</td>
+        </tr>
+        <tr>
+          <td><code>verify-session</code></td>
+          <td>Pública</td>
+          <td>Cliente web</td>
+          <td>Verifica con Stripe el estado de pago de un session_id.</td>
+        </tr>
+        <tr>
+          <td><code>send-contact-email</code></td>
+          <td>Pública + rate-limit</td>
+          <td>Cliente web</td>
+          <td>Persiste mensaje y envía notificación al admin.</td>
+        </tr>
+        <tr>
+          <td><code>admin-product-sync</code></td>
+          <td>JWT admin</td>
+          <td>Panel Vue</td>
+          <td>CRUD de productos con sincronización a Stripe.</td>
+        </tr>
+        <tr>
+          <td><code>send-shipping-email</code></td>
+          <td>JWT admin</td>
+          <td>Panel Vue</td>
+          <td>Notifica al cliente con número de seguimiento.</td>
+        </tr>
+        <tr>
+          <td><code>trigger-rebuild</code></td>
+          <td>JWT admin</td>
+          <td>Panel Vue</td>
+          <td>Lanza build de Astro vía GitHub Actions.</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Flujos críticos · 08</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 9 — SEGURIDAD (1/2)
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div>
+        <div class="section-title">Seguridad — capas y controles</div>
+        <div class="section-desc">Defensa en profundidad sobre la plataforma</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:14px;">
+      Los controles se agrupan en cuatro <strong>capas concéntricas</strong>: red, transporte, aplicación y datos. Un fallo en una capa no compromete las siguientes.
+    </p>
+
+    <h3 class="sub">Capa de red y transporte</h3>
+    <div class="sec-row">
+      <div class="sec-num">01</div>
+      <div class="sec-name">HTTPS forzado</div>
+      <div class="sec-desc">Todo el tráfico circula sobre TLS 1.3. HTTP redirige a HTTPS por defecto en Firebase Hosting.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">02</div>
+      <div class="sec-name">HSTS preload</div>
+      <div class="sec-desc"><code>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</code> — el navegador rechaza HTTP futuro durante 1 año.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">03</div>
+      <div class="sec-name">CDN distribuida</div>
+      <div class="sec-desc">Mitigación implícita de DDoS volumétrico vía red global de Firebase (Cloud CDN de Google).</div>
+    </div>
+
+    <h3 class="sub">Capa de aplicación · cabeceras</h3>
+    <div class="sec-row">
+      <div class="sec-num">04</div>
+      <div class="sec-name">Content-Security-Policy</div>
+      <div class="sec-desc">Política estricta: <code>default-src 'self'</code>; conexiones limitadas a Supabase/Stripe; <code>frame-ancestors 'none'</code> impide clickjacking.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">05</div>
+      <div class="sec-name">X-Frame-Options DENY</div>
+      <div class="sec-desc">Refuerzo doble anti-clickjacking para navegadores antiguos.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">06</div>
+      <div class="sec-name">X-Content-Type-Options</div>
+      <div class="sec-desc"><code>nosniff</code> — el navegador no interpreta MIME types incorrectos.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">07</div>
+      <div class="sec-name">Referrer-Policy</div>
+      <div class="sec-desc"><code>strict-origin-when-cross-origin</code> — no fuga de paths privados a terceros.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">08</div>
+      <div class="sec-name">Permissions-Policy</div>
+      <div class="sec-desc">Bloquea cámara, micrófono, geolocalización; permite <code>payment</code> sólo a dominios de Stripe.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">09</div>
+      <div class="sec-name">Cross-Origin-Opener-Policy</div>
+      <div class="sec-desc"><code>same-origin</code> — aísla la pestaña principal de pop-ups maliciosos.</div>
+    </div>
+
+    <h3 class="sub">Capa de aplicación · API</h3>
+    <div class="sec-row">
+      <div class="sec-num">10</div>
+      <div class="sec-name">CORS allowlist</div>
+      <div class="sec-desc">Las funciones serverless sólo aceptan peticiones de <code>madcry.com</code> y entornos de desarrollo. Antes era abierto a todos los dominios.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">11</div>
+      <div class="sec-name">Verificación JWT</div>
+      <div class="sec-desc">Funciones admin (<code>admin-product-sync</code>, <code>trigger-rebuild</code>, <code>send-shipping-email</code>) exigen JWT válido + email exacto del admin.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">12</div>
+      <div class="sec-name">Verificación de firma Stripe</div>
+      <div class="sec-desc">El webhook valida HMAC-SHA256 con <code>STRIPE_WEBHOOK_SECRET</code>. Sin firma válida no se procesa el evento.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">13</div>
+      <div class="sec-name">Rate-limit por IP y email</div>
+      <div class="sec-desc">Formulario de contacto: máx. 3/h por email + 10/h por IP. Función rebuild: throttle 60 s.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">14</div>
+      <div class="sec-name">Honeypot anti-bots</div>
+      <div class="sec-desc">Campo invisible en el formulario. Bots lo rellenan, humanos no. Reduce ~95% del spam automatizado.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">15</div>
+      <div class="sec-name">Sanitización de URLs de imagen</div>
+      <div class="sec-desc">Antes de tocar Stripe / BD, se filtran esquemas <code>javascript:</code>, <code>data:</code>, <code>vbscript:</code>.</div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Seguridad · 09</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 10 — SEGURIDAD (2/2)
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+
+    <h3 class="sub" style="margin-top:0;">Capa de datos</h3>
+    <div class="sec-row">
+      <div class="sec-num">16</div>
+      <div class="sec-name">Row-Level Security</div>
+      <div class="sec-desc">Postgres aplica políticas a cada fila. La clave anon del cliente <strong>no puede</strong> leer pedidos ni mensajes ni borradores. Verificable por SQL.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">17</div>
+      <div class="sec-name">Vista pública limitada</div>
+      <div class="sec-desc"><code>products_public</code> excluye productos en borrador. Es la única superficie expuesta en build.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">18</div>
+      <div class="sec-name">Aislamiento de service_role</div>
+      <div class="sec-desc">La clave maestra que ignora RLS vive sólo dentro de Edge Functions, nunca en el navegador, nunca en logs.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">19</div>
+      <div class="sec-name">Almacenamiento con MIME whitelist</div>
+      <div class="sec-desc">Bucket <code>products</code> sólo acepta JPEG, PNG, WebP, AVIF. Tope de 10 MB por archivo.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">20</div>
+      <div class="sec-name">Cifrado en reposo</div>
+      <div class="sec-desc">Todos los datos en Postgres y Storage cifrados con AES-256 por la propia plataforma de Supabase.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">21</div>
+      <div class="sec-name">Email enmascarado en respuestas públicas</div>
+      <div class="sec-desc"><code>verify-session</code> devuelve sólo iniciales + dominio (<code>su***@dominio.com</code>) para evitar enumerar clientes con un session_id filtrado.</div>
+    </div>
+    <div class="sec-row">
+      <div class="sec-num">22</div>
+      <div class="sec-name">Soft-delete de productos</div>
+      <div class="sec-desc">No se borran filas: pasan a status <code>draft</code> y el producto Stripe se archiva. Mantiene integridad referencial con pedidos históricos.</div>
+    </div>
+
+    <h3 class="sub">Pagos · separación de responsabilidades</h3>
+    <div class="callout callout-dark">
+      <div class="callout-icon">▣</div>
+      <div>
+        <p>Madcry Studio <strong>nunca</strong> almacena ni recibe datos de tarjeta. El proceso de cobro ocurre íntegramente en infraestructura de Stripe (PCI-DSS Level 1, máximo nivel de cumplimiento). Madcry sólo recibe del webhook el resultado del pago, los datos de envío del cliente y el identificador opaco <code>cs_…</code> de la sesión.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Resumen — auditoría interna 2026-05</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Área</th>
+          <th>Estado</th>
+          <th>Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Secretos en repositorio</td>
+          <td><span class="tag tag-ok">OK</span></td>
+          <td>Verificado: ningún <code>.env</code> en historial Git.</td>
+        </tr>
+        <tr>
+          <td>RLS en todas las tablas sensibles</td>
+          <td><span class="tag tag-ok">OK</span></td>
+          <td>4/4 tablas con RLS activo y políticas explícitas.</td>
+        </tr>
+        <tr>
+          <td>Webhook Stripe firmado</td>
+          <td><span class="tag tag-ok">OK</span></td>
+          <td>HMAC-SHA256 con secret rotable.</td>
+        </tr>
+        <tr>
+          <td>CORS de Edge Functions</td>
+          <td><span class="tag tag-ok">OK</span></td>
+          <td>Allowlist tras endurecimiento de mayo 2026.</td>
+        </tr>
+        <tr>
+          <td>CSP sin <code>unsafe-inline</code></td>
+          <td><span class="tag tag-warn">Mejora</span></td>
+          <td>Pendiente migración a hashes/nonces. No bloqueante.</td>
+        </tr>
+        <tr>
+          <td>Captcha en formularios</td>
+          <td><span class="tag tag-warn">Mejora</span></td>
+          <td>Honeypot + rate-limit cubren el riesgo actual. Cloudflare Turnstile en cola.</td>
+        </tr>
+        <tr>
+          <td>Validación de propiedad en /success</td>
+          <td><span class="tag tag-warn">Mejora</span></td>
+          <td>Email enmascarado mitigado; refuerzo opcional con cookie firmada.</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Seguridad · 10</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 11 — GESTIÓN DE SECRETOS
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div>
+        <div class="section-title">Gestión de secretos y credenciales</div>
+        <div class="section-desc">Inventario, almacenamiento y procedimiento de rotación</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom:12px;">
+      Las credenciales se clasifican en dos grupos según su exposición:
+    </p>
+
+    <h3 class="sub">Públicas (visibles en bundle del navegador)</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Origen</th>
+          <th>Riesgo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>PUBLIC_SUPABASE_URL</code></td>
+          <td>Supabase</td>
+          <td>Nulo · es URL pública del proyecto.</td>
+        </tr>
+        <tr>
+          <td><code>PUBLIC_SUPABASE_ANON_KEY</code></td>
+          <td>Supabase</td>
+          <td>Bajo · sólo permite lo que las políticas RLS permitan.</td>
+        </tr>
+        <tr>
+          <td><code>PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td>
+          <td>Stripe</td>
+          <td>Nulo · diseñada para ir en cliente.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Privadas (solo en Edge Functions / GitHub Secrets)</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Almacenamiento</th>
+          <th>Procedimiento de rotación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+          <td>Edge Functions secrets</td>
+          <td>Dashboard Supabase → Settings → API → Reset.</td>
+        </tr>
+        <tr>
+          <td><code>STRIPE_SECRET_KEY</code></td>
+          <td>Edge Functions secrets</td>
+          <td>Stripe Dashboard → Developers → API Keys → Roll.</td>
+        </tr>
+        <tr>
+          <td><code>STRIPE_WEBHOOK_SECRET</code></td>
+          <td>Edge Functions secrets</td>
+          <td>Stripe Dashboard → Webhooks → Endpoint → Roll secret.</td>
+        </tr>
+        <tr>
+          <td><code>RESEND_API_KEY</code></td>
+          <td>Edge Functions secrets</td>
+          <td>Resend Dashboard → API Keys → Revoke + recreate.</td>
+        </tr>
+        <tr>
+          <td><code>SUPABASE_DB_PASSWORD</code></td>
+          <td>Solo terminal puntual</td>
+          <td>Supabase Dashboard → Database → Reset password.</td>
+        </tr>
+        <tr>
+          <td><code>GITHUB_TOKEN</code> (deploy)</td>
+          <td>Edge Functions secrets</td>
+          <td>GitHub Settings → Developer settings → Tokens.</td>
+        </tr>
+        <tr>
+          <td><code>FIREBASE_SERVICE_ACCOUNT</code></td>
+          <td>GitHub Actions secrets</td>
+          <td>Firebase IAM → service account → New key.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Reglas internas de manejo</h3>
+    <ul class="checklist">
+      <li>Nunca pegar una credencial privada en chat, email, ticket o screenshot.</li>
+      <li>Nunca persistirla en <code>.env.local</code> salvo si es estrictamente <code>PUBLIC_*</code>.</li>
+      <li>Si es necesaria de forma puntual, exportarla en la sesión de terminal y borrar histórico (<code>history -c</code>).</li>
+      <li>Rotar inmediatamente cualquier credencial que haya estado en un dispositivo perdido, repositorio público o canal compartido.</li>
+      <li>Toda rotación queda registrada con fecha en este documento (sección Anexo · Registro de rotaciones).</li>
+    </ul>
+
+    <div class="callout callout-warn">
+      <div class="callout-icon">!</div>
+      <div>
+        <p><strong>Política de mínimo necesario:</strong> el archivo <code>.env.local</code> que vive en la máquina de desarrollo contiene exclusivamente claves <code>PUBLIC_*</code>. Las claves potentes están en Supabase secrets — accesibles a la persona con login del proyecto, no al sistema de archivos del developer.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Gestión de secretos · 11</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 12 — SEO + RENDIMIENTO + ACCESIBILIDAD
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div>
+        <div class="section-title">SEO, rendimiento y accesibilidad</div>
+        <div class="section-desc">Indexación y experiencia de usuario</div>
+      </div>
+    </div>
+
+    <h3 class="sub">SEO</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Control</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sitemap automático (<code>sitemap-index.xml</code>)</td>
+          <td><span class="tag tag-ok">Activo</span> · 30 URLs · regenerado en cada build.</td>
+        </tr>
+        <tr>
+          <td><code>robots.txt</code> con directivas explícitas</td>
+          <td><span class="tag tag-ok">OK</span> · admin/success bloqueados, IA crawlers permitidos.</td>
+        </tr>
+        <tr>
+          <td>Datos estructurados JSON-LD</td>
+          <td><span class="tag tag-ok">OK</span> · Organization + WebSite + Product + Article + Breadcrumb + Event.</td>
+        </tr>
+        <tr>
+          <td>Meta description única por página</td>
+          <td><span class="tag tag-ok">OK</span> · 11 páginas con descripción específica.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;link rel="canonical"&gt;</code> en todas las páginas</td>
+          <td><span class="tag tag-ok">OK</span></td>
+        </tr>
+        <tr>
+          <td>Open Graph + Twitter Card 1200×630</td>
+          <td><span class="tag tag-ok">OK</span> · <code>/images/og-banner.png</code></td>
+        </tr>
+        <tr>
+          <td><code>noindex</code> en /admin, /success, /404</td>
+          <td><span class="tag tag-ok">OK</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Rendimiento</h3>
+    <ul style="display:flex;flex-direction:column;gap:6px;list-style:none;margin-bottom:12px;">
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;"><strong>SSG (pre-render):</strong> el HTML llega listo desde la CDN, sin esperar a que un servidor lo construya.</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;"><strong>Caché agresiva:</strong> assets versionados con <code>max-age=31536000, immutable</code>.</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;"><strong>Lazy-loading</strong> en imágenes de listado.</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;"><strong>Preload + onload-swap</strong> para Google Fonts (no bloquea el render inicial).</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;"><strong>HTTP/2</strong> y <strong>Brotli</strong> servidos por Firebase.</li>
+    </ul>
+
+    <h3 class="sub">Accesibilidad</h3>
+    <p>El sitio sigue las pautas <strong>WCAG 2.1 AA</strong> en navegabilidad (contrastes verificados, estructura semántica con <code>&lt;main&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;article&gt;</code>, focus visibles, atributos <code>alt</code> en imágenes, formulario etiquetado). Auditoría de profundidad pendiente con herramienta automatizada (axe-core) prevista para próxima iteración.</p>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>SEO + rendimiento · 12</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 13 — CUMPLIMIENTO LEGAL
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div>
+        <div class="section-title">Cumplimiento legal</div>
+        <div class="section-desc">RGPD, LSSI-CE y normativa aplicable</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Reglamento General de Protección de Datos (RGPD · UE 2016/679)</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Requisito</th>
+          <th>Implementación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Información clara al usuario</td>
+          <td>Página <code>/privacidad</code> y <code>/legal</code> publicadas y enlazadas en footer.</td>
+        </tr>
+        <tr>
+          <td>Base legal documentada</td>
+          <td>Ejecución de contrato (pedidos), interés legítimo (contacto), consentimiento (newsletter futura).</td>
+        </tr>
+        <tr>
+          <td>Minimización de datos</td>
+          <td>Sólo se piden los datos imprescindibles para envío y facturación.</td>
+        </tr>
+        <tr>
+          <td>Derechos ARSULIPO</td>
+          <td>Solicitud por email a <code>info@madcry.com</code>. Acceso, rectificación, supresión, limitación, portabilidad y oposición.</td>
+        </tr>
+        <tr>
+          <td>Cifrado en tránsito y en reposo</td>
+          <td>TLS 1.3 + AES-256 por proveedor (Supabase, Stripe, Resend).</td>
+        </tr>
+        <tr>
+          <td>Encargados de tratamiento</td>
+          <td>Supabase, Stripe, Resend, Firebase. Todos con DPA firmado y cláusulas SCC para transferencia internacional.</td>
+        </tr>
+        <tr>
+          <td>Plazos de conservación</td>
+          <td>5 años para datos fiscales (pedidos), 2 años para mensajes de contacto.</td>
+        </tr>
+        <tr>
+          <td>Brechas de seguridad</td>
+          <td>Procedimiento documentado · notificación a la AEPD en plazo &lt; 72 h.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Ley de Servicios de la Sociedad de la Información (LSSI-CE)</h3>
+    <ul style="display:flex;flex-direction:column;gap:6px;list-style:none;">
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;">Aviso legal accesible desde el footer con titularidad, NIF, dirección y email de contacto.</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;">Política de cookies (en cola — el sitio no instala cookies de terceros analíticos sin consentimiento).</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;">Identificación clara del precio, IVA, gastos de envío y forma de pago antes de la compra.</li>
+      <li style="padding:8px 12px;background:var(--bone);font-size:12.5px;">Confirmación de pedido por email con resumen y referencia.</li>
+    </ul>
+
+    <h3 class="sub">Comercio electrónico</h3>
+    <p>La tienda cumple con los <strong>14 días de derecho de desistimiento</strong> establecidos por la Ley General para la Defensa de Consumidores y Usuarios, salvo en piezas personalizadas (comisión a medida) donde el desistimiento queda excluido por su naturaleza específica conforme al art. 103.c) del TRLGDCU. Esta excepción se informa de forma destacada antes de finalizar el encargo.</p>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Cumplimiento legal · 13</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 14 — OPERACIÓN, BACKUPS Y CONTINUIDAD
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <div class="section-title">Operación, backups y continuidad</div>
+        <div class="section-desc">Cómo se despliega, se respalda y se recupera la plataforma</div>
+      </div>
+    </div>
+
+    <h3 class="sub">Despliegue</h3>
+    <p style="margin-bottom:12px;">
+      Cada commit en la rama <code>main</code> dispara el workflow <code>deploy.yml</code> de GitHub Actions, que ejecuta <code>npm ci</code>, <code>astro build</code> y un deploy a Firebase Hosting con la action oficial. Tiempo total medio: ~2-3 minutos. Es posible disparar el mismo workflow manualmente desde el panel admin (función <code>trigger-rebuild</code>).
+    </p>
+
+    <h3 class="sub">Backups</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Frecuencia</th>
+          <th>Retención</th>
+          <th>Mecanismo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PostgreSQL</td>
+          <td>Diaria automática</td>
+          <td>7 días (plan free)<br />30 días (plan Pro)</td>
+          <td>Supabase Backups (PITR opcional)</td>
+        </tr>
+        <tr>
+          <td>Imágenes (Storage)</td>
+          <td>Continuo</td>
+          <td>Indefinido</td>
+          <td>Replicación interna del proveedor</td>
+        </tr>
+        <tr>
+          <td>Código</td>
+          <td>En cada commit</td>
+          <td>Indefinido</td>
+          <td>GitHub (clones distribuidos)</td>
+        </tr>
+        <tr>
+          <td>Versión desplegada</td>
+          <td>En cada build</td>
+          <td>10 versiones</td>
+          <td>Firebase Hosting · rollback en 1 click</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Recuperación ante incidencias</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Escenario</th>
+          <th>Procedimiento</th>
+          <th>RTO objetivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Bug en producción</td>
+          <td>Rollback en Firebase a versión anterior</td>
+          <td>&lt; 5 min</td>
+        </tr>
+        <tr>
+          <td>Pérdida de datos en BD</td>
+          <td>Restauración de backup Supabase + replay de webhooks</td>
+          <td>&lt; 4 h</td>
+        </tr>
+        <tr>
+          <td>Compromiso de credencial</td>
+          <td>Rotación según matriz de la sección 07 + auditoría de logs</td>
+          <td>&lt; 1 h</td>
+        </tr>
+        <tr>
+          <td>Caída del proveedor</td>
+          <td>Comunicación al cliente · esperar SLA del proveedor</td>
+          <td>Según SLA proveedor</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Monitorización</h3>
+    <p>
+      Logs estructurados en cada Edge Function (<code>console.log</code> visible en Supabase Dashboard). Stripe envía email automático ante webhooks fallidos. Resend reporta entrega/rebote. Próxima iteración: integración con <strong>Sentry</strong> para errores de cliente y agregación de logs en una sola consola.
+    </p>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Operación · 14</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 15 — ANEXOS
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip"></div>
+  <div class="page-body">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div>
+        <div class="section-title">Anexos</div>
+        <div class="section-desc">Glosario, matriz de roles y registro</div>
+      </div>
+    </div>
+
+    <h3 class="sub">A · Glosario rápido</h3>
+    <table class="doc-table">
+      <tbody>
+        <tr><th style="width:24%;">SSG</th><td>Static Site Generation. El sitio se compila a HTML estático en build, no en cada petición.</td></tr>
+        <tr><th>RLS</th><td>Row-Level Security. Postgres aplica políticas por fila a cualquier consulta.</td></tr>
+        <tr><th>JWT</th><td>JSON Web Token. Identidad firmada que el navegador presenta para autenticarse.</td></tr>
+        <tr><th>HMAC</th><td>Algoritmo que firma un mensaje con un secreto compartido para verificar su origen.</td></tr>
+        <tr><th>CSP</th><td>Content-Security-Policy. Cabecera HTTP que limita qué recursos puede cargar el navegador.</td></tr>
+        <tr><th>HSTS</th><td>HTTP Strict Transport Security. Fuerza HTTPS futuras visitas.</td></tr>
+        <tr><th>PCI-DSS</th><td>Payment Card Industry Data Security Standard. Lo cumple Stripe en nombre de Madcry.</td></tr>
+        <tr><th>JAMstack</th><td>JavaScript, APIs y Markup pre-renderizado. Arquitectura donde el cliente es estático y los servicios se invocan vía API.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">B · Matriz de roles</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Quién</th>
+          <th>Acceso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Visitante anónimo</td>
+          <td>Cualquiera</td>
+          <td>Lectura del catálogo público, blog, compras, formulario contacto.</td>
+        </tr>
+        <tr>
+          <td>Cliente con pedido</td>
+          <td>Comprador</td>
+          <td>Página /success de su pedido, emails de confirmación y envío.</td>
+        </tr>
+        <tr>
+          <td>Administradora</td>
+          <td>Susana Madriz (info@madcry.com)</td>
+          <td>Panel /admin: CRUD productos, mensajes recibidos, lanzar publicaciones, enviar shipping.</td>
+        </tr>
+        <tr>
+          <td>Mantenimiento técnico</td>
+          <td>Tane Solutions</td>
+          <td>Repositorio Git, Supabase Dashboard, Stripe Dashboard, Firebase Console (acceso revocable).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">C · Registro de auditorías y rotaciones</h3>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Evento</th>
+          <th>Responsable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026-05-04</td>
+          <td>Auditoría interna de seguridad y SEO. Endurecimiento de CORS, sanitización de imágenes, throttle en rebuild, sitemap automático, JSON-LD, descripciones únicas. Sin hallazgos críticos.</td>
+          <td>Tane Solutions</td>
+        </tr>
+        <tr>
+          <td>2026-05-04</td>
+          <td>Limpieza de <code>.env.local</code> · retiradas service_role, stripe_secret, webhook_secret, resend_key, db_password.</td>
+          <td>Tane Solutions</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-style:italic;">—</td>
+          <td style="color:var(--text-muted);font-style:italic;">Próxima rotación trimestral programada</td>
+          <td style="color:var(--text-muted);font-style:italic;">Tane Solutions</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-accent" style="margin-top:24px;">
+      <div class="callout-icon">▣</div>
+      <div>
+        <p><strong>Documento controlado.</strong> Este documento se versiona junto al código en <code>docs/</code>. Cualquier cambio en la arquitectura, dependencia o control de seguridad debe reflejarse aquí en la misma pull request.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Madcry Studio · Documentación técnica</span>
+    <span>Anexos · 15</span>
+    <span>v1.0 · Mayo 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CONTRAPORTADA
+══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover-light">
+    <div class="cover-top">
+      <div class="cover-logo" style="display:flex;align-items:center;gap:14px;">
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:0.08em;color:var(--ink);">MADCRY</div>
+        <div style="font-family:var(--font-display);font-size:9px;letter-spacing:0.3em;color:var(--ink);opacity:0.5;">STUDIO</div>
+      </div>
+      <div class="cover-doc-type">Final del documento</div>
+    </div>
+
+    <div class="cover-body" style="justify-content:center;gap:30px;">
+      <div class="divider-ink"></div>
+      <div class="cover-title" style="font-size:46px;">
+        Plataforma<br />
+        construida con<br />
+        <span class="hl-ink">criterio.</span>
+      </div>
+      <div class="cover-subtitle">
+        Cualquier consulta sobre arquitectura, seguridad o cumplimiento se responde por escrito por la entidad responsable del mantenimiento. Datos de contacto al pie.
+      </div>
+      <div class="divider-ink"></div>
+    </div>
+
+    <div class="cover-footer">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <span style="font-weight:700;color:var(--ink);opacity:1;">Madcry Studio</span>
+        <span style="opacity:0.55;">info@madcry.com · madcry.com</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;text-align:right;">
+        <span style="font-weight:700;color:var(--ink);opacity:1;">Tane Solutions</span>
+        <span style="opacity:0.55;">www.tanesolutions.com</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
