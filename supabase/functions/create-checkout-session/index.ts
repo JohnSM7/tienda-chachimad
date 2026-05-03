@@ -53,6 +53,15 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Producto no disponible' }, 400);
     }
 
+    // Las piezas custom van por encargo: no se compran online, se solicita
+    // presupuesto via /contact. Bloqueo defensivo aunque el HTML no muestre el boton.
+    if (product.category_slug === 'custom') {
+      return jsonResponse(
+        { error: 'Esta pieza es por encargo. Solicita presupuesto en /contact.' },
+        400
+      );
+    }
+
     // 2. Imagen principal absoluta para Stripe
     const firstImage = Array.isArray(product.images) && product.images.length > 0
       ? String(product.images[0])

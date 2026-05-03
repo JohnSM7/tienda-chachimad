@@ -19,6 +19,8 @@ const { product } = Astro.props as { product: Product };
 const mainImage = Array.isArray(product.images) && product.images.length > 0
     ? getProductImageUrl(String(product.images[0]))
     : "/images/logo.png";
+const isCustom = product.category_slug === "custom";
+const contactUrl = `/contact?type=commission&product=${encodeURIComponent(product.slug)}`;
 ---
 
 <Layout
@@ -60,11 +62,15 @@ const mainImage = Array.isArray(product.images) && product.images.length > 0
             >
                 {product.name}
             </h1>
-            <p
-                class="text-2xl text-gray-400 font-light mb-12 tracking-wider font-mono"
-            >
-                {formatPrice(product.price_cents, product.currency || "eur")}
-            </p>
+            {isCustom ? (
+                <p class="text-base text-gray-400 font-light mb-12 tracking-[0.3em] uppercase">
+                    Pieza por encargo · Presupuesto a medida
+                </p>
+            ) : (
+                <p class="text-2xl text-gray-400 font-light mb-12 tracking-wider font-mono">
+                    {formatPrice(product.price_cents, product.currency || "eur")}
+                </p>
+            )}
 
             <div
                 class="space-y-6 text-gray-400 text-sm tracking-wide leading-relaxed mb-16 border-t border-white/10 pt-8 max-w-md"
@@ -83,20 +89,29 @@ const mainImage = Array.isArray(product.images) && product.images.length > 0
             </div>
 
             <div class="mb-auto">
-                <button
-                    id="buy-btn"
-                    data-product-id={product.id}
-                    data-status={product.status}
-                    class:list={[
-                        "w-full text-center py-5 text-sm font-bold uppercase tracking-[0.3em] transition duration-300",
-                        product.status === "available"
-                            ? "bg-white text-black hover:bg-gray-300 cursor-pointer"
-                            : "border border-red-900/30 bg-red-900/10 text-red-500 cursor-not-allowed"
-                    ]}
-                    disabled={product.status !== "available"}
-                >
-                    {product.status === "available" ? "Adquirir Obra" : "Sold Out"}
-                </button>
+                {isCustom ? (
+                    <a
+                        href={contactUrl}
+                        class="block w-full text-center py-5 text-sm font-bold uppercase tracking-[0.3em] bg-white text-black hover:bg-gray-300 transition duration-300"
+                    >
+                        Solicitar presupuesto →
+                    </a>
+                ) : (
+                    <button
+                        id="buy-btn"
+                        data-product-id={product.id}
+                        data-status={product.status}
+                        class:list={[
+                            "w-full text-center py-5 text-sm font-bold uppercase tracking-[0.3em] transition duration-300",
+                            product.status === "available"
+                                ? "bg-white text-black hover:bg-gray-300 cursor-pointer"
+                                : "border border-red-900/30 bg-red-900/10 text-red-500 cursor-not-allowed",
+                        ]}
+                        disabled={product.status !== "available"}
+                    >
+                        {product.status === "available" ? "Adquirir Obra" : "Sold Out"}
+                    </button>
+                )}
                 <p id="buy-error" class="text-red-500 text-xs mt-3 text-center hidden"></p>
             </div>
         </div>

@@ -105,9 +105,15 @@ const categories = [
                                 </p>
                             </div>
                             <div class="text-right">
-                                <span class="block text-xl text-white font-bold tracking-widest">
-                                    {formatPrice(product.price_cents, product.currency || "eur")}
-                                </span>
+                                {product.category_slug === "custom" ? (
+                                    <span class="block text-xs text-gray-400 font-medium tracking-widest uppercase whitespace-nowrap">
+                                        Por encargo
+                                    </span>
+                                ) : (
+                                    <span class="block text-xl text-white font-bold tracking-widest">
+                                        {formatPrice(product.price_cents, product.currency || "eur")}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </article>

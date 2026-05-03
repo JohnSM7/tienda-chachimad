@@ -259,6 +259,27 @@ import Layout from "../layouts/Layout.astro";
     const btn = form?.querySelector("button");
     const btnText = btn?.querySelector("span");
 
+    // Pre-seleccionar tipo desde ?type=commission y autorrellenar mensaje
+    // si venimos desde /product/[slug] de un cuadro custom.
+    const params = new URLSearchParams(window.location.search);
+    const requestedType = params.get("type");
+    const productSlug = params.get("product");
+    if (requestedType && form) {
+        const radio = form.querySelector(
+            `input[name="type"][value="${requestedType}"]`,
+        ) as HTMLInputElement | null;
+        if (radio) radio.checked = true;
+    }
+    if (productSlug && form) {
+        const messageField = form.querySelector(
+            "textarea[name='message']",
+        ) as HTMLTextAreaElement | null;
+        if (messageField && !messageField.value) {
+            messageField.value = `Hola Susana, me interesa una pieza tipo "${productSlug}". ¿Podrias darme un presupuesto orientativo?`;
+            messageField.dispatchEvent(new Event("input"));
+        }
+    }
+
     if (form && btn && btnText) {
         // Guardamos los nodos originales (texto + flecha) de forma segura
         // sin innerHTML para no romper CSP estricta.
