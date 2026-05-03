@@ -32,7 +32,7 @@ const categories = [
 
 <Layout title="MADCRY STUDIO | Shop">
     <header
-        class="relative w-full min-h-[40vh] flex flex-col justify-end items-center overflow-hidden border-b border-white/10 pt-40 md:pt-52 pb-10 md:pb-12"
+        class="relative w-full flex flex-col justify-end items-center overflow-hidden border-b border-white/10 pt-32 md:pt-40 pb-6 md:pb-8"
     >
         <div class="absolute inset-0 z-0 bg-neutral-900">
             <div
@@ -75,6 +75,8 @@ const categories = [
                         class="product-item group relative flex flex-col gap-4 transition-all duration-500"
                         data-category={product.category_slug}
                         data-product-id={product.id}
+                        data-price={product.price_cents}
+                        data-hide-price={(product as any).category_hide_price ? "1" : "0"}
                     >
                         <a
                             href={`/product/${product.slug}`}
@@ -165,8 +167,11 @@ const categories = [
         // --- Filtro por categoria desde ?category= ---
         const params = new URLSearchParams(window.location.search);
         const filterCat = params.get("category");
-        if (filterCat) {
-            const items = document.querySelectorAll<HTMLElement>(".product-item");
+        const grid = document.getElementById("product-grid");
+        if (filterCat && grid) {
+            const items = Array.from(
+                document.querySelectorAll<HTMLElement>(".product-item"),
+            );
             let visibleCount = 0;
             items.forEach((item) => {
                 if (item.dataset.category === filterCat) {
@@ -176,6 +181,16 @@ const categories = [
                     item.style.display = "none";
                 }
             });
+
+            // Re-ordenar los visibles por precio descendente (mas caro primero).
+            // Si la categoria oculta precio, manten orden de creacion.
+            const visibles = items.filter((it) => it.style.display !== "none");
+            visibles.sort((a, b) => {
+                const pa = parseInt(a.dataset.price ?? "0", 10);
+                const pb = parseInt(b.dataset.price ?? "0", 10);
+                return pb - pa;
+            });
+            visibles.forEach((el) => grid.appendChild(el));
 
             // Actualizar header con el nombre de la coleccion
             const eyebrow = document.getElementById("category-eyebrow");
