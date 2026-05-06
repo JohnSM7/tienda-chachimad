@@ -123,13 +123,28 @@ const breadcrumbSchema = {
                     Esta pieza no se revela hasta la apertura oficial de la exposicion el 13 de mayo de 2026 a las 20:00.
                 </p>
 
-                <div class="flex flex-col items-center gap-3 pt-4">
+                <div class="flex flex-col items-center gap-6 pt-4">
                     <span class="text-[10px] tracking-[0.4em] uppercase text-gray-500">Reveal en</span>
                     <div
-                        class="text-4xl md:text-7xl font-bold tracking-widest text-white tabular-nums"
+                        class="grid grid-cols-4 gap-6 md:gap-12"
                         data-locked-countdown
                     >
-                        — — —
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
+                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Days</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
+                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Hours</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
+                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Min</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
+                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Sec</span>
+                        </div>
                     </div>
                 </div>
 
@@ -246,22 +261,35 @@ const breadcrumbSchema = {
         const main = document.querySelector<HTMLElement>("[data-locked-page]");
         if (!main) return;
         const target = main.dataset.revealAt;
-        const node = main.querySelector<HTMLElement>("[data-locked-countdown]");
-        if (!target || !node) return;
+        const wrap = main.querySelector<HTMLElement>("[data-locked-countdown]");
+        if (!target || !wrap) return;
+
+        const cells = {
+            d: wrap.querySelector<HTMLElement>('[data-cd="d"]'),
+            h: wrap.querySelector<HTMLElement>('[data-cd="h"]'),
+            m: wrap.querySelector<HTMLElement>('[data-cd="m"]'),
+            s: wrap.querySelector<HTMLElement>('[data-cd="s"]'),
+        };
 
         const t = new Date(target).getTime();
         const update = () => {
             const diff = t - Date.now();
             if (diff <= 0) {
-                node.textContent = "REVEAL";
+                if (cells.d) cells.d.textContent = "00";
+                if (cells.h) cells.h.textContent = "00";
+                if (cells.m) cells.m.textContent = "00";
+                if (cells.s) cells.s.textContent = "LIVE";
                 setTimeout(() => location.reload(), 1500);
                 return;
             }
             const d = Math.floor(diff / 86400000);
-            const h = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, "0");
-            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-            node.textContent = `${d}d ${h}:${m}:${s}`;
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            if (cells.d) cells.d.textContent = String(d).padStart(2, "0");
+            if (cells.h) cells.h.textContent = String(h).padStart(2, "0");
+            if (cells.m) cells.m.textContent = String(m).padStart(2, "0");
+            if (cells.s) cells.s.textContent = String(s).padStart(2, "0");
         };
 
         update();

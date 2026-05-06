@@ -34,6 +34,41 @@ const categories = [
     title="Colección · MADCRY Studio"
     description="Piezas únicas (1/1) pintadas a mano por Susana Madriz: arte urbano dark, anime y comisiones a medida. Envío a toda Europa."
 >
+    <!--
+        Filtro CSS-first: aplica el ?category=X al <html> antes de que
+        el body pinte. Asi evitamos el flash de "todas las categorias"
+        que aparecia mientras el JS principal cargaba.
+    -->
+    <script is:inline>
+        (function() {
+            function applyShopFilter() {
+                try {
+                    var p = new URLSearchParams(window.location.search);
+                    var cat = p.get("category");
+                    if (cat) document.documentElement.setAttribute("data-shop-cat", cat);
+                    else document.documentElement.removeAttribute("data-shop-cat");
+                } catch (e) {}
+            }
+            applyShopFilter();
+            // Re-aplica tras cada navegacion via Astro ViewTransitions.
+            document.addEventListener("astro:page-load", applyShopFilter);
+            document.addEventListener("astro:after-swap", applyShopFilter);
+        })();
+    </script>
+    <style>
+        /* Cuando hay filtro de categoria, oculta TODOS los items por defecto
+           y solo muestra los que coinciden. Funciona sin JS principal. */
+        html[data-shop-cat] .product-item { display: none !important; }
+        html[data-shop-cat="madcry"] .product-item[data-category="madcry"],
+        html[data-shop-cat="one-piece"] .product-item[data-category="one-piece"],
+        html[data-shop-cat="dragon-ball"] .product-item[data-category="dragon-ball"],
+        html[data-shop-cat="jujutsu-kaisen"] .product-item[data-category="jujutsu-kaisen"],
+        html[data-shop-cat="naruto"] .product-item[data-category="naruto"],
+        html[data-shop-cat="custom"] .product-item[data-category="custom"],
+        html[data-shop-cat="otros"] .product-item[data-category="otros"] {
+            display: flex !important;
+        }
+    </style>
     <header
         class="relative w-full flex flex-col justify-end items-center overflow-hidden border-b border-white/10 pt-32 md:pt-40 pb-6 md:pb-8"
     >
@@ -95,16 +130,31 @@ const categories = [
                                         loading="lazy"
                                         class="w-full h-full object-cover opacity-70 transition-opacity duration-700 group-hover:opacity-90"
                                     />
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 pointer-events-none px-4">
                                         <span class="text-[10px] uppercase tracking-[0.4em] text-red-500 font-bold animate-pulse">
                                             Coming · 13.05.26
                                         </span>
-                                        <span
-                                            class="font-bold text-white text-2xl uppercase tracking-widest countdown"
+                                        <div
+                                            class="grid grid-cols-4 gap-3 text-center"
                                             data-countdown
                                         >
-                                            —
-                                        </span>
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Days</span>
+                                            </div>
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Hours</span>
+                                            </div>
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Min</span>
+                                            </div>
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Sec</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -230,15 +280,27 @@ const categories = [
             let anyDone = false;
             items.forEach((el) => {
                 const target = el.dataset.revealAt;
-                const node = el.querySelector<HTMLElement>("[data-countdown]");
-                if (!target || !node) return;
+                const wrap = el.querySelector<HTMLElement>("[data-countdown]");
+                if (!target || !wrap) return;
                 const t = new Date(target).getTime();
                 const c = formatCountdown(t);
+                const cells = {
+                    d: wrap.querySelector<HTMLElement>('[data-cd="d"]'),
+                    h: wrap.querySelector<HTMLElement>('[data-cd="h"]'),
+                    m: wrap.querySelector<HTMLElement>('[data-cd="m"]'),
+                    s: wrap.querySelector<HTMLElement>('[data-cd="s"]'),
+                };
                 if (c.done) {
                     anyDone = true;
-                    node.textContent = "REVEAL";
+                    if (cells.d) cells.d.textContent = "00";
+                    if (cells.h) cells.h.textContent = "00";
+                    if (cells.m) cells.m.textContent = "00";
+                    if (cells.s) cells.s.textContent = "LIVE";
                 } else {
-                    node.textContent = `${c.d}d ${c.h}:${c.m}:${c.s}`;
+                    if (cells.d) cells.d.textContent = c.d.padStart(2, "0");
+                    if (cells.h) cells.h.textContent = c.h;
+                    if (cells.m) cells.m.textContent = c.m;
+                    if (cells.s) cells.s.textContent = c.s;
                 }
             });
             if (anyDone) {
