@@ -58,11 +58,27 @@ const eventSchema = {
                 Obras disponibles a la venta en web tras la exposición oficial.
             </p>
             
-            <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
-                <a href="/shop?category=madcry" class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black">
+            <div class="pt-8 flex flex-col items-center justify-center gap-4">
+                <a
+                    href="/shop?category=madcry"
+                    class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black cursor-pointer"
+                >
                     <span class="absolute inset-0 border-0 group-hover:border-[25px] ease-linear duration-100 transition-all border-white rounded-full"></span>
-                    <span class="relative w-full text-center uppercase tracking-[0.2em] text-xs md:text-sm font-bold whitespace-nowrap">Ver Colección</span>
+                    <span class="relative w-full text-center uppercase tracking-[0.3em] text-xs md:text-sm font-bold whitespace-nowrap flex items-center gap-3 justify-center">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        Coming Soon
+                    </span>
                 </a>
+                <p class="text-[10px] tracking-[0.4em] uppercase text-gray-500">
+                    Reveal · 13.05.2026 · 20:00
+                </p>
+                <div
+                    id="home-countdown"
+                    data-reveal-at="2026-05-13T20:00:00+02:00"
+                    class="text-sm md:text-base tracking-[0.3em] uppercase text-gray-300 tabular-nums font-bold"
+                >
+                    — — —
+                </div>
             </div>
         </div>
 
@@ -72,3 +88,30 @@ const eventSchema = {
         </div>
     </main>
 </Layout>
+
+<script>
+    document.addEventListener("astro:page-load", () => {
+        const node = document.getElementById("home-countdown") as HTMLElement | null;
+        if (!node) return;
+        const target = node.dataset.revealAt;
+        if (!target) return;
+        const t = new Date(target).getTime();
+
+        const update = () => {
+            const diff = t - Date.now();
+            if (diff <= 0) {
+                node.textContent = "REVEAL · LIVE";
+                return;
+            }
+            const d = Math.floor(diff / 86400000);
+            const h = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, "0");
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+            node.textContent = `${d} · ${h}:${m}:${s}`;
+        };
+
+        update();
+        const id = window.setInterval(update, 1000);
+        document.addEventListener("astro:before-swap", () => clearInterval(id), { once: true });
+    });
+</script>

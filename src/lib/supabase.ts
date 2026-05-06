@@ -49,6 +49,19 @@ export function formatPrice(cents: number, currency = 'eur'): string {
   }).format(cents / 100);
 }
 
+/**
+ * Tipo extendido para la vista products_public — anade campos que la
+ * vista calcula y que no estan en la tabla base (reveal_at, is_locked,
+ * categorias). Mantenemos una sola fuente de verdad para el shop.
+ */
+export type PublicProduct = Database['public']['Tables']['products']['Row'] & {
+  reveal_at: string | null;
+  is_locked: boolean;
+  category_price_label: string | null;
+  category_default_description: string | null;
+  category_hide_price: boolean | null;
+};
+
 export type Product = Database['public']['Tables']['products']['Row'];
 export type ProductInsert = Database['public']['Tables']['products']['Insert'];
 export type ProductUpdate = Database['public']['Tables']['products']['Update'];

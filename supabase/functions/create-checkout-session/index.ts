@@ -53,6 +53,17 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Producto no disponible' }, 400, req);
     }
 
+    // Defensa server-side: si la pieza tiene reveal_at futuro, bloqueamos
+    // el checkout aunque el cliente lo intente forzar. La vista publica
+    // ya enmascara la imagen, pero esto cierra la puerta a comprar a ciegas.
+    if (product.reveal_at && new Date(product.reveal_at) > new Date()) {
+      return jsonResponse(
+        { error: 'Esta pieza no esta disponible todavia. Vuelve el 13 de mayo a las 20:00.' },
+        400,
+        req
+      );
+    }
+
     // Las categorias con hide_price=true van por encargo (Commission):
     // se solicita presupuesto via /contact, no checkout online. Defensa
     // server-side aunque el HTML no muestre el boton.

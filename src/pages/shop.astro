@@ -73,73 +73,113 @@ const categories = [
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"
         >
             {
-                list.map((product) => (
-                    <article
-                        class="product-item group relative flex flex-col gap-4 transition-all duration-500"
-                        data-category={product.category_slug}
-                        data-product-id={product.id}
-                        data-price={product.price_cents}
-                        data-hide-price={(product as any).category_hide_price ? "1" : "0"}
-                    >
-                        <a
-                            href={`/product/${product.slug}`}
-                            class="block relative aspect-square overflow-hidden bg-black border border-white/5"
+                list.map((product, idx) => {
+                    const isLocked = !!(product as any).is_locked;
+                    const revealAt = (product as any).reveal_at as string | null;
+                    const pieceNumber = String(idx + 1).padStart(2, "0");
+                    return (
+                        <article
+                            class="product-item group relative flex flex-col gap-4 transition-all duration-500"
+                            data-category={product.category_slug}
+                            data-product-id={product.id}
+                            data-price={product.price_cents}
+                            data-hide-price={(product as any).category_hide_price ? "1" : "0"}
+                            data-locked={isLocked ? "1" : "0"}
+                            data-reveal-at={revealAt ?? ""}
                         >
-                            <img
-                                src={getProductImageUrl(
-                                    Array.isArray(product.images) && product.images.length > 0
-                                        ? String(product.images[0])
-                                        : null
-                                )}
-                                alt={product.name}
-                                loading="lazy"
-                                transition:name={`image-${product.id}`}
-                                class="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110"
-                            />
-
-                            {product.status === "available" && (
-                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                    <span class="border border-white px-6 py-2 text-white text-xs uppercase tracking-[0.2em] backdrop-blur-sm">
-                                        Ver Obra
-                                    </span>
+                            {isLocked ? (
+                                <div class="block relative aspect-square overflow-hidden bg-black border border-white/10">
+                                    <img
+                                        src="/images/mystery-card.png"
+                                        alt={`Pieza ${pieceNumber} · Reveal 13.05.2026`}
+                                        loading="lazy"
+                                        class="w-full h-full object-cover opacity-70 transition-opacity duration-700 group-hover:opacity-90"
+                                    />
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
+                                        <span class="text-[10px] uppercase tracking-[0.4em] text-red-500 font-bold animate-pulse">
+                                            Coming · 13.05.26
+                                        </span>
+                                        <span
+                                            class="font-bold text-white text-2xl uppercase tracking-widest countdown"
+                                            data-countdown
+                                        >
+                                            —
+                                        </span>
+                                    </div>
                                 </div>
+                            ) : (
+                                <a
+                                    href={`/product/${product.slug}`}
+                                    class="block relative aspect-square overflow-hidden bg-black border border-white/5"
+                                >
+                                    <img
+                                        src={getProductImageUrl(
+                                            Array.isArray(product.images) && product.images.length > 0
+                                                ? String(product.images[0])
+                                                : null
+                                        )}
+                                        alt={product.name}
+                                        loading="lazy"
+                                        transition:name={`image-${product.id}`}
+                                        class="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110"
+                                    />
+
+                                    {product.status === "available" && (
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span class="border border-white px-6 py-2 text-white text-xs uppercase tracking-[0.2em] backdrop-blur-sm">
+                                                Ver Obra
+                                            </span>
+                                        </div>
+                                    )}
+                                </a>
                             )}
-                        </a>
 
-                        <div class="flex justify-between items-start pt-2 relative z-10">
-                            <div class="space-y-1">
-                                <h3 class="text-xl text-white font-medium uppercase tracking-wide group-hover:text-gray-300 transition flex items-center gap-3 flex-wrap">
-                                    {product.name}
+                            <div class="flex justify-between items-start pt-2 relative z-10">
+                                <div class="space-y-1">
+                                    <h3 class="text-xl text-white font-medium uppercase tracking-wide group-hover:text-gray-300 transition flex items-center gap-3 flex-wrap">
+                                        {isLocked ? `Pieza nº ${pieceNumber}` : product.name}
 
-                                    {product.status === "sold" && (
-                                        <span data-status-badge class="border border-red-900/30 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
-                                            Sold Out
+                                        {isLocked && (
+                                            <span class="border border-red-900/40 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                                                Locked
+                                            </span>
+                                        )}
+                                        {!isLocked && product.status === "sold" && (
+                                            <span data-status-badge class="border border-red-900/30 bg-red-900/10 text-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                                                Sold Out
+                                            </span>
+                                        )}
+                                        {!isLocked && product.is_new && (
+                                            <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest whitespace-nowrap animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+                                                New
+                                            </span>
+                                        )}
+                                    </h3>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider line-clamp-1">
+                                        {isLocked
+                                            ? "Revelacion oficial · 13 mayo 2026 · 20:00 CET"
+                                            : product.description}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    {isLocked ? (
+                                        <span class="block text-sm text-white/60 font-bold tracking-widest uppercase whitespace-nowrap">
+                                            ?? €
+                                        </span>
+                                    ) : (product as any).category_hide_price ? (
+                                        <span class="block text-sm text-white font-bold tracking-widest uppercase whitespace-nowrap">
+                                            {(product as any).category_price_label || "Commission"}
+                                        </span>
+                                    ) : (
+                                        <span class="block text-xl text-white font-bold tracking-widest">
+                                            {formatPrice(product.price_cents, product.currency || "eur")}
                                         </span>
                                     )}
-                                    {product.is_new && (
-                                        <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest whitespace-nowrap animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]">
-                                            New
-                                        </span>
-                                    )}
-                                </h3>
-                                <p class="text-xs text-gray-500 uppercase tracking-wider line-clamp-1">
-                                    {product.description}
-                                </p>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                {(product as any).category_hide_price ? (
-                                    <span class="block text-sm text-white font-bold tracking-widest uppercase whitespace-nowrap">
-                                        {(product as any).category_price_label || "Commission"}
-                                    </span>
-                                ) : (
-                                    <span class="block text-xl text-white font-bold tracking-widest">
-                                        {formatPrice(product.price_cents, product.currency || "eur")}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </article>
-                ))
+                        </article>
+                    );
+                })
             }
         </div>
 
@@ -166,7 +206,55 @@ const categories = [
         otros: "Otros",
     };
 
+    function formatCountdown(target: number): { d: string; h: string; m: string; s: string; done: boolean } {
+        const diff = target - Date.now();
+        if (diff <= 0) return { d: "0", h: "00", m: "00", s: "00", done: true };
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        return {
+            d: String(d),
+            h: String(h).padStart(2, "0"),
+            m: String(m).padStart(2, "0"),
+            s: String(s).padStart(2, "0"),
+            done: false,
+        };
+    }
+
+    function startCountdowns() {
+        const items = document.querySelectorAll<HTMLElement>('.product-item[data-locked="1"]');
+        if (items.length === 0) return;
+
+        const update = () => {
+            let anyDone = false;
+            items.forEach((el) => {
+                const target = el.dataset.revealAt;
+                const node = el.querySelector<HTMLElement>("[data-countdown]");
+                if (!target || !node) return;
+                const t = new Date(target).getTime();
+                const c = formatCountdown(t);
+                if (c.done) {
+                    anyDone = true;
+                    node.textContent = "REVEAL";
+                } else {
+                    node.textContent = `${c.d}d ${c.h}:${c.m}:${c.s}`;
+                }
+            });
+            if (anyDone) {
+                // Si ya paso la hora, recargamos para que el SSR/cliente
+                // reciba la vista sin enmascarar.
+                setTimeout(() => location.reload(), 1500);
+            }
+        };
+
+        update();
+        const id = window.setInterval(update, 1000);
+        document.addEventListener("astro:before-swap", () => clearInterval(id), { once: true });
+    }
+
     document.addEventListener("astro:page-load", async () => {
+        startCountdowns();
         // --- Filtro por categoria desde ?category= ---
         const params = new URLSearchParams(window.location.search);
         const filterCat = params.get("category");
