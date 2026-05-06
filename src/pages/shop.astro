@@ -124,37 +124,50 @@ const categories = [
                         >
                             {isLocked ? (
                                 <div class="block relative aspect-square overflow-hidden bg-black border border-white/10">
-                                    <img
-                                        src="/images/mystery-card.png"
-                                        alt={`Pieza ${pieceNumber} · Reveal 13.05.2026`}
-                                        loading="lazy"
-                                        class="w-full h-full object-cover opacity-70 transition-opacity duration-700 group-hover:opacity-90"
+                                    {/* Fondo limpio con marca de agua sutil — sin imagen "SOON"
+                                        para que el countdown sea el protagonista */}
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-900"
                                     />
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 pointer-events-none px-4">
-                                        <span class="text-[10px] uppercase tracking-[0.4em] text-red-500 font-bold animate-pulse">
-                                            Coming · 13.05.26
-                                        </span>
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]"
+                                    >
+                                        <span class="text-[28rem] font-bold leading-[0.8] text-white">M</span>
+                                    </div>
+                                    {/* Borde decorativo con esquinas en rojo */}
+                                    <div class="absolute inset-4 border border-white/10 pointer-events-none"></div>
+                                    <span class="absolute top-3 left-3 text-[8px] tracking-[0.3em] uppercase text-gray-600 font-bold">
+                                        Madcry
+                                    </span>
+                                    <span class="absolute top-3 right-3 text-[8px] tracking-[0.3em] uppercase text-red-500 font-bold animate-pulse">
+                                        ● Coming
+                                    </span>
+
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-5 pointer-events-none px-4">
                                         <div
-                                            class="grid grid-cols-4 gap-3 text-center"
+                                            class="grid grid-cols-4 gap-3 md:gap-4 text-center"
                                             data-countdown
                                         >
                                             <div class="flex flex-col items-center">
-                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
-                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Days</span>
+                                                <span class="text-2xl md:text-3xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-500 mt-2">Days</span>
                                             </div>
                                             <div class="flex flex-col items-center">
-                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
-                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Hours</span>
+                                                <span class="text-2xl md:text-3xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-500 mt-2">Hours</span>
                                             </div>
                                             <div class="flex flex-col items-center">
-                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
-                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Min</span>
+                                                <span class="text-2xl md:text-3xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-500 mt-2">Min</span>
                                             </div>
                                             <div class="flex flex-col items-center">
-                                                <span class="text-xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
-                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1">Sec</span>
+                                                <span class="text-2xl md:text-3xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
+                                                <span class="text-[8px] tracking-[0.3em] uppercase text-gray-500 mt-2">Sec</span>
                                             </div>
                                         </div>
+                                        <span class="text-[9px] tracking-[0.4em] uppercase text-gray-600">
+                                            13.05.2026 · 20:00
+                                        </span>
                                     </div>
                                 </div>
                             ) : (
