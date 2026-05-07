@@ -1,0 +1,62 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+    title="Mensaje enviado · MADCRY Studio"
+    description="Gracias por tu mensaje. Te respondemos en menos de 48 horas."
+    noindex={true}
+>
+    <main
+        class="min-h-screen flex flex-col items-center justify-center px-6 py-32 relative overflow-hidden"
+    >
+        <!-- Marca de agua de fondo -->
+        <div
+            class="absolute inset-0 pointer-events-none opacity-[0.04] flex items-center justify-center select-none"
+        >
+            <span class="text-[40vw] font-bold uppercase tracking-tighter leading-[0.8]">M</span>
+        </div>
+
+        <div class="relative z-10 max-w-2xl w-full text-center space-y-10">
+            <p class="text-green-500 text-[10px] tracking-[0.5em] font-bold uppercase animate-pulse flex items-center justify-center gap-3">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                Mensaje recibido
+            </p>
+
+            <h1
+                class="text-5xl md:text-8xl font-bold uppercase tracking-tighter text-white leading-[0.9]"
+            >
+                Gracias.
+            </h1>
+
+            <p class="text-gray-400 text-sm md:text-base tracking-wide leading-relaxed max-w-xl mx-auto">
+                Hemos recibido tu mensaje. Susana lo revisará en persona y te
+                responderá en menos de <strong class="text-white">48 horas</strong>
+                desde <span class="text-white">info@madcry.com</span>.
+            </p>
+
+            <p class="text-gray-500 text-xs tracking-[0.3em] uppercase">
+                Mientras tanto, echa un vistazo al estudio.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+                <a
+                    href="/shop"
+                    class="inline-block px-12 py-4 bg-white text-black uppercase tracking-[0.2em] text-xs font-bold hover:bg-gray-200 transition w-full sm:w-auto text-center"
+                >
+                    Ver colección →
+                </a>
+                <a
+                    href="/"
+                    class="inline-block px-12 py-4 border border-white/40 text-white uppercase tracking-[0.2em] text-xs font-bold hover:bg-white hover:text-black transition w-full sm:w-auto text-center"
+                >
+                    Volver al inicio
+                </a>
+            </div>
+
+            <p class="text-[10px] text-gray-600 uppercase tracking-[0.3em] pt-12">
+                Madcry Studio · Madrid · 1/1
+            </p>
+        </div>
+    </main>
+</Layout>

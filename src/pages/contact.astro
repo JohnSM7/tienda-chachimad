@@ -327,22 +327,11 @@ import Layout from "../layouts/Layout.astro";
                     throw new Error(err.error || "Error de envio");
                 }
 
-                if (status) {
-                    status.classList.remove("hidden");
-                    status.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
-                }
+                btnText.textContent = "ENVIADO ✓";
                 (form as HTMLFormElement).reset();
-                btnText.textContent = "ENVIADO";
-
-                setTimeout(() => {
-                    restoreOriginal();
-                    btn.disabled = false;
-                    btn.classList.remove("opacity-70", "cursor-not-allowed");
-                    if (status) status.classList.add("hidden");
-                }, 4000);
+                // Redirige a la pantalla "Gracias" con el layout completo —
+                // mejor que un mensaje inline al pie del formulario.
+                window.location.href = "/mensaje-enviado";
             } catch (error) {
                 console.error("Contact error:", error);
                 btnText.textContent = "ERROR AL ENVIAR";
