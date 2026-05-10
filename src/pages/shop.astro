@@ -54,12 +54,18 @@ const categoryNames: Record<string, string> = Object.fromEntries(
             document.addEventListener("astro:after-swap", applyShopFilter);
         })();
     </script>
-    <!-- CSS dinamico: una regla por cada categoria de la BD para que
-         el filtro funcione tambien con categorias nuevas que cree el admin
-         sin tener que tocar este archivo. -->
+    <!-- CSS dinamico:
+         1. Una regla por cada categoria de la BD para que el filtro
+            funcione tambien con categorias nuevas que cree el admin
+            sin tener que tocar este archivo.
+         2. En "Ver Todo" (sin filtro) ocultamos las piezas bloqueadas
+            (data-locked="1") — son sorpresa hasta su reveal. Cuando
+            la fecha pase, la BD devuelve is_locked=false en el
+            siguiente build y aparecen normalmente. -->
     <style is:inline set:html={`
         html[data-shop-cat] .product-item { display: none !important; }
         ${(allCategories ?? []).map((c) => `html[data-shop-cat="${c.slug}"] .product-item[data-category="${c.slug}"] { display: flex !important; }`).join("\n        ")}
+        html:not([data-shop-cat]) .product-item[data-locked="1"] { display: none !important; }
     `} />
 
     <!-- Mapa de slug→nombre de categorias generado en build desde la BD,
