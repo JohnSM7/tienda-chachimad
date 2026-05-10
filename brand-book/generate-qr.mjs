@@ -109,7 +109,7 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 const page = await browser.newPage();
-await page.setViewport({ width: 800, height: 1200, deviceScaleFactor: 2 });
+await page.setViewport({ width: 1000, height: 1000, deviceScaleFactor: 2 });
 
 const dateStr = new Date().toLocaleDateString('es-ES', {
   year: 'numeric',
@@ -181,7 +181,7 @@ for (const product of products) {
   await page.screenshot({
     path: out,
     type: 'png',
-    clip: { x: 0, y: 0, width: 800, height: 1200 },
+    clip: { x: 0, y: 0, width: 1000, height: 1000 },
   });
   console.log(`  OK ${filename}`);
 }
