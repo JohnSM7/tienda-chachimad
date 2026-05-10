@@ -50,9 +50,78 @@ Deno.serve(async (req) => {
 
   try {
     const { action, product } = (await req.json()) as {
-      action: 'create' | 'update' | 'delete';
+      action: 'create' | 'update' | 'delete' | 'sync-stripe';
       product: ProductPayload;
     };
+
+    // ---------- sync-stripe ----------
+    // Vincula a Stripe productos creados antes de que existiera el flujo
+    // automatico, o re-sincroniza imagenes/descripcion. Si el producto
+    // ya tiene stripe_product_id, lo actualiza con los datos frescos.
+    if (action === 'sync-stripe') {
+      if (!product.id) return jsonResponse({ error: 'Falta id' }, 400, req);
+
+      const { data: existing, error: readErr } = await supabase
+        .from('products')
+        .select('id, slug, name, description, images, stripe_product_id, status')
+        .eq('id', product.id)
+        .single();
+
+      if (readErr || !existing) {
+        return jsonResponse({ error: 'Producto no encontrado' }, 404, req);
+      }
+
+      const imageUrls = absolutizeImages(
+        Array.isArray(existing.images) ? (existing.images as string[]) : []
+      );
+
+      try {
+        if (existing.stripe_product_id) {
+          // Ya tiene Stripe Product → solo refresca datos
+          const updated = await stripe.products.update(existing.stripe_product_id, {
+            name: existing.name,
+            description: existing.description || undefined,
+            images: imageUrls.slice(0, 8),
+            metadata: { slug: existing.slug },
+            active: existing.status !== 'draft',
+          });
+          return jsonResponse(
+            { ok: true, action: 'updated', stripe_product_id: updated.id },
+            200,
+            req
+          );
+        }
+
+        // No tiene Stripe Product → crea uno y lo vincula
+        const created = await stripe.products.create({
+          name: existing.name,
+          description: existing.description || undefined,
+          images: imageUrls.slice(0, 8),
+          metadata: { slug: existing.slug },
+          active: existing.status !== 'draft',
+        });
+
+        const { error: linkErr } = await supabase
+          .from('products')
+          .update({ stripe_product_id: created.id })
+          .eq('id', existing.id);
+
+        if (linkErr) {
+          // Rollback Stripe si fallo la BD
+          await stripe.products.update(created.id, { active: false }).catch(() => {});
+          return jsonResponse({ error: linkErr.message }, 500, req);
+        }
+
+        return jsonResponse(
+          { ok: true, action: 'created', stripe_product_id: created.id },
+          200,
+          req
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Error Stripe';
+        return jsonResponse({ error: `Stripe: ${msg}` }, 500, req);
+      }
+    }
 
     if (action === 'delete') {
       if (!product.id) return jsonResponse({ error: 'Falta id' }, 400, req);

@@ -1,5 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+// =============================================================
+// Datos del titular — sustituir antes del launch
+// =============================================================
+const titular = {
+    nombre: "Susana Madriz",
+    nif: "[[ NIF / DNI ]]",
+    direccion: "[[ Calle, número, código postal, Madrid, España ]]",
+    email: "info@madcry.com",
+    telefono: "+34 684 123 159",
+    actividad: "Artista plástica · Venta de obra original",
+};
+const ultimaActualizacion = "Mayo 2026";
 ---
 
 <Layout
@@ -15,7 +28,7 @@ import Layout from "../layouts/Layout.astro";
                     Aviso Legal
                 </h1>
                 <p class="text-gray-500 text-xs tracking-[0.3em] uppercase">
-                    Identificación y Titularidad
+                    Última actualización · {ultimaActualizacion}
                 </p>
             </header>
 
@@ -26,61 +39,110 @@ import Layout from "../layouts/Layout.astro";
                 prose-strong:text-white prose-strong:font-bold
                 prose-li:text-gray-400 prose-li:text-sm"
             >
-                <h3>1. Datos Identificativos</h3>
+                <h3>1. Identificación del titular</h3>
                 <p>
-                    En cumplimiento con el deber de información recogido en
+                    En cumplimiento del deber de información recogido en el
                     artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios
-                    de la Sociedad de la Información y del Comercio Electrónico,
-                    a continuación se reflejan los siguientes datos:
+                    de la Sociedad de la Información y del Comercio Electrónico
+                    (LSSI-CE), se hace constar la siguiente información del
+                    responsable de este sitio web:
                 </p>
                 <p>
-                    <strong>Titular:</strong> [TU NOMBRE COMPLETO O RAZÓN SOCIAL]<br
-                    />
-                    <strong>NIF/CIF:</strong> [TU DNI O CIF]<br />
-                    <strong>Domicilio:</strong> [TU DIRECCIÓN COMPLETA]<br />
-                    <strong>Email:</strong> info@madcry.com
+                    <strong>Titular:</strong> {titular.nombre}<br />
+                    <strong>NIF:</strong> {titular.nif}<br />
+                    <strong>Domicilio:</strong> {titular.direccion}<br />
+                    <strong>Email de contacto:</strong>
+                    <a href={`mailto:${titular.email}`}>{titular.email}</a><br />
+                    <strong>Teléfono:</strong>
+                    <a href={`tel:${titular.telefono.replace(/\s/g, "")}`}>{titular.telefono}</a><br />
+                    <strong>Actividad:</strong> {titular.actividad}
                 </p>
-                <br />
-                <h3>2. Propiedad Intelectual</h3>
+
+                <h3>2. Objeto del sitio</h3>
                 <p>
-                    Todo el contenido de este sitio web (incluyendo, pero no
-                    limitado a: imágenes de obras, textos, logotipos, diseño
-                    gráfico, código fuente) es propiedad intelectual exclusiva
-                    de <strong>Madcry Studio</strong> o de terceros que han autorizado
-                    su uso.
+                    El sitio web madcry.com es propiedad de {titular.nombre}.
+                    Tiene por objeto presentar la obra plástica del estudio,
+                    permitir la compra directa de piezas originales y recibir
+                    consultas relativas a comisiones a medida.
+                </p>
+
+                <h3>3. Propiedad intelectual</h3>
+                <p>
+                    La totalidad del contenido de este sitio (imágenes de obras,
+                    textos, logotipo, diseño gráfico, plantillas de email,
+                    estructura) es propiedad intelectual exclusiva de
+                    <strong>Madcry Studio</strong> y se encuentra protegida por
+                    la Ley de Propiedad Intelectual.
                 </p>
                 <p>
                     Queda expresamente prohibida la reproducción, distribución,
-                    comunicación pública y transformación, total o parcial, de
-                    los contenidos de esta web sin la autorización expresa y por
+                    comunicación pública o transformación —total o parcial— de
+                    cualquier contenido del sitio sin autorización expresa y por
                     escrito del titular.
                 </p>
                 <p>
-                    <em>Nota importante sobre las obras:</em> La compra de una obra
-                    de arte original o impresión <strong
-                        >no transfiere al comprador los derechos de explotación</strong
-                    > ni de reproducción de la imagen, que siguen perteneciendo al
-                    artista.
+                    <strong>Compra de obra:</strong> la adquisición de una pieza
+                    original transfiere al comprador la propiedad física del
+                    soporte, pero <strong>no</strong> los derechos de
+                    explotación, reproducción, comunicación pública ni
+                    transformación de la imagen, que permanecen en titularidad
+                    de la artista conforme al art. 56 LPI.
                 </p>
-                <br />
-                <h3>3. Uso del Portal</h3>
+
+                <h3>4. Condiciones de uso</h3>
                 <p>
-                    El usuario asume la responsabilidad del uso del portal.
-                    Dicha responsabilidad se extiende al registro que fuese
-                    necesario para acceder a determinados servicios o
-                    contenidos. El usuario se compromete a hacer un uso adecuado
-                    de los contenidos y servicios que Madcry Studio ofrece.
+                    El acceso al sitio es libre y gratuito. El usuario se
+                    compromete a hacer un uso conforme a la ley, a las buenas
+                    costumbres y al presente aviso legal. Queda prohibido
+                    cualquier uso del sitio con fines ilícitos, lesivos de
+                    derechos de terceros o que pueda dañar el funcionamiento del
+                    portal.
                 </p>
-                <br />
-                <h3>4. Exclusión de Garantías</h3>
+
+                <h3>5. Exclusión de garantías y responsabilidad</h3>
                 <p>
-                    Madcry Studio no se hace responsable, en ningún caso, de los
-                    daños y perjuicios de cualquier naturaleza que pudieran
-                    ocasionar, a título enunciativo: errores u omisiones en los
-                    contenidos, falta de disponibilidad del portal o la
-                    transmisión de virus o programas maliciosos, a pesar de
-                    haber adoptado todas las medidas tecnológicas necesarias
-                    para evitarlo.
+                    Madcry Studio no se responsabiliza, en la medida permitida
+                    por la legislación vigente, de los daños y perjuicios de
+                    cualquier naturaleza derivados de:
+                </p>
+                <ul>
+                    <li>Errores u omisiones en los contenidos publicados.</li>
+                    <li>
+                        Indisponibilidades temporales del portal o sus servicios.
+                    </li>
+                    <li>
+                        Transmisión de virus o programas maliciosos, pese a las
+                        medidas técnicas adoptadas.
+                    </li>
+                    <li>
+                        Mal uso del sitio o accesos no autorizados a las cuentas
+                        de los usuarios.
+                    </li>
+                </ul>
+
+                <h3>6. Enlaces a sitios de terceros</h3>
+                <p>
+                    Este sitio puede contener enlaces a sitios web de terceros
+                    (Instagram, Stripe, Resend, Firebase, Supabase). Madcry
+                    Studio no asume responsabilidad alguna sobre el contenido o
+                    las prácticas de privacidad de dichos sitios.
+                </p>
+
+                <h3>7. Legislación aplicable y jurisdicción</h3>
+                <p>
+                    Las relaciones entre Madcry Studio y los usuarios se rigen
+                    por la legislación española. Para la resolución de cualquier
+                    conflicto las partes se someten, con renuncia expresa a
+                    cualquier otro fuero, a los Juzgados y Tribunales de Madrid,
+                    salvo que la legislación aplicable disponga otra cosa para
+                    consumidores y usuarios.
+                </p>
+
+                <h3>8. Modificaciones</h3>
+                <p>
+                    Madcry Studio se reserva el derecho a modificar el presente
+                    aviso legal en cualquier momento. Las modificaciones serán
+                    efectivas desde su publicación en el sitio.
                 </p>
             </div>
         </article>

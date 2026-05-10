@@ -1,5 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const titular = {
+    nombre: "Susana Madriz",
+    nif: "[[ NIF / DNI ]]",
+    direccion: "[[ Calle, número, código postal, Madrid, España ]]",
+    email: "info@madcry.com",
+};
+const ultimaActualizacion = "Mayo 2026";
 ---
 
 <Layout
@@ -15,7 +23,7 @@ import Layout from "../layouts/Layout.astro";
                     Política de Privacidad
                 </h1>
                 <p class="text-gray-500 text-xs tracking-[0.3em] uppercase">
-                    Protección de Datos (RGPD)
+                    Última actualización · {ultimaActualizacion}
                 </p>
             </header>
 
@@ -24,41 +32,193 @@ import Layout from "../layouts/Layout.astro";
                 prose-headings:text-white prose-headings:uppercase prose-headings:tracking-widest prose-headings:text-sm prose-headings:font-bold prose-headings:mt-12
                 prose-p:text-gray-400 prose-p:font-light prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base
                 prose-strong:text-white prose-strong:font-bold
-                prose-li:text-gray-400 prose-li:text-sm"
+                prose-li:text-gray-400 prose-li:text-sm
+                prose-table:text-gray-400 prose-th:text-white"
             >
-                <h3>1. Responsable del Tratamiento</h3>
                 <p>
-                    Tus datos personales serán tratados por <strong
-                        >[TU NOMBRE COMPLETO O RAZÓN SOCIAL]</strong
-                    > (en adelante, "Madcry Studio"), con domicilio en [TU DIRECCIÓN
-                    COMPLETA] y email de contacto <a
-                        href="mailto:info@madcry.com"
-                        class="text-white hover:underline">info@madcry.com</a
-                    >.
+                    Madcry Studio respeta tu privacidad y se compromete a
+                    proteger tus datos personales conforme al Reglamento (UE)
+                    2016/679 (RGPD), la Ley Orgánica 3/2018 de Protección de
+                    Datos y Garantía de Derechos Digitales (LOPDGDD) y la Ley
+                    34/2002 (LSSI-CE).
                 </p>
-                <br />
 
-                <h3>2. Finalidad del Tratamiento</h3>
-                <p>¿Para qué usamos tus datos personales?</p>
+                <h3>1. Responsable del tratamiento</h3>
+                <p>
+                    <strong>Titular:</strong> {titular.nombre}<br />
+                    <strong>NIF:</strong> {titular.nif}<br />
+                    <strong>Domicilio:</strong> {titular.direccion}<br />
+                    <strong>Email:</strong>
+                    <a href={`mailto:${titular.email}`}>{titular.email}</a>
+                </p>
+
+                <h3>2. Datos que recogemos</h3>
+                <p>Tratamos exclusivamente los datos que tú nos facilitas:</p>
                 <ul>
                     <li>
-                        <strong>Gestión de pedidos:</strong> Para tramitar la compra,
-                        gestionar el envío con la empresa de transporte y emitir la
-                        factura correspondiente.
+                        <strong>Compra:</strong> nombre, email, teléfono y dirección
+                        postal de envío. Los datos de tarjeta los procesa Stripe;
+                        nosotros nunca los recibimos ni almacenamos.
                     </li>
                     <li>
-                        <strong>Atención al cliente:</strong> Para responder a las
-                        dudas o consultas que nos hagas llegar a través del formulario
-                        de contacto o email.
+                        <strong>Formulario de contacto:</strong> nombre, email,
+                        mensaje y, opcionalmente, presupuesto orientativo.
                     </li>
                     <li>
-                        <strong>Comunicaciones comerciales:</strong> Solo si te has
-                        suscrito expresamente a nuestra Newsletter, te enviaremos
-                        novedades sobre nuevos "drops" o exposiciones. Puedes darte
-                        de baja en cualquier momento.
+                        <strong>Datos técnicos:</strong> dirección IP y
+                        user-agent del navegador en el momento de enviar un
+                        formulario, con fines exclusivos de seguridad
+                        (anti-spam y rate-limiting).
                     </li>
                 </ul>
+
+                <h3>3. Finalidad y base legal</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Finalidad</th>
+                            <th>Base legal</th>
+                            <th>Plazo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Gestionar pedidos y enviar la obra</td>
+                            <td>Ejecución de contrato (art. 6.1.b RGPD)</td>
+                            <td>5 años (obligación fiscal)</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Notificarte sobre tu pedido (confirmación,
+                                envío, incidencias)
+                            </td>
+                            <td>Ejecución de contrato</td>
+                            <td>Hasta resolución del pedido</td>
+                        </tr>
+                        <tr>
+                            <td>Atender tu mensaje de contacto</td>
+                            <td>Interés legítimo (art. 6.1.f)</td>
+                            <td>2 años o hasta retirada</td>
+                        </tr>
+                        <tr>
+                            <td>Prevenir spam y fraude</td>
+                            <td>Interés legítimo</td>
+                            <td>1 año</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4. Encargados de tratamiento</h3>
+                <p>
+                    Para prestar el servicio compartimos datos estrictamente
+                    necesarios con los siguientes proveedores, todos con
+                    contratos de encargado de tratamiento (DPA) y, cuando
+                    aplica, cláusulas contractuales tipo (SCC) para
+                    transferencias internacionales:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Stripe Payments Europe Ltd.</strong> · Procesa
+                        cobros con tarjeta. Cumple PCI-DSS Level 1.
+                    </li>
+                    <li>
+                        <strong>Supabase Inc.</strong> · Almacena la base de
+                        datos de productos, pedidos y mensajes en
+                        infraestructura europea (Frankfurt).
+                    </li>
+                    <li>
+                        <strong>Resend Inc.</strong> · Envía los emails
+                        transaccionales (confirmación de pedido, tracking,
+                        notificación de mensajes).
+                    </li>
+                    <li>
+                        <strong>Google LLC (Firebase Hosting)</strong> · Sirve
+                        el sitio web vía CDN global.
+                    </li>
+                    <li>
+                        <strong>GitHub Inc.</strong> · Hospeda el código fuente
+                        privado del sitio.
+                    </li>
+                </ul>
+
+                <h3>5. Tus derechos</h3>
+                <p>
+                    Como titular de los datos puedes ejercer en cualquier
+                    momento los siguientes derechos:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Acceso:</strong> conocer qué datos tuyos
+                        tratamos.
+                    </li>
+                    <li>
+                        <strong>Rectificación:</strong> corregir datos
+                        inexactos.
+                    </li>
+                    <li>
+                        <strong>Supresión:</strong> eliminar tus datos cuando
+                        ya no sean necesarios.
+                    </li>
+                    <li>
+                        <strong>Limitación:</strong> restringir el tratamiento
+                        en ciertos supuestos.
+                    </li>
+                    <li>
+                        <strong>Portabilidad:</strong> recibir tus datos en
+                        formato estructurado.
+                    </li>
+                    <li>
+                        <strong>Oposición:</strong> oponerte al tratamiento
+                        basado en interés legítimo.
+                    </li>
+                    <li>
+                        <strong>Reclamación ante la AEPD:</strong> si
+                        consideras que no hemos atendido correctamente tus
+                        derechos, puedes acudir a la
+                        <a
+                            href="https://www.aepd.es"
+                            target="_blank"
+                            rel="noopener noreferrer">Agencia Española de Protección de Datos</a>.
+                    </li>
+                </ul>
+                <p>
+                    Para ejercitar cualquier derecho escribe a
+                    <a href={`mailto:${titular.email}`}>{titular.email}</a>
+                    indicando el derecho que deseas ejercitar y adjuntando copia
+                    de tu DNI o equivalente. Resolveremos en el plazo máximo de
+                    un mes.
+                </p>
+
+                <h3>6. Cookies</h3>
+                <p>
+                    Este sitio no instala cookies de terceros con fines
+                    publicitarios o de seguimiento. Únicamente se utilizan
+                    cookies técnicas necesarias para el funcionamiento del
+                    panel de administración y la sesión segura de checkout en
+                    Stripe.
+                </p>
+
+                <h3>7. Seguridad</h3>
+                <p>
+                    Aplicamos medidas técnicas y organizativas para garantizar
+                    la confidencialidad e integridad de los datos: cifrado TLS
+                    1.3 en tránsito, AES-256 en reposo, control de acceso por
+                    roles (Row-Level Security en la base de datos), cabeceras
+                    HTTP de seguridad (HSTS, CSP, X-Frame-Options), y
+                    verificación criptográfica de los webhooks de pago. En caso
+                    de brecha de seguridad, lo notificaremos a la AEPD en el
+                    plazo de 72 horas conforme al art. 33 RGPD.
+                </p>
+
+                <h3>8. Modificaciones</h3>
+                <p>
+                    Esta política puede actualizarse para reflejar cambios
+                    legales o de servicio. La fecha de la última actualización
+                    aparece al inicio del documento. Si los cambios son
+                    sustanciales y afectan a tus derechos, te lo
+                    comunicaremos por email cuando sea posible.
+                </p>
             </div>
         </article>
-    </main></Layout
->
+    </main>
+</Layout>

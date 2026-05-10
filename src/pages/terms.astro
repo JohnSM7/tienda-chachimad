@@ -1,5 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const titular = {
+    nombre: "Susana Madriz",
+    nif: "[[ NIF / DNI ]]",
+    email: "info@madcry.com",
+};
+const ultimaActualizacion = "Mayo 2026";
 ---
 
 <Layout
@@ -15,7 +22,7 @@ import Layout from "../layouts/Layout.astro";
                     Términos y Condiciones
                 </h1>
                 <p class="text-gray-500 text-xs tracking-[0.3em] uppercase">
-                    Contrato de Compra-Venta
+                    Última actualización · {ultimaActualizacion}
                 </p>
             </header>
 
@@ -26,86 +33,196 @@ import Layout from "../layouts/Layout.astro";
                 prose-strong:text-white prose-strong:font-bold
                 prose-li:text-gray-400 prose-li:text-sm"
             >
-                <h3>1. Objeto</h3>
+                <h3>1. Vendedor</h3>
                 <p>
-                    Las presentes condiciones regulan la compra de productos
-                    artísticos a través del sitio web madcry.com. La realización
-                    de un pedido implica la aceptación plena y sin reservas de
-                    todas y cada una de las presentes condiciones.
+                    Las presentes condiciones regulan la venta de obra de arte
+                    original a través de madcry.com, sitio web titularidad de
+                    {titular.nombre} (NIF {titular.nif}), en adelante
+                    "Madcry Studio".
                 </p>
-                <br />
-                <h3>2. Precios e Impuestos</h3>
+
+                <h3>2. Producto</h3>
                 <p>
-                    Los precios mostrados en la web están indicados en Euros
-                    (€).
-                    <br />
-                    <strong>IVA:</strong> [ELIGE OPCIÓN SEGÚN TU CASO] Los precios
-                    incluyen el IVA correspondiente. / Los precios están exentos de
-                    IVA según el artículo X (si aplicase).
-                    <br />
-                    <strong>Aduanas:</strong> Para envíos fuera de la Unión Europea,
-                    el comprador es responsable de los posibles aranceles, impuestos
-                    de importación o tasas de aduana que se generen en destino.
+                    Las obras ofertadas son <strong>piezas únicas (1/1)</strong>
+                    pintadas a mano por la artista. Cada pieza es irrepetible.
+                    El sitio detalla técnica, dimensiones y año cuando esa
+                    información está disponible.
                 </p>
-                <br />
-                <h3>3. Proceso de Compra</h3>
                 <p>
-                    El usuario deberá seleccionar los productos y añadirlos al
-                    carrito. Una vez finalizada la selección, procederá al pago
-                    a través de la pasarela segura (Stripe / Shop Pay). El
-                    contrato se entiende perfeccionado en el momento en que
-                    recibimos la confirmación del pago.
+                    Las imágenes mostradas pueden presentar pequeñas variaciones
+                    de tono respecto al original debido a la reproducción
+                    fotográfica y la calibración del monitor del comprador. La
+                    obra entregada es la representada en las imágenes.
                 </p>
-                <br />
-                <h3>4. Política de Devoluciones (Derecho de Desistimiento)</h3>
+
+                <h3>3. Precios e impuestos</h3>
                 <p>
-                    De acuerdo con la normativa vigente, el cliente dispone de <strong
-                        >14 días naturales</strong
-                    > desde la recepción del pedido para ejercer su derecho de desistimiento.
+                    Los precios se muestran en euros e incluyen los impuestos
+                    aplicables conforme al régimen fiscal de la artista. Los
+                    gastos de envío se calculan en el momento del checkout en
+                    función del país de destino.
+                </p>
+
+                <h3>4. Proceso de compra</h3>
+                <ol>
+                    <li>Selección de la pieza en madcry.com/shop.</li>
+                    <li>
+                        Click en <em>Adquirir Obra</em> que redirige al
+                        checkout seguro de Stripe.
+                    </li>
+                    <li>
+                        Introducción de datos personales y tarjeta. Stripe
+                        procesa el cobro; Madcry Studio nunca accede a los
+                        datos de tarjeta.
+                    </li>
+                    <li>
+                        Confirmación por email del pedido con número de
+                        referencia.
+                    </li>
+                    <li>
+                        Preparación y envío en 24-48 horas laborables tras
+                        confirmación de pago.
+                    </li>
+                </ol>
+
+                <h3>5. Métodos de pago</h3>
+                <p>
+                    El cobro se realiza íntegramente a través de Stripe Payments
+                    Europe Ltd., proveedor que cumple el estándar PCI-DSS Level
+                    1. Aceptamos tarjetas Visa, Mastercard y American Express.
+                </p>
+
+                <h3>6. Envíos</h3>
+                <p>
+                    Realizamos envíos a España, Portugal, Francia, Alemania,
+                    Italia, Países Bajos, Bélgica, Austria e Irlanda. Tarifas
+                    aplicables:
                 </p>
                 <ul>
                     <li>
-                        El producto debe devolverse en perfecto estado y en su
-                        embalaje original para garantizar su protección.
+                        <strong>España:</strong> 15 € · entrega en 3-5 días
+                        laborables.
                     </li>
                     <li>
-                        Los gastos de envío de la devolución correrán a cargo
-                        del cliente, salvo que el producto sea defectuoso o haya
-                        habido un error por nuestra parte.
+                        <strong>Resto de la Unión Europea:</strong> 25 € ·
+                        entrega en 5-10 días laborables.
                     </li>
                 </ul>
                 <p>
-                    <strong>Excepciones importantes:</strong> No se admitirán devoluciones
-                    de:
+                    El comprador recibirá un email con el número de seguimiento
+                    cuando la pieza salga del estudio. Las obras se embalan con
+                    materiales de protección adecuados a la naturaleza de cada
+                    técnica.
+                </p>
+                <p>
+                    El riesgo de pérdida o deterioro durante el transporte se
+                    transfiere al comprador en el momento de la entrega
+                    conforme al art. 66 ter del TRLGDCU.
+                </p>
+
+                <h3>7. Derecho de desistimiento</h3>
+                <p>
+                    Conforme al art. 102 del Real Decreto Legislativo 1/2007
+                    (TRLGDCU), tienes derecho a desistir de la compra sin
+                    indicar motivo en un plazo de <strong>14 días naturales</strong>
+                    desde la recepción de la pieza.
+                </p>
+                <p>
+                    Para ejercerlo, envía un email a
+                    <a href={`mailto:${titular.email}`}>{titular.email}</a>
+                    indicando el número de pedido y tu intención de desistir.
+                    El reembolso se realizará en el mismo método de pago en un
+                    plazo máximo de 14 días desde la recepción del aviso, una
+                    vez verificado el estado de la obra devuelta.
+                </p>
+                <p>
+                    <strong>Excepciones al desistimiento (art. 103.c TRLGDCU):</strong>
+                    quedan excluidas del derecho de desistimiento las piezas
+                    confeccionadas conforme a las especificaciones del consumidor
+                    o claramente personalizadas (Comisiones a medida). Esta
+                    excepción se informa de forma destacada antes del encargo.
+                </p>
+                <p>
+                    Los gastos de devolución corren a cargo del comprador, salvo
+                    que la pieza llegue dañada por causas imputables al
+                    transporte o al embalaje, en cuyo caso Madcry Studio asume
+                    los gastos de retirada y devolución.
+                </p>
+
+                <h3>8. Comisiones y encargos a medida</h3>
+                <p>
+                    Las piezas por encargo siguen un proceso distinto:
                 </p>
                 <ul>
                     <li>
-                        Obras personalizadas ("Custom") o encargos realizados
-                        bajo las especificaciones del cliente.
+                        Solicitud vía formulario de contacto con descripción del
+                        proyecto.
                     </li>
                     <li>
-                        Productos que hayan sido desprecintados o manipulados de
-                        forma que su valor de mercado se vea alterado.
+                        Envío de presupuesto detallado con técnica, dimensiones,
+                        plazo y precio.
+                    </li>
+                    <li>
+                        Aprobación del cliente y abono del 50 % a la firma del
+                        encargo.
+                    </li>
+                    <li>
+                        Boceto preliminar enviado en un plazo acordado para
+                        validación.
+                    </li>
+                    <li>
+                        Pago del 50 % restante a la entrega de la pieza
+                        terminada.
                     </li>
                 </ul>
-                <br />
-                <h3>5. Garantía de Transporte</h3>
                 <p>
-                    Todos nuestros envíos viajan asegurados. Si recibes el
-                    paquete con daños visibles en el exterior, es <strong
-                        >obligatorio</strong
-                    > indicarlo en el albarán del mensajero al firmar ("Caja golpeada")
-                    y contactarnos en las primeras 24 horas con fotografías. Sin esto,
-                    el seguro no cubrirá los daños.
+                    Las piezas a medida no admiten desistimiento (art. 103.c
+                    TRLGDCU). Eventuales modificaciones sobre el boceto deben
+                    consensuarse antes de su realización definitiva.
                 </p>
-                <br />
-                <h3>6. Legislación Aplicable</h3>
+
+                <h3>9. Autenticidad y propiedad intelectual</h3>
                 <p>
-                    Estas condiciones se regirán o interpretarán conforme a la
-                    legislación española en aquello que no esté expresamente
-                    establecido. Para cualquier controversia, las partes se
-                    someten a los Juzgados y Tribunales del domicilio del
-                    usuario (si es consumidor) o de Madrid (si es empresa).
+                    Cada obra se acompaña, cuando el comprador lo solicita, de
+                    un certificado de autenticidad firmado por la artista.
+                </p>
+                <p>
+                    La compra transfiere al comprador la propiedad física de la
+                    obra pero no los derechos de explotación, reproducción,
+                    comunicación pública ni transformación, que permanecen en
+                    titularidad de la artista conforme al art. 56 LPI.
+                </p>
+
+                <h3>10. Reclamaciones y resolución de conflictos</h3>
+                <p>
+                    Cualquier reclamación puede dirigirse a
+                    <a href={`mailto:${titular.email}`}>{titular.email}</a>.
+                    Atendemos toda reclamación en un plazo máximo de 7 días
+                    laborables.
+                </p>
+                <p>
+                    Conforme al Reglamento (UE) 524/2013, los consumidores
+                    residentes en la UE pueden acudir a la plataforma de
+                    Resolución de Litigios en Línea de la Comisión Europea:
+                    <a
+                        href="https://ec.europa.eu/consumers/odr"
+                        target="_blank"
+                        rel="noopener noreferrer">ec.europa.eu/consumers/odr</a>.
+                </p>
+
+                <h3>11. Legislación aplicable</h3>
+                <p>
+                    Estas condiciones se rigen por la legislación española. Para
+                    cualquier controversia, las partes se someten a los
+                    Juzgados y Tribunales del domicilio del consumidor cuando
+                    así lo permita la ley.
+                </p>
+
+                <h3>12. Modificaciones</h3>
+                <p>
+                    Madcry Studio puede modificar las presentes condiciones en
+                    cualquier momento. Los pedidos en curso se regirán siempre
+                    por las condiciones vigentes en el momento de la compra.
                 </p>
             </div>
         </article>

@@ -86,6 +86,28 @@ async function quickStatus(p: Product, status: "available" | "sold") {
   if (!error) loadAll();
 }
 
+/**
+ * Vincula este producto con Stripe (lo crea alli si no existe, o
+ * actualiza el existente con los datos actuales). Util para piezas
+ * antiguas creadas antes del flujo automatico.
+ */
+const syncingId = ref<string | null>(null);
+async function syncWithStripe(p: Product) {
+  if (syncingId.value) return;
+  syncingId.value = p.id;
+  try {
+    const { syncProduct } = await import("../../lib/admin");
+    const res = await syncProduct("sync-stripe", { id: p.id });
+    const verb = res?.action === "created" ? "vinculado" : "actualizado";
+    alert(`✓ Producto ${verb} en Stripe (${res?.stripe_product_id ?? "?"})`);
+    loadAll();
+  } catch (e: any) {
+    alert(`Error sincronizando: ${e?.message ?? "desconocido"}`);
+  } finally {
+    syncingId.value = null;
+  }
+}
+
 async function deleteProduct(p: Product) {
   const ok = confirm(
     `Borrar "${p.name}"?\n\nPasara a estado 'draft' (oculto en la tienda)\ny se archivara en Stripe. Pedidos antiguos no se pierden.`,
@@ -436,6 +458,37 @@ onMounted(loadAll);
               <p class="text-gray-400 text-xs">
                 {{ formatPrice(p.price_cents, p.currency || "eur") }} · {{ p.category_slug }}
               </p>
+
+              <!-- Estado Stripe: vinculado o no -->
+              <div class="flex items-center justify-between gap-2 text-[9px]">
+                <span
+                  v-if="p.stripe_product_id"
+                  class="text-green-500/80 uppercase tracking-widest font-mono"
+                  :title="p.stripe_product_id"
+                >
+                  ● Stripe sync
+                </span>
+                <span
+                  v-else
+                  class="text-yellow-500/80 uppercase tracking-widest"
+                >
+                  ◌ Sin Stripe
+                </span>
+                <button
+                  @click="syncWithStripe(p)"
+                  :disabled="syncingId === p.id"
+                  class="text-[9px] uppercase tracking-widest text-gray-400 hover:text-white border-b border-zinc-700 hover:border-white transition disabled:opacity-50"
+                  :title="p.stripe_product_id ? 'Actualizar datos en Stripe' : 'Crear y vincular con Stripe'"
+                >
+                  {{
+                    syncingId === p.id
+                      ? "..."
+                      : p.stripe_product_id
+                        ? "↻ refresh"
+                        : "+ vincular"
+                  }}
+                </button>
+              </div>
 
               <div class="flex gap-2 pt-2">
                 <button

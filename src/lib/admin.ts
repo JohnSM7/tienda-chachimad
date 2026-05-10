@@ -71,7 +71,7 @@ export async function deleteProductImage(path: string) {
  * un producto. La function se encarga de sincronizar con Stripe.
  */
 export async function syncProduct(
-  action: 'create' | 'update' | 'delete',
+  action: 'create' | 'update' | 'delete' | 'sync-stripe',
   payload: ProductUpdate & { id?: string }
 ) {
   const { data: session } = await supabase.auth.getSession();
