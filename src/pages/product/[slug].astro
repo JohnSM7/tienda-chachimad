@@ -95,7 +95,7 @@ const breadcrumbSchema = {
         >
             <a
                 href="/shop"
-                class="absolute top-32 left-6 lg:left-12 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition"
+                class="absolute top-44 left-6 lg:left-12 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition z-20"
                 >← Back to Collection</a
             >
 
@@ -109,9 +109,14 @@ const breadcrumbSchema = {
             </div>
 
             <div class="relative z-10 max-w-3xl w-full text-center space-y-12">
-                <p class="text-red-500 text-[10px] tracking-[0.5em] font-bold uppercase animate-pulse">
-                    Pieza protegida · Coleccion MADCRY
-                </p>
+                <div class="space-y-2 animate-pulse">
+                    <p class="text-red-500 text-[10px] tracking-[0.5em] font-bold uppercase">
+                        Pieza protegida
+                    </p>
+                    <p class="text-red-500/70 text-[10px] tracking-[0.5em] font-bold uppercase">
+                        Coleccion MADCRY
+                    </p>
+                </div>
 
                 <h1
                     class="text-5xl md:text-8xl font-bold uppercase tracking-tighter text-white leading-[0.9]"
@@ -119,9 +124,11 @@ const breadcrumbSchema = {
                     Coming<br />Soon
                 </h1>
 
-                <p class="text-gray-400 text-xs md:text-sm tracking-[0.3em] uppercase max-w-xl mx-auto leading-relaxed">
-                    Esta pieza no se revela hasta la apertura oficial de la exposicion el 13 de mayo de 2026 a las 20:00.
-                </p>
+                <div class="text-gray-400 text-xs md:text-sm tracking-[0.3em] uppercase max-w-xl mx-auto leading-relaxed space-y-2">
+                    <p>Esta pieza no se revela</p>
+                    <p>hasta la apertura oficial de la exposicion</p>
+                    <p class="text-white">13 de mayo de 2026 · 20:00</p>
+                </div>
 
                 <div class="flex flex-col items-center gap-6 pt-4">
                     <span class="text-[10px] tracking-[0.4em] uppercase text-gray-500">Reveal en</span>
