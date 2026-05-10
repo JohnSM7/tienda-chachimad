@@ -112,38 +112,29 @@
         letter-spacing: 0.06em;
       }
 
-      .status {
-        margin-top: 18px;
-        align-self: flex-start;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.4em;
-        text-transform: uppercase;
-        padding: 8px 20px;
-        border: 1px solid;
-      }
-      .status.available { color: #22c55e; border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.08); }
-      .status.sold      { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
-      .status.reserved  { color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); }
-      .status.draft     { color: #999; border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.04); }
-
+      /* Scan hint debajo del QR (columna derecha) */
       .scan {
-        margin-top: 24px;
+        margin-top: 22px;
         font-size: 11px;
         line-height: 1.8;
         letter-spacing: 0.3em;
         text-transform: uppercase;
         color: #777;
+        text-align: center;
       }
       .scan strong {
         color: #fff;
         font-weight: 700;
         letter-spacing: 0.2em;
       }
+      .scan .arrow {
+        color: #dc2626;
+      }
 
       /* ─── COLUMNA DERECHA: QR ─── */
       .qr-wrap {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
       }
@@ -215,22 +206,19 @@
           <div class="technique">{{TECHNIQUE}}</div>
           <div class="dimensions">{{DIMENSIONS}}</div>
         </div>
-
-        <div class="status {{STATUS_CLASS}}">{{STATUS}}</div>
-
-        <div class="scan">
-          Escanea →<br />
-          madcry.com/product/<strong>{{SLUG}}</strong>
-        </div>
       </div>
 
-      <!-- ──── DERECHA: QR ──── -->
+      <!-- ──── DERECHA: QR + scan hint debajo ──── -->
       <div class="qr-wrap">
         <div class="qr-card">
           <img class="qr" src="{{QR}}" alt="QR" />
           <div class="logo-mask">
             <img src="{{LOGO_DATA_URL}}" alt="MADCRY" />
           </div>
+        </div>
+        <div class="scan">
+          <span class="arrow">↑</span> Escanea para adquirir<br />
+          madcry.com/product/<strong>{{SLUG}}</strong>
         </div>
       </div>
 
