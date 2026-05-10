@@ -28,6 +28,46 @@ const supabase = createClient(
 
 const SHOP_URL = Deno.env.get('SHOP_URL') ?? 'https://madcry.com';
 
+// =====================================================
+// Tarifas de envio
+// =====================================================
+// Politica: a partir de FREE_SHIPPING_THRESHOLD_CENTS el envio
+// es gratis (Espana y resto UE). Por debajo, tarifas estandar.
+const FREE_SHIPPING_THRESHOLD_CENTS = 8500; // 85.00 EUR
+const ES_SHIPPING_CENTS = 1000;             // 10.00 EUR
+const EU_SHIPPING_CENTS = 2500;             // 25.00 EUR
+
+function buildShippingOptions(productPriceCents: number) {
+  const free = productPriceCents >= FREE_SHIPPING_THRESHOLD_CENTS;
+  const esAmount = free ? 0 : ES_SHIPPING_CENTS;
+  const euAmount = free ? 0 : EU_SHIPPING_CENTS;
+
+  return [
+    {
+      shipping_rate_data: {
+        type: 'fixed_amount' as const,
+        fixed_amount: { amount: esAmount, currency: 'eur' },
+        display_name: free ? 'Envio Espana · GRATIS' : 'Envio Espana',
+        delivery_estimate: {
+          minimum: { unit: 'business_day' as const, value: 3 },
+          maximum: { unit: 'business_day' as const, value: 5 },
+        },
+      },
+    },
+    {
+      shipping_rate_data: {
+        type: 'fixed_amount' as const,
+        fixed_amount: { amount: euAmount, currency: 'eur' },
+        display_name: free ? 'Envio resto UE · GRATIS' : 'Envio resto UE',
+        delivery_estimate: {
+          minimum: { unit: 'business_day' as const, value: 5 },
+          maximum: { unit: 'business_day' as const, value: 10 },
+        },
+      },
+    },
+  ];
+}
+
 Deno.serve(async (req) => {
   const cors = handleCors(req);
   if (cors) return cors;
@@ -114,30 +154,7 @@ Deno.serve(async (req) => {
       shipping_address_collection: {
         allowed_countries: ['ES', 'PT', 'FR', 'DE', 'IT', 'NL', 'BE', 'AT', 'IE'],
       },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: { amount: 1500, currency: 'eur' },
-            display_name: 'Envio Espana',
-            delivery_estimate: {
-              minimum: { unit: 'business_day', value: 3 },
-              maximum: { unit: 'business_day', value: 5 },
-            },
-          },
-        },
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: { amount: 2500, currency: 'eur' },
-            display_name: 'Envio resto UE',
-            delivery_estimate: {
-              minimum: { unit: 'business_day', value: 5 },
-              maximum: { unit: 'business_day', value: 10 },
-            },
-          },
-        },
-      ],
+      shipping_options: buildShippingOptions(product.price_cents),
       // Email autocomplete + factura
       phone_number_collection: { enabled: true },
       // Redirects

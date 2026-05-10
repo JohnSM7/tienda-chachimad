@@ -206,9 +206,21 @@ const breadcrumbSchema = {
                     Sold
                 </p>
             ) : (
-                <p class="text-2xl text-gray-400 font-light mb-12 tracking-wider font-mono">
-                    {formatPrice(product.price_cents, product.currency || "eur")}
-                </p>
+                <div class="mb-12">
+                    <p class="text-2xl text-gray-400 font-light tracking-wider font-mono">
+                        {formatPrice(product.price_cents, product.currency || "eur")}
+                    </p>
+                    {product.price_cents >= 8500 ? (
+                        <p class="text-[10px] tracking-[0.4em] uppercase text-green-500 mt-2 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            Envío gratis incluido
+                        </p>
+                    ) : (
+                        <p class="text-[10px] tracking-[0.4em] uppercase text-gray-500 mt-2">
+                            + 10€ envío España · Gratis a partir de 85€
+                        </p>
+                    )}
+                </div>
             )}
 
             <div
