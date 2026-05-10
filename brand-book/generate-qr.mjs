@@ -3,7 +3,7 @@
 // un QR con error correction High (permite logo central sin romper
 // la decodificacion) y lo compone con la plantilla de marca.
 //
-// Salida: brand-book/dist/qr/<slug>.png
+// Salida: brand-book/dist/qr/<NOMBRE DEL CUADRO>.png
 import puppeteer from 'puppeteer';
 import QRCode from 'qrcode';
 import { createClient } from '@supabase/supabase-js';
@@ -67,9 +67,35 @@ if (!products?.length) {
 
 console.log(`Generando ${products.length} QR(s)...`);
 
-// ---------- 4) Template ----------
+// ---------- 4) Template + limpieza ----------
 const template = await fs.readFile(TEMPLATE, 'utf8');
+
+// Limpia QRs anteriores para evitar acumular archivos con nombres distintos
+// si Susana renombro un cuadro entre ejecuciones.
+try {
+  const oldFiles = await fs.readdir(OUT_DIR);
+  await Promise.all(
+    oldFiles
+      .filter((f) => f.toLowerCase().endsWith('.png'))
+      .map((f) => fs.unlink(path.join(OUT_DIR, f)))
+  );
+} catch {
+  // ok si la carpeta no existe
+}
 await fs.mkdir(OUT_DIR, { recursive: true });
+
+/**
+ * Convierte el nombre del cuadro en un nombre de archivo seguro.
+ * Elimina chars prohibidos en Windows pero conserva mayusculas y
+ * espacios para que sea legible. Si queda vacio (ej: nombre era
+ * solo "?"), cae al slug original.
+ */
+function safeFilename(name, slug) {
+  if (!name) return slug;
+  const FORBIDDEN = /[<>:"/\\|?*]/g;
+  const safe = name.replace(FORBIDDEN, '').replace(/\s+/g, ' ').trim();
+  return safe || slug;
+}
 
 const browser = await puppeteer.launch({
   headless: 'new',
@@ -87,7 +113,7 @@ const dateStr = new Date().toLocaleDateString('es-ES', {
 for (const product of products) {
   const url = `${SHOP_URL}/product/${product.slug}`;
 
-  // Error correction H (~30%) → permite tapar centro con logo sin romper QR
+  // Error correction H (~30%) -> permite tapar centro con logo sin romper QR
   const qrDataUrl = await QRCode.toDataURL(url, {
     width: 1100,
     margin: 0,
@@ -107,7 +133,6 @@ for (const product of products) {
     waitUntil: 'domcontentloaded',
     timeout: 60000,
   });
-  // Espera hasta que la fuente este cargada y los <img> renderizados
   await page.evaluate(async () => {
     await document.fonts.ready;
     const imgs = Array.from(document.querySelectorAll('img'));
@@ -123,13 +148,14 @@ for (const product of products) {
     );
   });
 
-  const out = path.join(OUT_DIR, `${product.slug}.png`);
+  const filename = safeFilename(product.name, product.slug) + '.png';
+  const out = path.join(OUT_DIR, filename);
   await page.screenshot({
     path: out,
     type: 'png',
     clip: { x: 0, y: 0, width: 800, height: 1000 },
   });
-  console.log(`  ✓ ${product.slug}.png`);
+  console.log(`  OK ${filename}`);
 }
 
 await browser.close();
