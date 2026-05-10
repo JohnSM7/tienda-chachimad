@@ -100,6 +100,86 @@ async function deleteProduct(p: Product) {
   }
 }
 
+/**
+ * Cancela un pedido manualmente: lo deja como 'cancelled' (queda en
+ * el historial) y libera el cuadro a 'available' para que pueda
+ * volverse a vender. NO emite reembolso en Stripe — eso se hace
+ * desde el dashboard de Stripe si fuera un pago real.
+ */
+async function cancelOrder(o: Order) {
+  const ok = confirm(
+    `¿Cancelar este pedido?\n\n` +
+      `· Pasara a estado 'cancelled' (sigue en el historial)\n` +
+      `· La pieza vuelve a estar disponible en la tienda\n\n` +
+      `Si fue un pago real, recuerda emitir el reembolso desde Stripe.`,
+  );
+  if (!ok) return;
+
+  // Actualizar el pedido
+  const { error: orderErr } = await supabase
+    .from("orders")
+    .update({ status: "cancelled" })
+    .eq("id", o.id);
+  if (orderErr) {
+    alert(`Error cancelando: ${orderErr.message}`);
+    return;
+  }
+
+  // Devolver el producto a disponible (si todavia existe y no esta en draft)
+  if (o.product_id) {
+    const { data: prod } = await supabase
+      .from("products")
+      .select("status")
+      .eq("id", o.product_id)
+      .single();
+    if (prod && prod.status !== "draft") {
+      await supabase
+        .from("products")
+        .update({ status: "available" })
+        .eq("id", o.product_id);
+    }
+  }
+
+  loadAll();
+}
+
+/**
+ * Borra el pedido permanentemente. Util para limpiar pedidos de
+ * prueba. No deja rastro y devuelve el cuadro a disponible.
+ */
+async function deleteOrder(o: Order) {
+  const ok = confirm(
+    `¿BORRAR PERMANENTEMENTE este pedido?\n\n` +
+      `Esta accion no se puede deshacer. Se elimina el registro\n` +
+      `y la pieza vuelve a estar disponible.\n\n` +
+      `Solo recomendado para pruebas.`,
+  );
+  if (!ok) return;
+
+  // Devolver producto a disponible primero (si aplica)
+  if (o.product_id) {
+    const { data: prod } = await supabase
+      .from("products")
+      .select("status")
+      .eq("id", o.product_id)
+      .single();
+    if (prod && prod.status !== "draft") {
+      await supabase
+        .from("products")
+        .update({ status: "available" })
+        .eq("id", o.product_id);
+    }
+  }
+
+  const { error } = await supabase.from("orders").delete().eq("id", o.id);
+  if (error) {
+    alert(`Error borrando: ${error.message}`);
+    return;
+  }
+
+  loadAll();
+}
+
 async function markOrderShipped(o: Order) {
   const tracking = prompt("Numero de seguimiento:");
   if (!tracking) return;
@@ -449,13 +529,31 @@ onMounted(loadAll);
               {{ o.tracking_number || "—" }}
             </td>
             <td class="py-3 px-2 text-right">
-              <button
-                v-if="o.status === 'paid'"
-                @click="markOrderShipped(o)"
-                class="text-[10px] uppercase tracking-widest text-white border border-white/30 px-2 py-1 hover:bg-white hover:text-black transition"
-              >
-                Marcar enviado
-              </button>
+              <div class="flex justify-end items-center gap-1.5">
+                <button
+                  v-if="o.status === 'paid'"
+                  @click="markOrderShipped(o)"
+                  class="text-[10px] uppercase tracking-widest text-white border border-white/30 px-2 py-1 hover:bg-white hover:text-black transition"
+                >
+                  Marcar enviado
+                </button>
+                <button
+                  v-if="['pending', 'paid', 'failed'].includes(o.status)"
+                  @click="cancelOrder(o)"
+                  class="text-[10px] uppercase tracking-widest text-yellow-400 border border-yellow-900/40 px-2 py-1 hover:bg-yellow-900/20 transition"
+                  title="Cancelar pedido — vuelve la pieza a disponible y queda en historial"
+                >
+                  Cancelar
+                </button>
+                <button
+                  @click="deleteOrder(o)"
+                  class="text-[10px] uppercase tracking-widest text-red-500 border border-red-900/40 px-2 py-1 hover:bg-red-900/30 hover:text-red-300 transition"
+                  title="Borrar permanentemente — solo para pruebas"
+                  aria-label="Borrar pedido"
+                >
+                  ✕
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
