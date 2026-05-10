@@ -7,12 +7,15 @@ import { supabase, formatPrice, getProductImageUrl, type Product } from "../lib/
 //
 // Orden: las piezas de venta directa primero (por precio desc),
 // luego las Commission (categorias con hide_price=true) al final.
-const { data: products, error } = await supabase
-    .from("products_public")
-    .select("*")
-    .order("category_hide_price", { ascending: true, nullsFirst: true })
-    .order("price_cents", { ascending: false })
-    .order("created_at", { ascending: false });
+const [{ data: products, error }, { data: allCategories }] = await Promise.all([
+    supabase
+        .from("products_public")
+        .select("*")
+        .order("category_hide_price", { ascending: true, nullsFirst: true })
+        .order("price_cents", { ascending: false })
+        .order("created_at", { ascending: false }),
+    supabase.from("categories").select("slug, name").order("sort_order"),
+]);
 
 if (error) {
     console.error("Error cargando productos:", error);
@@ -20,14 +23,10 @@ if (error) {
 
 const list: Product[] = (products as Product[] | null) ?? [];
 
-const categories = [
-    { id: "all", name: "Todo" },
-    { id: "madcry", name: "MadCry" },
-    { id: "one-piece", name: "One Piece" },
-    { id: "dragon-ball", name: "Dragon Ball" },
-    { id: "jujutsu-kaisen", name: "Jujutsu Kaisen" },
-    { id: "custom", name: "Custom" },
-];
+// Mapa slug→nombre para que el JS de filtro pinte el titulo correcto.
+const categoryNames: Record<string, string> = Object.fromEntries(
+    (allCategories ?? []).map((c) => [c.slug, c.name])
+);
 ---
 
 <Layout
@@ -55,20 +54,18 @@ const categories = [
             document.addEventListener("astro:after-swap", applyShopFilter);
         })();
     </script>
-    <style>
-        /* Cuando hay filtro de categoria, oculta TODOS los items por defecto
-           y solo muestra los que coinciden. Funciona sin JS principal. */
+    <!-- CSS dinamico: una regla por cada categoria de la BD para que
+         el filtro funcione tambien con categorias nuevas que cree el admin
+         sin tener que tocar este archivo. -->
+    <style is:inline set:html={`
         html[data-shop-cat] .product-item { display: none !important; }
-        html[data-shop-cat="madcry"] .product-item[data-category="madcry"],
-        html[data-shop-cat="one-piece"] .product-item[data-category="one-piece"],
-        html[data-shop-cat="dragon-ball"] .product-item[data-category="dragon-ball"],
-        html[data-shop-cat="jujutsu-kaisen"] .product-item[data-category="jujutsu-kaisen"],
-        html[data-shop-cat="naruto"] .product-item[data-category="naruto"],
-        html[data-shop-cat="custom"] .product-item[data-category="custom"],
-        html[data-shop-cat="otros"] .product-item[data-category="otros"] {
-            display: flex !important;
-        }
-    </style>
+        ${(allCategories ?? []).map((c) => `html[data-shop-cat="${c.slug}"] .product-item[data-category="${c.slug}"] { display: flex !important; }`).join("\n        ")}
+    `} />
+
+    <!-- Mapa de slug→nombre de categorias generado en build desde la BD,
+         consumido por el script que actualiza el header de la coleccion. -->
+    <script id="category-names-data" type="application/json" set:html={JSON.stringify(categoryNames)} />
+
     <header
         class="relative w-full flex flex-col justify-end items-center overflow-hidden border-b border-white/10 pt-32 md:pt-40 pb-6 md:pb-8"
     >
@@ -263,15 +260,12 @@ const categories = [
 <script>
     import { supabase } from "../lib/supabase";
 
-    const CATEGORY_NAMES: Record<string, string> = {
-        madcry: "MadCry",
-        "one-piece": "One Piece",
-        "dragon-ball": "Dragon Ball",
-        "jujutsu-kaisen": "Jujutsu Kaisen",
-        naruto: "Naruto",
-        custom: "Commission",
-        otros: "Otros",
-    };
+    // Mapa de nombres inyectado desde el frontmatter (BD). Si Susana
+    // crea una categoria nueva en /admin → Categorias, aparece aqui
+    // tras el siguiente rebuild.
+    const CATEGORY_NAMES: Record<string, string> = JSON.parse(
+        document.getElementById("category-names-data")?.textContent || "{}"
+    );
 
     function formatCountdown(target: number): { d: string; h: string; m: string; s: string; done: boolean } {
         const diff = target - Date.now();

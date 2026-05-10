@@ -1,5 +1,6 @@
 ---
 import { ViewTransitions } from "astro:transitions";
+import { supabase } from "../lib/supabase";
 
 interface Props {
     title: string;
@@ -8,6 +9,42 @@ interface Props {
     ogType?: "website" | "article" | "product";
     noindex?: boolean;
     schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+// Lee las categorias del menu en build time. Susana las gestiona desde
+// /admin → Categorias → toggle "En menu". El rebuild las regenera.
+type MenuCategory = {
+    slug: string;
+    name: string;
+    menu_badge: string | null;
+};
+
+// Fallback si la migracion 20260510 aun no se aplico (columna show_in_menu
+// no existe). Asi el sitio nunca queda con menu vacio aunque falte el SQL.
+const FALLBACK_MENU: MenuCategory[] = [
+    { slug: "madcry", name: "MadCry", menu_badge: "NEW" },
+    { slug: "one-piece", name: "One Piece", menu_badge: null },
+    { slug: "dragon-ball", name: "Dragon Ball", menu_badge: null },
+    { slug: "jujutsu-kaisen", name: "Jujutsu Kaisen", menu_badge: null },
+    { slug: "custom", name: "Custom", menu_badge: null },
+];
+
+let menuCategories: MenuCategory[];
+try {
+    const { data, error } = await supabase
+        .from("categories")
+        .select("slug, name, menu_badge, show_in_menu")
+        .eq("show_in_menu", true)
+        .order("sort_order");
+    if (error) throw error;
+    menuCategories = (data ?? []).map((c) => ({
+        slug: c.slug,
+        name: c.name,
+        menu_badge: (c as any).menu_badge ?? null,
+    }));
+    if (menuCategories.length === 0) menuCategories = FALLBACK_MENU;
+} catch {
+    menuCategories = FALLBACK_MENU;
 }
 
 const {
@@ -203,36 +240,22 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
                             <div
                                 class="bg-black/95 border border-white/10 backdrop-blur-md flex flex-col p-2 text-center shadow-2xl"
                             >
-                                <a
-                                    href="/shop?category=madcry"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition flex items-center justify-center gap-2"
-                                    >MadCry <span
-                                        class="bg-red-600 text-white text-[8px] font-bold px-1 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
-                                        >New</span
-                                    ></a
-                                >
-                                <a
-                                    href="/shop?category=one-piece"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
-                                    >One Piece</a
-                                >
-                                <a
-                                    href="/shop?category=dragon-ball"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
-                                    >Dragon Ball</a
-                                >
-                                <a
-                                    href="/shop?category=jujutsu-kaisen"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
-                                    >Jujutsu Kaisen</a
-                                >
-                                <a
-                                    href="/shop?category=custom"
-                                    class="text-gray-400 hover:text-white hover:bg-white/10 py-2 block transition"
-                                    >Custom</a
-                                >
-                                <div class="border-t border-white/10 my-1">
-                                </div>
+                                {menuCategories.map((cat) => (
+                                    <a
+                                        href={`/shop?category=${cat.slug}`}
+                                        class="text-gray-400 hover:text-white hover:bg-white/10 py-2 transition flex items-center justify-center gap-2 whitespace-nowrap"
+                                    >
+                                        {cat.name}
+                                        {cat.menu_badge && (
+                                            <span
+                                                class="bg-red-600 text-white text-[8px] font-bold px-1 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
+                                            >
+                                                {cat.menu_badge}
+                                            </span>
+                                        )}
+                                    </a>
+                                ))}
+                                <div class="border-t border-white/10 my-1"></div>
                                 <a
                                     href="/shop"
                                     class="text-white font-bold hover:bg-white/10 py-2 block transition"
@@ -285,34 +308,21 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
                     <div
                         class="pl-4 border-l border-white/10 flex flex-col space-y-3"
                     >
-                        <a
-                            href="/shop?category=madcry"
-                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition flex items-center gap-3"
-                            >MadCry <span
-                                class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
-                                >New</span
-                            ></a
-                        >
-                        <a
-                            href="/shop?category=one-piece"
-                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
-                            >One Piece</a
-                        >
-                        <a
-                            href="/shop?category=dragon-ball"
-                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
-                            >Dragon Ball</a
-                        >
-                        <a
-                            href="/shop?category=jujutsu-kaisen"
-                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
-                            >Jujutsu Kaisen</a
-                        >
-                        <a
-                            href="/shop?category=custom"
-                            class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition"
-                            >Custom</a
-                        >
+                        {menuCategories.map((cat) => (
+                            <a
+                                href={`/shop?category=${cat.slug}`}
+                                class="mobile-link text-lg text-gray-400 hover:text-white uppercase tracking-widest transition flex items-center gap-3"
+                            >
+                                {cat.name}
+                                {cat.menu_badge && (
+                                    <span
+                                        class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"
+                                    >
+                                        {cat.menu_badge}
+                                    </span>
+                                )}
+                            </a>
+                        ))}
                     </div>
                 </div>
 
