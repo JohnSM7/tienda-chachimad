@@ -89,16 +89,10 @@ const breadcrumbSchema = {
 >
     {isLocked ? (
         <main
-            class="min-h-screen flex flex-col items-center justify-center px-6 py-32 relative overflow-hidden"
+            class="min-h-screen flex flex-col items-center justify-center px-6 pt-44 pb-32 relative overflow-hidden"
             data-locked-page
             data-reveal-at={revealAt ?? ""}
         >
-            <a
-                href="/shop"
-                class="absolute top-44 left-6 lg:left-12 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition z-20"
-                >← Back to Collection</a
-            >
-
             <div
                 class="absolute inset-0 pointer-events-none opacity-[0.04] flex items-center justify-center select-none"
             >
@@ -109,6 +103,12 @@ const breadcrumbSchema = {
             </div>
 
             <div class="relative z-10 max-w-3xl w-full text-center space-y-12">
+                <a
+                    href="/shop"
+                    class="inline-flex items-center gap-2 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition border-b border-zinc-800 hover:border-white pb-1"
+                    >← Back to Collection</a
+                >
+
                 <div class="space-y-2 animate-pulse">
                     <p class="text-red-500 text-[10px] tracking-[0.5em] font-bold uppercase">
                         Pieza protegida
