@@ -49,11 +49,18 @@ const logoBuffer = await fs.readFile(LOGO_PATH);
 const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`;
 
 // ---------- 3) Productos a generar ----------
+// IMPORTANTE: leemos de la tabla "products" cruda, no de la vista
+// "products_public", porque esta enmascara dimensions/technique cuando
+// reveal_at > now() (las piezas MADCRY estan bloqueadas hasta 13/05).
+// Para los QR fisicos sí queremos los datos reales.
+//
+// Nota: anon RLS permite SELECT a non-draft, asi que esto funciona.
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const { data: products, error } = await supabase
-  .from('products_public')
+  .from('products')
   .select('slug, name, category_slug, dimensions, technique, year_created, status')
   .eq('category_slug', 'madcry')
+  .neq('status', 'draft')
   .order('slug');
 
 if (error) {
