@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>QR · MADCRY</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 800px;
+        height: 1000px;
+        font-family: "Oswald", sans-serif;
+        background: #000;
+        color: #fff;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      .stage {
+        position: relative;
+        width: 800px;
+        height: 1000px;
+        padding: 60px 60px 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background:
+          radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.06), transparent 60%),
+          #000;
+      }
+      .corner {
+        position: absolute;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        color: #555;
+      }
+      .corner.tl { top: 32px; left: 60px; }
+      .corner.tr { top: 32px; right: 60px; }
+      .corner.bl { bottom: 32px; left: 60px; color: #777; }
+      .corner.br { bottom: 32px; right: 60px; color: #777; letter-spacing: 0.3em; font-weight: 400; }
+
+      /* Pieza name */
+      .eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5em;
+        text-transform: uppercase;
+        color: #dc2626;
+        margin-top: 50px;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+      .name {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        text-align: center;
+        margin-bottom: 50px;
+        max-width: 100%;
+        color: #fff;
+        text-transform: uppercase;
+      }
+
+      /* QR card */
+      .qr-card {
+        position: relative;
+        width: 560px;
+        height: 560px;
+        background: #fff;
+        padding: 30px;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+      .qr-card::before,
+      .qr-card::after {
+        content: "";
+        position: absolute;
+        background: #dc2626;
+      }
+      .qr-card::before {
+        top: -3px;
+        left: -3px;
+        width: 80px;
+        height: 6px;
+      }
+      .qr-card::after {
+        bottom: -3px;
+        right: -3px;
+        width: 80px;
+        height: 6px;
+      }
+      .qr-card img.qr {
+        width: 100%;
+        height: 100%;
+        display: block;
+        image-rendering: pixelated;
+      }
+
+      /* Logo overlay center */
+      .logo-mask {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 110px;
+        height: 110px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #000;
+        box-shadow: 0 0 0 3px #fff;
+      }
+      .logo-mask img {
+        width: 78px;
+        height: 78px;
+        object-fit: contain;
+      }
+
+      /* URL */
+      .url {
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #888;
+        margin-top: 36px;
+        text-align: center;
+      }
+      .url strong {
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .scan-hint {
+        font-size: 10px;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: #555;
+        margin-top: 14px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <span class="corner tl">MADCRY · STUDIO</span>
+      <span class="corner tr">{{COLLECTION}}</span>
+
+      <div class="eyebrow">Pieza única · 1/1</div>
+      <div class="name">{{NAME}}</div>
+
+      <div class="qr-card">
+        <img class="qr" src="{{QR}}" alt="QR" />
+        <div class="logo-mask">
+          <img src="{{LOGO_DATA_URL}}" alt="MADCRY" />
+        </div>
+      </div>
+
+      <div class="url">
+        madcry.com/product/<strong>{{SLUG}}</strong>
+      </div>
+      <div class="scan-hint">Escanea para adquirir</div>
+
+      <span class="corner bl">{{DATE}}</span>
+      <span class="corner br">madcry.com</span>
+    </div>
+  </body>
+</html>
