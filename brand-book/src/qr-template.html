@@ -18,7 +18,7 @@
       html,
       body {
         width: 800px;
-        height: 1000px;
+        height: 1200px;
         font-family: "Oswald", sans-serif;
         background: #000;
         color: #fff;
@@ -28,8 +28,8 @@
       .stage {
         position: relative;
         width: 800px;
-        height: 1000px;
-        padding: 60px 60px 50px;
+        height: 1200px;
+        padding: 50px 50px 40px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -45,41 +45,54 @@
         letter-spacing: 0.4em;
         color: #555;
       }
-      .corner.tl { top: 32px; left: 60px; }
-      .corner.tr { top: 32px; right: 60px; }
-      .corner.bl { bottom: 32px; left: 60px; color: #777; }
-      .corner.br { bottom: 32px; right: 60px; color: #777; letter-spacing: 0.3em; font-weight: 400; }
+      .corner.tl { top: 28px; left: 50px; }
+      .corner.tr { top: 28px; right: 50px; }
+      .corner.bl { bottom: 28px; left: 50px; color: #777; }
+      .corner.br { bottom: 28px; right: 50px; color: #777; letter-spacing: 0.3em; font-weight: 400; }
 
-      /* Pieza name */
+      /* Cabecera con titulo de pieza */
       .eyebrow {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.5em;
         text-transform: uppercase;
         color: #dc2626;
-        margin-top: 50px;
-        margin-bottom: 12px;
+        margin-top: 40px;
+        margin-bottom: 10px;
         text-align: center;
       }
       .name {
-        font-size: 42px;
+        font-size: 38px;
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 1;
         text-align: center;
-        margin-bottom: 50px;
+        margin-bottom: 14px;
         max-width: 100%;
         color: #fff;
         text-transform: uppercase;
+      }
+      .author {
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #bcbcbc;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      .author strong {
+        color: #fff;
+        font-weight: 700;
       }
 
       /* QR card */
       .qr-card {
         position: relative;
-        width: 560px;
-        height: 560px;
+        width: 520px;
+        height: 520px;
         background: #fff;
-        padding: 30px;
+        padding: 28px;
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
       }
       .qr-card::before,
@@ -107,16 +120,14 @@
         image-rendering: pixelated;
       }
 
-      /* Logo overlay center — fondo negro para que las letras blancas
-         del logo destaquen, con borde blanco/negro doble para que
-         contraste con el QR negro/blanco que lo rodea. */
+      /* Logo overlay center — fondo negro, letras blancas */
       .logo-mask {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 110px;
-        height: 110px;
+        width: 100px;
+        height: 100px;
         background: #000;
         display: flex;
         align-items: center;
@@ -125,32 +136,73 @@
         box-shadow: 0 0 0 3px #000;
       }
       .logo-mask img {
-        width: 78px;
-        height: 78px;
+        width: 70px;
+        height: 70px;
         object-fit: contain;
       }
 
+      /* Bloque de metadatos (ficha tecnica de galeria) */
+      .meta {
+        margin-top: 32px;
+        width: 520px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      .meta .row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #bcbcbc;
+        font-weight: 400;
+      }
+      .meta .row .sep {
+        color: #444;
+      }
+      .meta .row strong {
+        color: #fff;
+        font-weight: 700;
+      }
+      .meta .status {
+        margin-top: 6px;
+        align-self: center;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        padding: 6px 18px;
+        border: 1px solid;
+      }
+      .meta .status.available { color: #22c55e; border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.08); }
+      .meta .status.sold       { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+      .meta .status.reserved   { color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); }
+      .meta .status.draft,
+      .meta .status.unknown    { color: #999; border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.04); }
+
       /* URL */
       .url {
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 400;
         letter-spacing: 0.3em;
         text-transform: uppercase;
         color: #888;
-        margin-top: 36px;
+        margin-top: 22px;
         text-align: center;
       }
       .url strong {
         color: #fff;
         font-weight: 700;
       }
-
       .scan-hint {
-        font-size: 10px;
+        font-size: 9px;
         letter-spacing: 0.4em;
         text-transform: uppercase;
         color: #555;
-        margin-top: 14px;
+        margin-top: 8px;
         text-align: center;
       }
     </style>
@@ -162,12 +214,25 @@
 
       <div class="eyebrow">Pieza única · 1/1</div>
       <div class="name">{{NAME}}</div>
+      <div class="author">
+        <strong>{{AUTHOR}}</strong> · {{YEAR}}
+      </div>
 
       <div class="qr-card">
         <img class="qr" src="{{QR}}" alt="QR" />
         <div class="logo-mask">
           <img src="{{LOGO_DATA_URL}}" alt="MADCRY" />
         </div>
+      </div>
+
+      <div class="meta">
+        <div class="row">
+          <span>{{TECHNIQUE}}</span>
+        </div>
+        <div class="row">
+          <strong>{{DIMENSIONS}}</strong>
+        </div>
+        <div class="status {{STATUS_CLASS}}">{{STATUS}}</div>
       </div>
 
       <div class="url">

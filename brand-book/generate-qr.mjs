@@ -52,7 +52,7 @@ const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const { data: products, error } = await supabase
   .from('products_public')
-  .select('slug, name, category_slug')
+  .select('slug, name, category_slug, dimensions, technique, year_created, status')
   .eq('category_slug', 'madcry')
   .order('slug');
 
@@ -102,13 +102,23 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 const page = await browser.newPage();
-await page.setViewport({ width: 800, height: 1000, deviceScaleFactor: 2 });
+await page.setViewport({ width: 800, height: 1200, deviceScaleFactor: 2 });
 
 const dateStr = new Date().toLocaleDateString('es-ES', {
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
 });
+
+function statusLabel(status) {
+  switch (status) {
+    case 'available': return 'Disponible';
+    case 'sold':      return 'Vendido';
+    case 'reserved':  return 'Reservado';
+    case 'draft':     return 'Borrador';
+    default:          return '—';
+  }
+}
 
 for (const product of products) {
   const url = `${SHOP_URL}/product/${product.slug}`;
@@ -121,13 +131,24 @@ for (const product of products) {
     color: { dark: '#000000', light: '#FFFFFF' },
   });
 
+  const technique = product.technique || 'Técnica mixta sobre lienzo';
+  const dimensions = product.dimensions || '—';
+  const year = product.year_created || new Date().getFullYear();
+  const status = statusLabel(product.status);
+
   const html = template
     .replace('{{NAME}}', product.name)
     .replace('{{SLUG}}', product.slug)
     .replace('{{QR}}', qrDataUrl)
     .replace('{{LOGO_DATA_URL}}', logoDataUrl)
     .replace('{{COLLECTION}}', 'COLECCION MADCRY')
-    .replace('{{DATE}}', dateStr);
+    .replace('{{DATE}}', dateStr)
+    .replace('{{AUTHOR}}', 'Susana Madriz')
+    .replace('{{YEAR}}', String(year))
+    .replace('{{TECHNIQUE}}', technique)
+    .replace('{{DIMENSIONS}}', dimensions)
+    .replace('{{STATUS}}', status)
+    .replace('{{STATUS_CLASS}}', product.status || 'available');
 
   await page.setContent(html, {
     waitUntil: 'domcontentloaded',
@@ -153,7 +174,7 @@ for (const product of products) {
   await page.screenshot({
     path: out,
     type: 'png',
-    clip: { x: 0, y: 0, width: 800, height: 1000 },
+    clip: { x: 0, y: 0, width: 800, height: 1200 },
   });
   console.log(`  OK ${filename}`);
 }
