@@ -233,6 +233,10 @@ const categories = [
                                         <span class="block text-sm text-white font-bold tracking-widest uppercase whitespace-nowrap">
                                             {(product as any).category_price_label || "Commission"}
                                         </span>
+                                    ) : product.status === "sold" ? (
+                                        <span class="block text-sm text-gray-500 font-bold tracking-[0.3em] uppercase whitespace-nowrap line-through decoration-1">
+                                            Sold
+                                        </span>
                                     ) : (
                                         <span class="block text-xl text-white font-bold tracking-widest">
                                             {formatPrice(product.price_cents, product.currency || "eur")}
