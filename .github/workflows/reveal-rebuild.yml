@@ -1,0 +1,82 @@
+name: Reveal · Rebuild MADCRY
+
+# =====================================================
+# Disparo automatico el dia del reveal de la coleccion MADCRY.
+# La vista `products_public` calcula is_locked = reveal_at > now()
+# en cada query. Con un rebuild despues de las 20:00 los cuadros
+# pasan a 'available' en el HTML estatico.
+#
+# Cron en UTC. Madrid en mayo (CEST = UTC+2). Por tanto:
+#   20:00 Madrid = 18:00 UTC
+#
+# Programamos DOS disparos consecutivos por si GitHub Actions
+# tiene retraso en horas pico (la latencia puede llegar a 15 min):
+#   - 18:05 UTC = 20:05 Madrid
+#   - 18:25 UTC = 20:25 Madrid (backup)
+#
+# El segundo es redundante pero inofensivo: vuelve a publicar el
+# mismo HTML ya desbloqueado.
+#
+# IMPORTANTE: este workflow se ejecutaria cada 13 de mayo en
+# adelante (GitHub Actions cron no permite especificar año). Un
+# `check_year` step lo limita a 2026. Tras el evento puedes
+# eliminar este archivo si quieres mantenerlo limpio.
+# =====================================================
+
+on:
+  schedule:
+    - cron: '5 18 13 5 *'   # 13 mayo · 20:05 Madrid (CEST)
+    - cron: '25 18 13 5 *'  # 13 mayo · 20:25 Madrid · backup
+  # Tambien manual por si quieres probar antes del dia
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - id: check
+        run: |
+          YEAR=$(date -u +%Y)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch — running unconditionally"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          elif [ "$YEAR" = "2026" ]; then
+            echo "Scheduled run on year $YEAR — proceeding"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "Scheduled run on year $YEAR — NOT 2026, skipping"
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+  build_and_deploy:
+    needs: guard
+    if: needs.guard.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build Astro (post-reveal, cuadros MADCRY ya desbloqueados)
+        env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: crymad-691a8
+          channelId: live
