@@ -89,27 +89,33 @@ const breadcrumbSchema = {
 >
     {isLocked ? (
         <main
-            class="min-h-screen flex flex-col items-center justify-center px-6 pt-44 pb-32 relative overflow-hidden"
+            class="min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-12 md:pb-20 relative overflow-hidden"
             data-locked-page
             data-reveal-at={revealAt ?? ""}
         >
+            {/* Back fijo arriba-izquierda, fuera del flujo central. z-30 para
+                pasar por encima del nav que tiene z-50 a la altura del logo
+                pero deja libre la zona izquierda. */}
+            <a
+                href="/shop"
+                class="fixed top-20 md:top-24 left-4 md:left-8 z-40 inline-flex items-center gap-1.5 text-[9px] md:text-[10px] uppercase tracking-[0.25em] md:tracking-[0.3em] text-gray-500 hover:text-white border border-white/10 hover:border-white/40 bg-black/60 backdrop-blur-sm px-3 py-2 transition"
+            >
+                ← Back
+            </a>
+
+            {/* Marca de agua "M" gigante de fondo */}
             <div
                 class="absolute inset-0 pointer-events-none opacity-[0.04] flex items-center justify-center select-none"
             >
-                <span
-                    class="text-[40vw] font-bold uppercase tracking-tighter leading-[0.8]"
+                <span class="text-[40vw] font-bold uppercase tracking-tighter leading-[0.8]"
                     >M</span
                 >
             </div>
 
-            <div class="relative z-10 max-w-3xl w-full text-center space-y-12">
-                <a
-                    href="/shop"
-                    class="inline-flex items-center gap-2 text-gray-500 hover:text-white text-[10px] uppercase tracking-[0.3em] transition border-b border-zinc-800 hover:border-white pb-1"
-                    >← Back to Collection</a
-                >
-
-                <div class="space-y-2 animate-pulse">
+            {/* Contenido central — gaps mas ajustados en mobile para que
+                todo entre en pantallas pequenas sin scroll forzado */}
+            <div class="relative z-10 max-w-3xl w-full text-center space-y-6 md:space-y-10">
+                <div class="space-y-1 md:space-y-2 animate-pulse">
                     <p class="text-red-500 text-[10px] tracking-[0.5em] font-bold uppercase">
                         Pieza protegida
                     </p>
@@ -124,47 +130,38 @@ const breadcrumbSchema = {
                     Coming<br />Soon
                 </h1>
 
-                <div class="text-gray-400 text-xs md:text-sm tracking-[0.3em] uppercase max-w-xl mx-auto leading-relaxed space-y-2">
+                <div class="text-gray-400 text-[11px] md:text-sm tracking-[0.25em] md:tracking-[0.3em] uppercase max-w-xl mx-auto leading-relaxed space-y-1 md:space-y-2">
                     <p>Esta pieza no se revela</p>
                     <p>hasta la apertura oficial de la exposicion</p>
-                    <p class="text-white">13 de mayo de 2026 · 20:00</p>
+                    <p class="text-white pt-1">13 de mayo de 2026 · 20:00</p>
                 </div>
 
-                <div class="flex flex-col items-center gap-6 pt-4">
+                <div class="flex flex-col items-center gap-3 md:gap-5 pt-2">
                     <span class="text-[10px] tracking-[0.4em] uppercase text-gray-500">Reveal en</span>
                     <div
-                        class="grid grid-cols-4 gap-6 md:gap-12"
+                        class="grid grid-cols-4 gap-4 md:gap-12"
                         data-locked-countdown
                     >
                         <div class="flex flex-col items-center">
-                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
-                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Days</span>
+                            <span class="text-3xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="d">—</span>
+                            <span class="text-[9px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-2 md:mt-3">Days</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
-                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Hours</span>
+                            <span class="text-3xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="h">—</span>
+                            <span class="text-[9px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-2 md:mt-3">Hours</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
-                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Min</span>
+                            <span class="text-3xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="m">—</span>
+                            <span class="text-[9px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-2 md:mt-3">Min</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-4xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
-                            <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-3">Sec</span>
+                            <span class="text-3xl md:text-7xl font-bold text-white tabular-nums leading-none" data-cd="s">—</span>
+                            <span class="text-[9px] md:text-xs tracking-[0.3em] uppercase text-gray-500 mt-2 md:mt-3">Sec</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-8">
-                    <a
-                        href="/shop"
-                        class="inline-block px-12 py-4 border border-white/40 text-white uppercase tracking-[0.2em] text-xs font-bold hover:bg-white hover:text-black transition"
-                    >
-                        Volver a la coleccion
-                    </a>
-                </div>
-
-                <p class="text-[10px] text-gray-600 uppercase tracking-[0.3em] pt-12">
+                <p class="text-[9px] md:text-[10px] text-gray-600 uppercase tracking-[0.3em] pt-2 md:pt-6">
                     Susana Madriz · Madrid · 1/1
                 </p>
             </div>
