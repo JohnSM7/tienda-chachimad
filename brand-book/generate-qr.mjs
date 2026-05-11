@@ -111,11 +111,10 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 await page.setViewport({ width: 1000, height: 1000, deviceScaleFactor: 2 });
 
-const dateStr = new Date().toLocaleDateString('es-ES', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
+// Fecha del evento/reveal (no la fecha de generacion del QR). Si
+// algun dia se mueve el reveal, cambia esto y vuelve a ejecutar
+// npm run qr.
+const dateStr = '13/05/2026';
 
 function statusLabel(status) {
   switch (status) {
