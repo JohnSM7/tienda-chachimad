@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>QR · MADCRY</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -39,19 +39,19 @@
           #000;
       }
 
-      /* Esquinas decorativas */
+      /* Esquinas decorativas — todo bold para que aguante imprenta */
       .corner {
         position: absolute;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.4em;
-        color: #555;
+        color: #777;
       }
       .corner.tl { top: 24px; left: 50px; }
       .corner.tr { top: 24px; right: 50px; }
-      .corner.bl { bottom: 24px; left: 50px; color: #777; letter-spacing: 0.3em; font-weight: 400; }
-      .corner.br { bottom: 24px; right: 50px; color: #777; letter-spacing: 0.3em; font-weight: 400; }
+      .corner.bl { bottom: 24px; left: 50px; color: #aaa; letter-spacing: 0.3em; }
+      .corner.br { bottom: 24px; right: 50px; color: #aaa; letter-spacing: 0.3em; }
 
       /* ─── COLUMNA IZQUIERDA: ficha tecnica ─── */
       .info {
@@ -75,12 +75,14 @@
         background: #dc2626;
         margin: 4px 0;
       }
-      /* Bloque de ficha tipo etiqueta de galeria */
+      /* Bloque de ficha tipo etiqueta de galeria — pesos minimos 500
+         para que no se diluyan al imprimir. Oswald 300 es demasiado
+         fino para tinta sobre papel. */
       .ficha {
         font-size: 24px;
         line-height: 1.55;
-        color: #d6d6d6;
-        font-weight: 300;
+        color: #e5e5e5;
+        font-weight: 500;
         letter-spacing: 0.02em;
       }
       .ficha .author {
@@ -92,31 +94,32 @@
         line-height: 1.1;
       }
       .ficha .author .year {
-        color: #999;
-        font-weight: 300;
+        color: #bbb;
+        font-weight: 500;
         font-size: 24px;
       }
       .ficha .technique {
         font-style: italic;
-        font-weight: 400;
+        font-weight: 500;
       }
       .ficha .dimensions {
         font-weight: 700;
         color: #fff;
         letter-spacing: 0.05em;
-        font-size: 26px;
+        font-size: 28px;
         margin-top: 4px;
       }
 
-      /* Scan hint debajo del QR (columna derecha) */
+      /* Scan hint debajo del QR (columna derecha) — bold para imprenta */
       .scan {
-        margin-top: 22px;
-        font-size: 11px;
-        line-height: 1.8;
-        letter-spacing: 0.3em;
+        margin-top: 24px;
+        font-size: 14px;
+        line-height: 1.7;
+        letter-spacing: 0.25em;
         text-transform: uppercase;
-        color: #777;
+        color: #aaa;
         text-align: center;
+        font-weight: 600;
       }
       .scan strong {
         color: #fff;
