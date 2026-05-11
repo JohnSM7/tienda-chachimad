@@ -42,7 +42,7 @@
       /* Esquinas decorativas — todo bold para que aguante imprenta */
       .corner {
         position: absolute;
-        font-size: 19px;
+        font-size: 22px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.4em;
@@ -61,7 +61,7 @@
         padding-left: 10px;
       }
       .name {
-        font-size: 70px;
+        font-size: 82px;
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 0.92;
@@ -79,7 +79,7 @@
          para que no se diluyan al imprimir. Oswald 300 es demasiado
          fino para tinta sobre papel. */
       .ficha {
-        font-size: 28px;
+        font-size: 32px;
         line-height: 1.55;
         color: #e5e5e5;
         font-weight: 500;
@@ -88,15 +88,15 @@
       .ficha .author {
         font-weight: 700;
         color: #fff;
-        font-size: 34px;
+        font-size: 40px;
         letter-spacing: 0.02em;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         line-height: 1.1;
       }
       .ficha .author .year {
         color: #bbb;
         font-weight: 500;
-        font-size: 28px;
+        font-size: 32px;
       }
       .ficha .technique {
         font-style: italic;
@@ -106,25 +106,31 @@
         font-weight: 700;
         color: #fff;
         letter-spacing: 0.05em;
-        font-size: 32px;
-        margin-top: 6px;
+        font-size: 38px;
+        margin-top: 8px;
       }
 
       /* Scan hint debajo del QR (columna derecha) — bold para imprenta */
       .scan {
-        margin-top: 28px;
-        font-size: 18px;
-        line-height: 1.7;
+        margin-top: 30px;
+        font-size: 21px;
+        line-height: 1.5;
         letter-spacing: 0.25em;
         text-transform: uppercase;
         color: #aaa;
         text-align: center;
         font-weight: 600;
       }
+      .scan .url {
+        display: block;
+        margin-top: 8px;
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+      }
       .scan strong {
         color: #fff;
         font-weight: 700;
-        letter-spacing: 0.2em;
       }
       .scan .arrow {
         color: #dc2626;
@@ -215,8 +221,8 @@
           </div>
         </div>
         <div class="scan">
-          <span class="arrow">↑</span> Escanea para adquirir<br />
-          madcry.com/product/<strong>{{SLUG}}</strong>
+          <span class="arrow">↑</span> Escanea para adquirir
+          <span class="url">madcry.com/product/<strong>{{SLUG}}</strong></span>
         </div>
       </div>
 
