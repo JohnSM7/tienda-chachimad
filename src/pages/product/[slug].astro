@@ -230,7 +230,17 @@ const breadcrumbSchema = {
             <div
                 class="space-y-6 text-gray-400 text-sm tracking-wide leading-relaxed mb-16 border-t border-white/10 pt-8 max-w-md"
             >
-                <p>{product.description || fallbackDescription}</p>
+                {/* Render parrafos separados por doble salto de linea.
+                    Si la descripcion viene de BD con \n\n, salen como
+                    parrafos independientes con espacio entre ellos. */}
+                <div class="space-y-4">
+                    {(product.description || fallbackDescription)
+                        .split(/\n\s*\n/)
+                        .filter((p) => p.trim().length > 0)
+                        .map((paragraph) => (
+                            <p>{paragraph.trim()}</p>
+                        ))}
+                </div>
                 <ul
                     class="space-y-2 text-xs uppercase tracking-widest text-gray-500 list-disc list-inside"
                 >
