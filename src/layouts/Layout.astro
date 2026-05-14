@@ -99,11 +99,21 @@ const extraSchemas = schema
         : [schema]
     : [];
 const allSchemas = [...baseSchemas, ...extraSchemas];
+
+// Google Tag Manager — solo en build de produccion para no
+// contaminar estadisticas con desarrollo local.
+const GTM_ID = "GTM-TPHRVJ8S";
+const isProd = import.meta.env.PROD;
 ---
 
 <!doctype html>
 <html lang="es" class="bg-black">
     <head>
+        {/* Google Tag Manager — lo mas arriba posible en <head> */}
+        {isProd && (
+            <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`} />
+        )}
+
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/png" href="/images/logo.png" />
@@ -147,6 +157,11 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
     <body
         class="bg-black text-gray-200 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black"
     >
+        {/* GTM noscript fallback — justo tras <body> */}
+        {isProd && (
+            <noscript set:html={`<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`} />
+        )}
+
         <nav
             class="fixed top-0 w-full z-50 px-6 py-2 flex justify-between md:justify-center items-center bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none"
         >
