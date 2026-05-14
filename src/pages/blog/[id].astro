@@ -1,36 +1,68 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { posts } from "../../data/posts";
+import { supabase, getPostImageUrl, type Post } from "../../lib/supabase";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+    // Lee de BD; fallback a fichero estatico si la tabla aun no existe.
+    let posts: Array<Partial<Post> & { slug: string }> = [];
+    try {
+        const { data, error } = await supabase
+            .from("posts_public")
+            .select("*");
+        if (error) throw error;
+        posts = data ?? [];
+    } catch {
+        const { posts: legacy } = await import("../../data/posts.js");
+        posts = legacy.map((p: any) => ({
+            slug: p.id,
+            title: p.title,
+            excerpt: p.excerpt,
+            content: p.content,
+            image: p.image,
+            category: p.category,
+            published_at: p.date,
+        }));
+    }
+
     return posts.map((post) => ({
-        params: { id: post.id },
+        params: { id: post.slug },
         props: { post },
     }));
 }
 
-const { post } = Astro.props;
+const { post } = Astro.props as { post: Post };
+
+function formatDate(iso: string | null | undefined): string {
+    if (!iso) return "";
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return iso;
+    return date
+        .toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })
+        .toUpperCase();
+}
+
+const heroImage = getPostImageUrl(post.image);
 ---
 
 <Layout
     title={`${post.title} · Journal · MADCRY Studio`}
-    description={post.excerpt}
-    image={post.image}
+    description={post.excerpt ?? undefined}
+    image={heroImage}
     ogType="article"
     schema={{
         "@context": "https://schema.org",
         "@type": "Article",
         headline: post.title,
         description: post.excerpt,
-        image: `https://madcry.com${post.image}`,
-        datePublished: post.date,
+        image: heroImage.startsWith("http") ? heroImage : `https://madcry.com${heroImage}`,
+        datePublished: post.published_at,
         author: { "@type": "Person", name: "Susana Madriz" },
         publisher: {
             "@type": "Organization",
             name: "MADCRY Studio",
             logo: { "@type": "ImageObject", url: "https://madcry.com/images/logo.png" },
         },
-        mainEntityOfPage: `https://madcry.com/blog/${post.id}`,
+        mainEntityOfPage: `https://madcry.com/blog/${post.slug}`,
     }}
 >
     <main class="pt-52 pb-24 px-6 min-h-screen">
@@ -51,10 +83,10 @@ const { post } = Astro.props;
                     <div
                         class="flex items-center gap-3 text-[10px] uppercase tracking-widest text-gray-400"
                     >
-                        <span class="text-white bg-white/10 px-2 py-1"
-                            >{post.category}</span
-                        >
-                        <span>{post.date}</span>
+                        {post.category && (
+                            <span class="text-white bg-white/10 px-2 py-1">{post.category}</span>
+                        )}
+                        <span>{formatDate(post.published_at)}</span>
                     </div>
 
                     <h1
@@ -63,11 +95,13 @@ const { post } = Astro.props;
                         {post.title}
                     </h1>
 
-                    <p
-                        class="text-lg text-gray-400 font-light leading-relaxed border-l border-white/20 pl-4"
-                    >
-                        {post.excerpt}
-                    </p>
+                    {post.excerpt && (
+                        <p
+                            class="text-lg text-gray-400 font-light leading-relaxed border-l border-white/20 pl-4"
+                        >
+                            {post.excerpt}
+                        </p>
+                    )}
                 </div>
 
                 <div class="w-full md:w-1/2">
@@ -80,10 +114,10 @@ const { post } = Astro.props;
                         </div>
 
                         <img
-                            src={post.image}
+                            src={heroImage}
                             alt={post.title}
                             class="lightbox-trigger cursor-zoom-in w-full h-full object-contain relative z-20 filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.7)] group-hover:scale-105 transition duration-1000"
-                            transition:name={`post-img-${post.id}`}
+                            transition:name={`post-img-${post.slug}`}
                         />
                     </div>
                     <p

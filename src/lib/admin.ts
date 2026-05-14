@@ -67,6 +67,36 @@ export async function deleteProductImage(path: string) {
 }
 
 /**
+ * Sube una imagen al bucket posts/. Devuelve el path interno
+ * para guardarlo en posts.image.
+ */
+export async function uploadPostImage(
+  file: File,
+  postSlug: string
+): Promise<{ path: string; publicUrl: string }> {
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const filename = `${postSlug}/${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from('posts')
+    .upload(filename, file, {
+      cacheControl: '31536000',
+      upsert: false,
+      contentType: file.type,
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from('posts').getPublicUrl(filename);
+  return { path: filename, publicUrl: data.publicUrl };
+}
+
+export async function deletePostImage(path: string) {
+  if (path.startsWith('/') || path.startsWith('http')) return;
+  return supabase.storage.from('posts').remove([path]);
+}
+
+/**
  * Llama a la edge function admin-product-sync para crear o actualizar
  * un producto. La function se encarga de sincronizar con Stripe.
  */

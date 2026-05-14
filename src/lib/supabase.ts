@@ -39,6 +39,16 @@ export function getProductImageUrl(path: string | null | undefined): string {
 }
 
 /**
+ * Como getProductImageUrl pero para el bucket "posts" (blog).
+ */
+export function getPostImageUrl(path: string | null | undefined): string {
+  if (!path) return '/images/logo.png';
+  if (path.startsWith('http') || path.startsWith('/')) return path;
+  const { data } = supabase.storage.from('posts').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/**
  * Formatea precio en centimos a string EUR.
  */
 export function formatPrice(cents: number, currency = 'eur'): string {
@@ -68,3 +78,22 @@ export type ProductUpdate = Database['public']['Tables']['products']['Update'];
 export type Order = Database['public']['Tables']['orders']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Category = Database['public']['Tables']['categories']['Row'];
+
+/**
+ * Posts del blog — la tabla aun no esta en database.types.ts (se
+ * regenera con `supabase gen types`). Mientras, tipo manual.
+ */
+export interface Post {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  image: string | null;
+  category: string | null;
+  status: 'draft' | 'published';
+  sort_order: number | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
