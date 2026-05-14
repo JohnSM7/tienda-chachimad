@@ -109,9 +109,51 @@ const isProd = import.meta.env.PROD;
 <!doctype html>
 <html lang="es" class="bg-black">
     <head>
-        {/* Google Tag Manager — lo mas arriba posible en <head> */}
+        {/*
+            Google Tag Manager + Consent Mode v2.
+            1) Define dataLayer y consent defaults (todo DENIED) ANTES
+               de que cargue GTM. Asi los tags arrancan sin trackear.
+            2) Si el usuario ya acepto antes (localStorage), actualiza
+               consent a granted y carga GTM.
+            3) Si no, GTM se carga igual pero en modo "consent denied",
+               sin cookies persistentes. Al aceptar el banner llamamos
+               a gtag('consent','update') y los tags empiezan a trackear.
+
+            Cumple RGPD: ninguna cookie de tracking se instala hasta que
+            el usuario haga click en "Aceptar".
+        */}
         {isProd && (
-            <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`} />
+            <script is:inline set:html={`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              // Defaults: TODO denegado hasta que el usuario decida
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'functionality_storage': 'granted',
+                'security_storage': 'granted',
+                'wait_for_update': 500
+              });
+              // Si el usuario ya acepto en una visita anterior, sube consents
+              try {
+                if (localStorage.getItem('madcry-consent') === 'accepted') {
+                  gtag('consent', 'update', {
+                    'ad_storage': 'granted',
+                    'ad_user_data': 'granted',
+                    'ad_personalization': 'granted',
+                    'analytics_storage': 'granted'
+                  });
+                }
+              } catch(e) {}
+              // Carga del contenedor GTM
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${GTM_ID}');
+            `} />
         )}
 
         <meta charset="UTF-8" />
@@ -640,6 +682,96 @@ const isProd = import.meta.env.PROD;
                 class="max-w-[95vw] max-h-[90vh] object-contain scale-95 transition-transform duration-300 pointer-events-none"
             />
         </div>
+
+        {/* ──── Banner de Cookies / RGPD ──── */}
+        <div
+            id="cookie-banner"
+            class="fixed bottom-0 left-0 right-0 z-[200] hidden bg-black/95 backdrop-blur-md border-t border-white/10"
+            role="dialog"
+            aria-label="Consentimiento de cookies"
+            aria-live="polite"
+        >
+            <div class="max-w-6xl mx-auto p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                <div class="flex-1 space-y-2">
+                    <p class="text-[10px] tracking-[0.3em] uppercase text-red-500 font-bold">
+                        Cookies
+                    </p>
+                    <p class="text-xs md:text-sm text-gray-300 leading-relaxed max-w-3xl">
+                        Usamos cookies de terceros (Google Analytics) para entender qué te interesa
+                        y mejorar el sitio. No te trackeamos sin tu permiso. Más info en
+                        <a href="/privacidad" class="text-white underline hover:text-gray-300">Privacidad</a>.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 md:gap-3 shrink-0">
+                    <button
+                        id="cookie-reject"
+                        type="button"
+                        class="px-5 py-3 text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 hover:text-white border border-white/20 hover:border-white/50 transition"
+                    >
+                        Solo necesarias
+                    </button>
+                    <button
+                        id="cookie-accept"
+                        type="button"
+                        class="px-5 py-3 text-[10px] uppercase tracking-[0.3em] font-bold text-black bg-white hover:bg-gray-200 transition"
+                    >
+                        Aceptar todo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {/* Boton flotante para reabrir el banner — accesible desde /privacidad */}
+        <script is:inline>
+            (function () {
+                var KEY = "madcry-consent";
+                function show() {
+                    var b = document.getElementById("cookie-banner");
+                    if (b) b.classList.remove("hidden");
+                }
+                function hide() {
+                    var b = document.getElementById("cookie-banner");
+                    if (b) b.classList.add("hidden");
+                }
+                function update(granted) {
+                    // Empuja al dataLayer la decision del usuario via Consent Mode v2
+                    if (typeof window.gtag !== "function") {
+                        window.dataLayer = window.dataLayer || [];
+                        window.gtag = function () { window.dataLayer.push(arguments); };
+                    }
+                    window.gtag("consent", "update", {
+                        ad_storage: granted ? "granted" : "denied",
+                        ad_user_data: granted ? "granted" : "denied",
+                        ad_personalization: granted ? "granted" : "denied",
+                        analytics_storage: granted ? "granted" : "denied",
+                    });
+                }
+                function decide(value) {
+                    try { localStorage.setItem(KEY, value); } catch (e) {}
+                    update(value === "accepted");
+                    hide();
+                }
+                function init() {
+                    var b = document.getElementById("cookie-banner");
+                    if (!b) return;
+                    var stored = null;
+                    try { stored = localStorage.getItem(KEY); } catch (e) {}
+                    if (!stored) show();
+                    var ok = document.getElementById("cookie-accept");
+                    var no = document.getElementById("cookie-reject");
+                    if (ok) ok.onclick = function () { decide("accepted"); };
+                    if (no) no.onclick = function () { decide("rejected"); };
+                    // Expone helper global para reabrir desde /privacidad
+                    window.openCookieSettings = function () {
+                        try { localStorage.removeItem(KEY); } catch (e) {}
+                        show();
+                    };
+                }
+                // Inicial + tras transiciones de Astro
+                document.addEventListener("DOMContentLoaded", init);
+                document.addEventListener("astro:page-load", init);
+            })();
+        </script>
     </body>
 </html>
 
