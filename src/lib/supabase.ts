@@ -80,6 +80,26 @@ export type Message = Database['public']['Tables']['messages']['Row'];
 export type Category = Database['public']['Tables']['categories']['Row'];
 
 /**
+ * Configuracion editable del sitio (portada, etc.). Singleton con
+ * id='homepage'. Si el id no existe, fallback a valores por defecto.
+ */
+export interface SiteSettings {
+  id: string;
+  hero_image: string | null;
+  eyebrow_text: string | null;
+  eyebrow_color: 'green' | 'red' | 'white' | null;
+  title: string | null;
+  subtitle: string | null;
+  description: string | null;
+  cta_label: string | null;
+  cta_url: string | null;
+  cta_note: string | null;
+  footer_top: string | null;
+  footer_bottom: string | null;
+  updated_at: string;
+}
+
+/**
  * Posts del blog — la tabla aun no esta en database.types.ts (se
  * regenera con `supabase gen types`). Mientras, tipo manual.
  */

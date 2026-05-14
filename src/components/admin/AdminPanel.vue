@@ -11,8 +11,9 @@ import { signOut, triggerRebuild } from "../../lib/admin";
 import ProductForm from "./ProductForm.vue";
 import CategoryEditor from "./CategoryEditor.vue";
 import BlogEditor from "./BlogEditor.vue";
+import HomeEditor from "./HomeEditor.vue";
 
-const tab = ref<"products" | "orders" | "messages" | "categories" | "blog">("products");
+const tab = ref<"products" | "orders" | "messages" | "categories" | "blog" | "homepage">("products");
 
 const products = ref<Product[]>([]);
 const orders = ref<Order[]>([]);
@@ -353,7 +354,7 @@ onMounted(loadAll);
     <!-- Tabs -->
     <nav class="flex gap-6 mb-6 text-xs uppercase tracking-widest border-b border-zinc-800 flex-wrap">
       <button
-        v-for="t in (['products', 'orders', 'messages', 'blog', 'categories'] as const)"
+        v-for="t in (['products', 'orders', 'messages', 'homepage', 'blog', 'categories'] as const)"
         :key="t"
         @click="tab = t"
         :class="[
@@ -368,9 +369,11 @@ onMounted(loadAll);
               ? `Pedidos (${stats.pendingOrders + stats.paidOrders})`
               : t === "messages"
                 ? `Mensajes (${stats.unreadMessages})`
-                : t === "blog"
-                  ? "Blog"
-                  : "Categorias"
+                : t === "homepage"
+                  ? "Portada"
+                  : t === "blog"
+                    ? "Blog"
+                    : "Categorias"
         }}
       </button>
     </nav>
@@ -663,6 +666,11 @@ onMounted(loadAll);
           {{ m.message }}
         </p>
       </article>
+    </section>
+
+    <!-- ========== HOMEPAGE ========== -->
+    <section v-if="tab === 'homepage'">
+      <HomeEditor />
     </section>
 
     <!-- ========== BLOG ========== -->

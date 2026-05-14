@@ -1,84 +1,144 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { supabase, getPostImageUrl, type SiteSettings } from '../lib/supabase';
+
+// Valores por defecto si la tabla site_settings aun no existe o
+// la fila 'homepage' no esta. Asi nunca rompe el sitio.
+const DEFAULTS = {
+  hero_image: '/images/evento-mena.jpg',
+  eyebrow_text: 'Ya disponible',
+  eyebrow_color: 'green' as 'green' | 'red' | 'white',
+  title: 'MADCRY',
+  subtitle: 'Primera Colección',
+  description: 'Piezas únicas (1/1) pintadas a mano · Disponibles online',
+  cta_label: 'Ver Colección →',
+  cta_url: '/shop?category=madcry',
+  cta_note: 'Envío gratis a partir de 85 €',
+  footer_top: 'MADCRY STUDIO',
+  footer_bottom: 'MENA - APULIAN FOOD',
+};
+
+let home: typeof DEFAULTS = { ...DEFAULTS };
+try {
+  const { data } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('id', 'homepage')
+    .maybeSingle();
+  if (data) {
+    const s = data as SiteSettings;
+    home = {
+      hero_image: s.hero_image || DEFAULTS.hero_image,
+      eyebrow_text: s.eyebrow_text || DEFAULTS.eyebrow_text,
+      eyebrow_color: (s.eyebrow_color as any) || DEFAULTS.eyebrow_color,
+      title: s.title || DEFAULTS.title,
+      subtitle: s.subtitle || DEFAULTS.subtitle,
+      description: s.description || DEFAULTS.description,
+      cta_label: s.cta_label || DEFAULTS.cta_label,
+      cta_url: s.cta_url || DEFAULTS.cta_url,
+      cta_note: s.cta_note || DEFAULTS.cta_note,
+      footer_top: s.footer_top || DEFAULTS.footer_top,
+      footer_bottom: s.footer_bottom || DEFAULTS.footer_bottom,
+    };
+  }
+} catch {
+  // Mantenemos DEFAULTS si la tabla aun no existe (migracion no aplicada)
+}
+
+const eyebrowColorClass = {
+  green: 'text-green-500',
+  red: 'text-red-500',
+  white: 'text-white',
+}[home.eyebrow_color];
+
+const eyebrowDotColorClass = {
+  green: 'bg-green-500',
+  red: 'bg-red-500',
+  white: 'bg-white',
+}[home.eyebrow_color];
+
+const heroImage = getPostImageUrl(home.hero_image);
 
 const eventSchema = {
-  "@context": "https://schema.org",
-  "@type": "ExhibitionEvent",
-  name: "MADCRY · Primera Exposición",
-  startDate: "2026-05-01",
-  endDate: "2026-05-31",
-  eventStatus: "https://schema.org/EventScheduled",
-  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+  '@context': 'https://schema.org',
+  '@type': 'ExhibitionEvent',
+  name: 'MADCRY · Primera Exposición',
+  startDate: '2026-05-01',
+  endDate: '2026-05-31',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   location: {
-    "@type": "Place",
-    name: "Restaurante MENA · Apulian Food",
+    '@type': 'Place',
+    name: 'Restaurante MENA · Apulian Food',
     address: {
-      "@type": "PostalAddress",
-      streetAddress: "Calle Humilladero, 16",
-      addressLocality: "Madrid",
-      addressRegion: "La Latina",
-      postalCode: "28005",
-      addressCountry: "ES",
+      '@type': 'PostalAddress',
+      streetAddress: 'Calle Humilladero, 16',
+      addressLocality: 'Madrid',
+      addressRegion: 'La Latina',
+      postalCode: '28005',
+      addressCountry: 'ES',
     },
   },
-  image: "https://madcry.com/images/evento-mena.jpg",
-  performer: { "@type": "Person", name: "Susana Madriz" },
-  organizer: { "@type": "Organization", name: "MADCRY Studio", url: "https://madcry.com" },
+  image: heroImage.startsWith('http') ? heroImage : `https://madcry.com${heroImage}`,
+  performer: { '@type': 'Person', name: 'Susana Madriz' },
+  organizer: { '@type': 'Organization', name: 'MADCRY Studio', url: 'https://madcry.com' },
 };
 ---
 
 <Layout
     title="MADCRY Studio · Galería de arte urbano y anime · Madrid"
-    description="Primera colección de Susana Madriz disponible online. Piezas únicas (1/1) de arte urbano, dark y anime. Envío a toda Europa."
+    description={home.description}
     schema={eventSchema}
 >
     <main class="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
 
         <div class="absolute inset-0 z-0">
             <img
-                src="/images/evento-mena.jpg"
-                alt="MadCry Exhibition Background"
+                src={heroImage}
+                alt="MadCry Background"
                 class="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all duration-[3s] scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black"></div>
         </div>
 
         <div class="z-10 text-center space-y-4 px-4">
-            <p class="text-green-500 text-xs tracking-[0.5em] font-bold uppercase animate-pulse flex items-center justify-center gap-3">
-                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                Ya disponible
+            <p class:list={["text-xs tracking-[0.5em] font-bold uppercase animate-pulse flex items-center justify-center gap-3", eyebrowColorClass]}>
+                <span class:list={["w-2 h-2 rounded-full", eyebrowDotColorClass]}></span>
+                {home.eyebrow_text}
             </p>
 
             <h1 class="text-6xl md:text-9xl font-bold uppercase tracking-tighter text-white drop-shadow-2xl leading-none">
-                MADCRY<br/>
+                {home.title}<br/>
             </h1>
             <h2 class="text-3xl md:text-5xl font-light uppercase tracking-widest text-gray-300 drop-shadow-2xl">
-                Primera Colección
+                {home.subtitle}
             </h2>
 
             <p class="text-gray-400 text-xs md:text-sm tracking-[0.2em] uppercase max-w-lg mx-auto pt-4 leading-relaxed">
-                Piezas únicas (1/1) pintadas a mano · Disponibles online
+                {home.description}
             </p>
 
             <div class="pt-8 flex flex-col items-center justify-center gap-4">
                 <a
-                    href="/shop?category=madcry"
+                    href={home.cta_url}
                     class="group relative inline-flex px-12 py-4 overflow-hidden border border-white/40 font-medium text-white transition-all duration-300 hover:bg-white hover:text-black cursor-pointer"
                 >
                     <span class="absolute inset-0 border-0 group-hover:border-[25px] ease-linear duration-100 transition-all border-white rounded-full"></span>
                     <span class="relative w-full text-center uppercase tracking-[0.3em] text-xs md:text-sm font-bold whitespace-nowrap flex items-center gap-3 justify-center">
-                        Ver Colección →
+                        {home.cta_label}
                     </span>
                 </a>
-                <p class="text-[10px] tracking-[0.4em] uppercase text-gray-500">
-                    Envío gratis a partir de 85 €
-                </p>
+                {home.cta_note && (
+                    <p class="text-[10px] tracking-[0.4em] uppercase text-gray-500">
+                        {home.cta_note}
+                    </p>
+                )}
             </div>
         </div>
 
         <div class="absolute bottom-8 w-full text-center text-gray-600 text-[10px] tracking-[0.3em] uppercase z-10 flex flex-col gap-1">
-            <span>MADCRY STUDIO</span>
-            <span>MENA - APULIAN FOOD</span>
+            <span>{home.footer_top}</span>
+            <span>{home.footer_bottom}</span>
         </div>
     </main>
 </Layout>
