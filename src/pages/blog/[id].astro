@@ -3,28 +3,14 @@ import Layout from "../../layouts/Layout.astro";
 import { supabase, getPostImageUrl, type Post } from "../../lib/supabase";
 
 export async function getStaticPaths() {
-    // Lee de BD; fallback a fichero estatico si la tabla aun no existe.
-    let posts: Array<Partial<Post> & { slug: string }> = [];
-    try {
-        const { data, error } = await supabase
-            .from("posts_public")
-            .select("*");
-        if (error) throw error;
-        posts = data ?? [];
-    } catch {
-        const { posts: legacy } = await import("../../data/posts.js");
-        posts = legacy.map((p: any) => ({
-            slug: p.id,
-            title: p.title,
-            excerpt: p.excerpt,
-            content: p.content,
-            image: p.image,
-            category: p.category,
-            published_at: p.date,
-        }));
+    const { data, error } = await supabase
+        .from("posts_public")
+        .select("*");
+    if (error) {
+        console.error("Error leyendo posts_public:", error.message);
+        return [];
     }
-
-    return posts.map((post) => ({
+    return (data ?? []).map((post) => ({
         params: { id: post.slug },
         props: { post },
     }));

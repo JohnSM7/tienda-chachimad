@@ -2,30 +2,21 @@
 import Layout from "../layouts/Layout.astro";
 import { supabase, getPostImageUrl, type Post } from "../lib/supabase";
 
-// Lee posts publicados de la BD. Fallback al fichero estatico
-// src/data/posts.js si la tabla aun no esta creada (migracion no
-// aplicada) — evita romper el sitio mientras Susana ejecuta el SQL.
+// Lee posts publicados de la vista publica de BD.
+// Si la vista no existe (migracion no aplicada) o hay error, se
+// muestra el placeholder de "sin posts" en vez de fallback — asi
+// el problema se ve claro en vez de mostrar contenido antiguo.
 let posts: Array<Pick<Post, "slug" | "title" | "excerpt" | "image" | "category" | "published_at">> = [];
-try {
-    const { data, error } = await supabase
-        .from("posts_public")
-        .select("slug, title, excerpt, image, category, published_at, sort_order")
-        .order("sort_order", { ascending: true })
-        .order("published_at", { ascending: false });
-    if (error) throw error;
-    posts = data ?? [];
-} catch {
-    // Fallback al fichero estatico — solo durante la migracion
-    const { posts: legacy } = await import("../data/posts.js");
-    posts = legacy.map((p: any) => ({
-        slug: p.id,
-        title: p.title,
-        excerpt: p.excerpt,
-        image: p.image,
-        category: p.category,
-        published_at: p.date,
-    }));
+const { data: postsData, error: postsError } = await supabase
+    .from("posts_public")
+    .select("slug, title, excerpt, image, category, published_at, sort_order")
+    .order("sort_order", { ascending: true })
+    .order("published_at", { ascending: false });
+
+if (postsError) {
+    console.error("Error leyendo posts_public:", postsError.message);
 }
+posts = postsData ?? [];
 
 function formatDate(iso: string | null): string {
     if (!iso) return "";
